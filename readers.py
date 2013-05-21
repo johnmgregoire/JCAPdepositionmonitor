@@ -34,10 +34,18 @@ def followingRead(filename):
     # opens csv file as read-only with binary line endings
     with open(filename, 'rb') as csvfile:
         lastEOFpos = 0
+        colNames = []
         while True:
             # move to position where EOF was previously
             csvfile.seek(lastEOFpos)
             data = csv.reader(csvfile, delimiter=' ', quotechar='|')
+
+            # Gets the column names -- verify that no data is lost
+            if(lastEOFpos == 0):
+                for x in data:
+                  colNames = x
+                  break
+
             # prints entire row of data for debugging purposes
             for row in data:
                 print row
