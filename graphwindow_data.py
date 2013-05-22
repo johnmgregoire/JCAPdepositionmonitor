@@ -7,7 +7,6 @@
 Displays single auto-updating data graph
 """
 
-import readers
 import sys, csv
 from PyQt4 import QtGui, QtCore
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
@@ -26,6 +25,10 @@ from pylab import *
     - loading previous data when switching graphs
     - should all graphs be initialized at the beginning, or initialized
         only when clicked on?
+    - incomplete set of data in DATA_DICT when graphs are updated
+    - Different graphs are affected by terminal/shell activity due to them
+        technically being on the same look/update information. This is likely
+        not fixable by simply seperating them, probably threading is necessary.
 
     TO DO:
     - determine condition for reader thread to end
@@ -49,8 +52,36 @@ class GraphWindow(QtGui.QMainWindow):
         # set window size and position on screen
         self.setGeometry(300, 300, 800, 600)
         self.setWindowTitle('Graph')
-        self.setCentralWidget(Graph(self))
+        self.activeGraphs = []
+
+
+        self.main_widget = QtGui.QWidget(self)
+        graph1 = Graph(self.main_widget)
+        graph2 = Graph(self.main_widget)
+
+        self.activeGraphs += [graph1]
+        self.activeGraphs += [graph2]
+
+        
+        l = QtGui.QVBoxLayout(self.main_widget)
+
+        l.addWidget(graph1)
+        l.addWidget(graph2)
+
+        self.setCentralWidget(self.main_widget)
+        
+        #self.setCentralWidget(graph1)
+        timer = QtCore.QTimer(self)
+        QtCore.QObject.connect(timer, QtCore.SIGNAL("timeout()"), self.windowUpdater)
+        
+        # update graph every 1000 milliseconds
+        timer.start(1000)
         self.show()
+
+    def windowUpdater(self):
+        
+        for x in self.activeGraphs:
+            x.updatePlot()
 
 
 """ thread that reads data from file """
@@ -96,7 +127,7 @@ class DataReader(QtCore.QThread):
                 if len(row) == numColumns:
                     for col in range(len(row)):
                        heading = DATA_HEADINGS.get(col)
-                       DATA_DICT[heading] += row[col]
+                       DATA_DICT[heading] += [row[col]]
                     print row
                 else:
                     partial_rows = True
@@ -128,31 +159,14 @@ class Graph(FigureCanvas):
         FigureCanvas.updateGeometry(self)
         # variable for sample graph
         self.xLim = 4
-        timer = QtCore.QTimer(self)
-        QtCore.QObject.connect(timer, QtCore.SIGNAL("timeout()"), self.updatePlot)
-        # data received every 1000 milliseconds
-        timer.start(1000)
 
     """ draws sample plot that is displayed when application is opened """
     def initPlot(self):
         self.axes = self.figure.add_subplot(111)
 
-        X = np.linspace(-np.pi, np.pi, 256, endpoint=True)
-        C,S = np.cos(X), np.sin(X)
-
-        self.axes.plot(X,C)
-        self.axes.plot(X,S)
-
     """ function that updates sample plot every second """
     def updatePlot(self):
-        X = np.linspace(-np.pi, np.pi, 256, endpoint=True)
-        C,S = np.cos(X), np.sin(X)
-
-        # increase the x-axis range by 1 every second
-        self.xLim += 1
-        setp(self.axes, xlim=(-4, self.xLim))
-        self.axes.plot(X,C)
-        self.axes.plot(X,S)
+        self.axes.plot(DATA_DICT['Value'])
 
         self.draw()
 
