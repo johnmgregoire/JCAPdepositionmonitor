@@ -88,10 +88,10 @@ class DataReader(QtCore.QThread):
             data = csv.reader(self.datafile)
             for row in data:
                 """ process colums:
-                check if row is complete
-                if so, add data to each appropriate column array
-                if not, save partial row to local variable container
-                if partial container is full, parse container
+                    check if row is complete
+                    if so, add data to each appropriate column array
+                    if not, save partial row to local variable container
+                    if partial container is full, parse container
                 """
                 if len(row) == numColumns:
                     for col in range(len(row)):
