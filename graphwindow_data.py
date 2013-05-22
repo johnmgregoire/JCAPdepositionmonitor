@@ -27,20 +27,22 @@ from pylab import *
     - should all graphs be initialized at the beginning, or initialized
         only when clicked on?
 
-    THINGS TO LOOK AT TOMORROW:
-    - events
-    - timer initialized to 0 - what does it actually do?
-
-    -AS, 5/21
+    TO DO:
+    - determine condition for reader thread to end
+    - take data on certain conditions?
+    - try/catch with partial rows (and other places)
 """
-    
+
+DATA_DICT = {}
+DATA_HEADINGS = {}
 
 """ main window of the application """
 class GraphWindow(QtGui.QMainWindow):
 
     def __init__(self):
         super(GraphWindow, self).__init__()
-        self.initData('testcsv.csv')
+        reader = DataReader(filename='testcsv.csv')
+        reader.start()
         self.initUI()
 
     def initUI(self):
@@ -50,19 +52,65 @@ class GraphWindow(QtGui.QMainWindow):
         self.setCentralWidget(Graph(self))
         self.show()
 
-    def initData(self, filename):
-        readers.followingRead(filename)
 
-# this function was used when data collection ran on its own timer
-"""    def updateData(self):
-        # move to position where EOF was previously
-        self.datafile.seek(self.lastEOFpos)
-        data = csv.reader(self.datafile)
-        # prints entire row of data for debugging purposes
-        for row in data:
-            print row
-        # save current EOF position
-        self.lastEOFpos = self.datafile.tell() """
+""" thread that reads data from file """
+class DataReader(QtCore.QThread):
+    def __init__(self, parent=None, filename='default.csv'):
+        super(DataReader, self).__init__()
+
+        self.initData(filename)
+
+    def initData(self, filename):
+        self.datafile = open(filename, 'rb')
+        # read first line and create data arrays
+        headings = self.datafile.readline().split(',')
+        self.numColumns = len(headings)
+        # strip off '/r/n' at end of line - only works on Windows
+        headings[self.numColumns-1] = headings[self.numColumns-1][:-2]
+        print headings
+        print self.numColumns
+        global DATA_DICT
+        global DATA_HEADINGS
+        for col in range(len(headings)):
+            DATA_HEADINGS[col] = headings[col]
+            DATA_DICT[headings[col]] = []
+        print DATA_HEADINGS
+        self.lastEOFpos = self.datafile.tell()
+
+    def run(self):
+        partial_rows = False
+        partial_row_container = []
+        global DATA_DICT
+        numColumns = len(DATA_DICT)
+        while True:
+            # move to position where EOF was previously
+            self.datafile.seek(self.lastEOFpos)
+            data = csv.reader(self.datafile)
+            for row in data:
+                """ process colums:
+                check if row is complete
+                if so, add data to each appropriate column array
+                if not, save partial row to local variable container
+                if partial container is full, parse container
+                """
+                if len(row) == numColumns:
+                    for col in range(len(row)):
+                       heading = DATA_HEADINGS.get(col)
+                       DATA_DICT[heading] += row[col]
+                    print row
+                else:
+                    partial_rows = True
+                    partial_row_container += row
+                    if len(partial_row_container) == numColumns:
+                        for col in range(len(partial_row_container)):
+                           heading = DATA_HEADINGS.get(col)
+                           DATA_DICT[heading] += partial_row_container[col]
+                        partial_rows = False
+                        print partial_row_container
+                        partial_row_container = []
+            # save current EOF position
+            self.lastEOFpos = self.datafile.tell()
+
 
 """ widget to represent an auto-updating graph """
 class Graph(FigureCanvas):
