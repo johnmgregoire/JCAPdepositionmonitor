@@ -15,12 +15,17 @@ import logging
 
 testfile = 'testcsv.csv'
 
+num = 0
+additionalCols = 6
 
 csvfile = open(testfile, 'wb')
 csvwriter = csv.writer(csvfile)
-csvwriter.writerow([ "Date" , "Time" , "Value" , "Value2" , "AValue" ])
-num = 0
+headers =  [ "Date" , "Time" , "Value" ]
 
+for j in range(additionalCols):
+    headers += [ "Value"+str(j) ]
+
+csvwriter.writerow(headers)
 
 while num < 1000:
     
@@ -41,8 +46,13 @@ while num < 1000:
 
     # Done in order to slow down the processing
     # print Ttime
+
+    content = [ date , Ttime , str(num%50)]
     
-    csvwriter.writerow([ date , Ttime , str(num%50) , str(num%100) , str(num%200) ])
+    for j in range(2,additionalCols+2):
+        content += [ str(num % (j*50))]
+        
+    csvwriter.writerow(content)
     
     num += 1
 
