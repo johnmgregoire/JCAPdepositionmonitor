@@ -13,9 +13,10 @@ from datareader import *
 class Graph(FigureCanvas):
 
     """ sets up Figure object, plot, and auto-updating timer """
-    def __init__(self, parent="None", width=5, height=4, dpi=100):
+    def __init__(self, parent="None", width=3, height=2, dpi=100,
+                 xvarname="None", yvarname="None"):
         self.figure = Figure(figsize=(width, height), dpi=dpi)
-        self.initPlot()
+        self.initPlot(xvarname, yvarname)
         FigureCanvas.__init__(self, self.figure)
         # Graph will have a parent widget if contained in a layout
         self.setParent(parent)
@@ -26,12 +27,17 @@ class Graph(FigureCanvas):
         # variable for sample graph
         self.xLim = 4
 
-    """ draws sample plot that is displayed when application is opened """
-    def initPlot(self):
+    """ draws plot of first variable versus time
+        that is displayed when application is opened """
+    def initPlot(self, xvarname, yvarname):
         self.axes = self.figure.add_subplot(111)
+        self.axes.set_xlabel(xvarname)
+        self.axes.set_ylabel(yvarname)
 
-    """ function that updates sample plot every second """
-    def updatePlot(self):
-        self.axes.plot(DATA_DICT['Value'])
+    """ function that updates plot every second """
+    def updatePlot(self, xvarname, yvarname):
+        x=DATA_DICT[yvarname]
+        print x
+        self.axes.plot(x) 
 
         self.draw()

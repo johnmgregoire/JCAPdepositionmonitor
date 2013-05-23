@@ -29,6 +29,7 @@ from profilecreator import *
     - Where to actually save the profiles
     - Do we want to only run with a file?
     - figure out if importing a file twice is bad
+    - fix reader so it doesn't put partial lines in dictionary
 """
 
 """ main window of the application """
@@ -42,10 +43,9 @@ class GraphWindow(QtGui.QMainWindow):
 
     def initUI(self):
         # set window size and position on screen
-        self.setGeometry(300, 300, 800, 600)
+        self.setGeometry(300, 200, 600, 800)
         self.setWindowTitle('Graph')
         self.activeGraphs = []
-
 
         # set up the menu bar and pop up windows
         menubar = self.menuBar()
@@ -56,8 +56,11 @@ class GraphWindow(QtGui.QMainWindow):
         optionsMenu.addAction(optionsAction)
         
         self.main_widget = QtGui.QWidget(self)
-        graph1 = Graph(self.main_widget)
-        graph2 = Graph(self.main_widget)
+
+        # make drop-down menu for selecting graphs
+        global DATA_HEADINGS
+        graph1 = Graph(self.main_widget, xvarname="Time", yvarname=DATA_HEADINGS.get(2))
+        graph2 = Graph(self.main_widget, xvarname="Time", yvarname=DATA_HEADINGS.get(2))
 
         self.activeGraphs += [graph1]
         self.activeGraphs += [graph2]
@@ -69,7 +72,6 @@ class GraphWindow(QtGui.QMainWindow):
 
         self.setCentralWidget(self.main_widget)
         
-        #self.setCentralWidget(graph1)
         timer = QtCore.QTimer(self)
         QtCore.QObject.connect(timer, QtCore.SIGNAL("timeout()"), self.updateWindow)
         
@@ -80,7 +82,7 @@ class GraphWindow(QtGui.QMainWindow):
     def updateWindow(self):
         
         for x in self.activeGraphs:
-            x.updatePlot()
+            x.updatePlot('Time', DATA_HEADINGS.get(2))
 
     def createProfile(self):
         self.profileCreator = ProfileCreator()
