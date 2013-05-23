@@ -14,14 +14,9 @@ from matplotlib.figure import Figure
 from pylab import *
 
 """ Functionality to add:
-    - connect to data file
-    - get correct column from data file
-    - read data file at regular (1 second?) intervals
-    - update plot with all new data
     - reset axis labels while maintaining same range (i.e., last 10 minutes)
 
     Concerns for multiple graphs:
-    - threading
     - loading previous data when switching graphs
     - should all graphs be initialized at the beginning, or initialized
         only when clicked on?
@@ -34,6 +29,8 @@ from pylab import *
     - determine condition for reader thread to end
     - take data on certain conditions?
     - try/catch with partial rows (and other places)
+    - Where to actually save the profiles
+    - Do we want to only run with a file? 
 """
 
 DATA_DICT = {}
@@ -55,6 +52,19 @@ class GraphWindow(QtGui.QMainWindow):
         self.activeGraphs = []
 
 
+        # set up the menu bar and pop up windows
+        menubar = self.menuBar()
+        fileMenu = menubar.addMenu('&File')
+        optionsMenu = menubar.addMenu('&Options')
+
+        optionsAction = QtGui.QAction('&Add Profile', self)
+
+        #optionsAction.triggered.connect(PROFILE MENU POPS UP)
+        # we need a function here to create a ProfileCreator() widget
+        optionsMenu.addAction(optionsAction)
+    
+
+        
         self.main_widget = QtGui.QWidget(self)
         graph1 = Graph(self.main_widget)
         graph2 = Graph(self.main_widget)
@@ -166,11 +176,22 @@ class Graph(FigureCanvas):
 
     """ function that updates sample plot every second """
     def updatePlot(self):
-        self.axes.plot(DATA_DICT['Value'])
+        #self.axes.plot(DATA_DICT['Value'])
 
         self.draw()
 
+"""widget to make profiles"""
+class ProfileCreator(QtGui.QWidget):
 
+    """sets up the Widget"""
+    def __init__(self):
+        super(ProfileCreator, self).__init__()
+
+        self.initUI()
+
+    def initUI(self):
+        pass
+        
 
 def main():
     app = QtGui.QApplication(sys.argv) 
