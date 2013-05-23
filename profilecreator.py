@@ -5,6 +5,7 @@
 
 from PyQt4 import QtGui
 from datareader import *
+import pickle 
 
 """widget to make profiles"""
 class ProfileCreator(QtGui.QWidget):
@@ -20,7 +21,7 @@ class ProfileCreator(QtGui.QWidget):
         self.setWindowTitle('Create a New Profile')
         vBox = QtGui.QVBoxLayout(self)
         instructions = QtGui.QLabel()
-        instructions.setText("Choose which variables to graph.")
+        instructions.setText("Choose up to 8 variables to graph.")
         instructions.setMaximumHeight(20)
         vBox.addWidget(instructions)
         checkField = QtGui.QWidget()
@@ -36,7 +37,7 @@ class ProfileCreator(QtGui.QWidget):
         self.getVars()
         okButton = QtGui.QPushButton("OK")
         # this will need to be changed to actually add profiles
-        okButton.clicked.connect(self.close)
+        okButton.clicked.connect(self.saveProfile)
         cancelButton = QtGui.QPushButton("Cancel")
         cancelButton.clicked.connect(self.close)
         buttons = QtGui.QHBoxLayout()
@@ -46,16 +47,32 @@ class ProfileCreator(QtGui.QWidget):
 
     def getVars(self):
         global DATA_HEADINGS
-        print DATA_HEADINGS
-        print len(DATA_HEADINGS)
-        checkboxes = []
-        for index in range(len(DATA_HEADINGS)):
-            checkboxes += [QtGui.QCheckBox(DATA_HEADINGS.get(index), self)]
-            if index <= len(DATA_HEADINGS)/2:
-                self.col1.addWidget(checkboxes[index])
+        self.checkboxes = []
+        for index in range(len(DATA_HEADINGS)-2):
+            self.checkboxes += [QtGui.QCheckBox(DATA_HEADINGS.get(index+2),
+                                                self)]
+            if index <= (len(DATA_HEADINGS)-2)/2:
+                self.col1.addWidget(self.checkboxes[index])
             else:
-                self.col2.addWidget(checkboxes[index])
+                self.col2.addWidget(self.checkboxes[index])
 
     def launch(self):
         self.show()
-        
+
+    def saveProfile(self):
+        #get varsList from checked boxes
+        varsList = []
+        for box in self.checkboxes:
+            if box.isChecked():
+                varsList += [str(box.text())]
+        if len(varsList) > 8:
+            tooManyVars()
+            return
+        elif len(varsList) < 1:
+            tooFewVars()
+            return
+        # eventually change to 'wb+' so we can append to file
+        savefile = open('saved_profiles.txt', 'wb')
+        pickle.dump(varsList, savefile)
+        self.close()
+            

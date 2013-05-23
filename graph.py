@@ -3,6 +3,7 @@
 # Last Updated: 5/23/2013
 # For JCAP
 
+import datetime
 from PyQt4 import QtGui
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -36,8 +37,11 @@ class Graph(FigureCanvas):
 
     """ function that updates plot every second """
     def updatePlot(self, xvarname, yvarname):
-        x=DATA_DICT[yvarname]
-        print x
-        self.axes.plot(x) 
+        yvar = DATA_DICT.get(yvarname)
+        list_of_times = []
+        for date_string in DATA_DICT.get(xvarname):
+            list_of_times += [datetime.datetime.strptime(date_string, "%H:%M:%S.%f")]
+        time = matplotlib.dates.date2num(list_of_times)
+        self.axes.plot_date(time, yvar) 
 
         self.draw()

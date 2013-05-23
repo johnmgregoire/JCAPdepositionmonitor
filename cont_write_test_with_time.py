@@ -18,14 +18,16 @@ csvfile = open(testfile, 'wb')
 csvwriter = csv.writer(csvfile)
 csvwriter.writerow([ "Date" , "Time" , "Value" ])
 num = 0 
-while num < 100000:
+while num < 1000:
     fulldate = strftime("%x %H:%M:%S", gmtime())
     microSec = str(time.time()).split('.')
     currentDT = fulldate.split()
     date = str(currentDT[0])
     Ttime = currentDT[1]+'.'+microSec[-1]
+    #Ttime = currentDT[1]
     print Ttime
     csvwriter.writerow([ date , Ttime , str(num%50) ])
+    #csvfile.flush()
     num += 1
 
 csvfile.close()

@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/21/2013
-# Last Updated: 5/22/2013
+# Last Updated: 5/23/2013
 # For JCAP
 
 """
@@ -59,16 +59,23 @@ class GraphWindow(QtGui.QMainWindow):
 
         # make drop-down menu for selecting graphs
         global DATA_HEADINGS
-        graph1 = Graph(self.main_widget, xvarname="Time", yvarname=DATA_HEADINGS.get(2))
-        graph2 = Graph(self.main_widget, xvarname="Time", yvarname=DATA_HEADINGS.get(2))
+        self.vars = []
+        selectVar = QtGui.QComboBox()
+        for index in range(2, len(DATA_HEADINGS)):
+            self.vars += [DATA_HEADINGS.get(index)]
+        for var in self.vars:
+            selectVar.addItem(var)
+            
+        graph1 = Graph(self.main_widget, xvarname="Time", yvarname=self.vars[0])
+        graph2 = Graph(self.main_widget, xvarname="Time", yvarname=self.vars[0])
 
         self.activeGraphs += [graph1]
         self.activeGraphs += [graph2]
 
-        l = QtGui.QVBoxLayout(self.main_widget)
-
-        l.addWidget(graph1)
-        l.addWidget(graph2)
+        layout = QtGui.QVBoxLayout(self.main_widget)
+        layout.addWidget(selectVar)
+        layout.addWidget(graph1)
+        layout.addWidget(graph2)
 
         self.setCentralWidget(self.main_widget)
         
@@ -82,7 +89,7 @@ class GraphWindow(QtGui.QMainWindow):
     def updateWindow(self):
         
         for x in self.activeGraphs:
-            x.updatePlot('Time', DATA_HEADINGS.get(2))
+            x.updatePlot('Time', self.vars[0])
 
     def createProfile(self):
         self.profileCreator = ProfileCreator()
