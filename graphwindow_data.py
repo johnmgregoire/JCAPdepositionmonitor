@@ -7,7 +7,6 @@
 Displays single auto-updating data graph
 """
 
-from datareader import *
 from graph import *
 from profilecreator import *
 
@@ -28,7 +27,8 @@ from profilecreator import *
     - take data on certain conditions?
     - try/catch with partial rows (and other places)
     - Where to actually save the profiles
-    - Do we want to only run with a file? 
+    - Do we want to only run with a file?
+    - figure out if importing a file twice is bad
 """
 
 """ main window of the application """
@@ -49,11 +49,10 @@ class GraphWindow(QtGui.QMainWindow):
 
         # set up the menu bar and pop up windows
         menubar = self.menuBar()
-        self.profileCreator = ProfileCreator()
         fileMenu = menubar.addMenu('&File')
         optionsMenu = menubar.addMenu('&Options')
         optionsAction = QtGui.QAction('&Add Profile', self)
-        optionsAction.triggered.connect(self.launchWidget(self.profileCreator))
+        optionsAction.triggered.connect(self.createProfile)
         optionsMenu.addAction(optionsAction)
         
         self.main_widget = QtGui.QWidget(self)
@@ -83,8 +82,9 @@ class GraphWindow(QtGui.QMainWindow):
         for x in self.activeGraphs:
             x.updatePlot()
 
-    def launchWidget(self, widget):
-        widget.launch()
+    def createProfile(self):
+        self.profileCreator = ProfileCreator()
+        self.profileCreator.launch()
 
 
 

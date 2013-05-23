@@ -7,6 +7,7 @@ from PyQt4 import QtGui
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from pylab import *
+from datareader import *
 
 """ widget to represent an auto-updating graph """
 class Graph(FigureCanvas):
@@ -31,7 +32,6 @@ class Graph(FigureCanvas):
 
     """ function that updates sample plot every second """
     def updatePlot(self):
-        # this is commented out while we work on UI
-        #self.axes.plot(DATA_DICT['Value'])
+        self.axes.plot(DATA_DICT['Value'])
 
         self.draw()
