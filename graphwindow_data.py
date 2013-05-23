@@ -49,16 +49,12 @@ class GraphWindow(QtGui.QMainWindow):
 
         # set up the menu bar and pop up windows
         menubar = self.menuBar()
+        self.profileCreator = ProfileCreator()
         fileMenu = menubar.addMenu('&File')
         optionsMenu = menubar.addMenu('&Options')
-
         optionsAction = QtGui.QAction('&Add Profile', self)
-
-        #optionsAction.triggered.connect(PROFILE MENU POPS UP)
-        # we need a function here to create a ProfileCreator() widget
+        optionsAction.triggered.connect(self.launchWidget(self.profileCreator))
         optionsMenu.addAction(optionsAction)
-    
-
         
         self.main_widget = QtGui.QWidget(self)
         graph1 = Graph(self.main_widget)
@@ -67,7 +63,6 @@ class GraphWindow(QtGui.QMainWindow):
         self.activeGraphs += [graph1]
         self.activeGraphs += [graph2]
 
-        
         l = QtGui.QVBoxLayout(self.main_widget)
 
         l.addWidget(graph1)
@@ -77,16 +72,19 @@ class GraphWindow(QtGui.QMainWindow):
         
         #self.setCentralWidget(graph1)
         timer = QtCore.QTimer(self)
-        QtCore.QObject.connect(timer, QtCore.SIGNAL("timeout()"), self.windowUpdater)
+        QtCore.QObject.connect(timer, QtCore.SIGNAL("timeout()"), self.updateWindow)
         
         # update graph every 1000 milliseconds
         timer.start(1000)
         self.show()
 
-    def windowUpdater(self):
+    def updateWindow(self):
         
         for x in self.activeGraphs:
             x.updatePlot()
+
+    def launchWidget(self, widget):
+        widget.launch()
 
 
 

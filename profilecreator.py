@@ -16,4 +16,7 @@ class ProfileCreator(QtGui.QWidget):
 
     def initUI(self):
         pass
+
+    def launch(self):
+        self.show()
         
