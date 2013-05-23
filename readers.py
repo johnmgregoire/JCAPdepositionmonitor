@@ -54,7 +54,7 @@ def followingRead(filename):
 
 """ this uses cont_write_test.py, which continuously writes
     to a csv file (for testing purposes) """
-# followingRead('testcsv.csv')
+followingRead('testcsv.csv')
             
 
                 

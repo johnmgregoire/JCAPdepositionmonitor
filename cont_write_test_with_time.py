@@ -16,7 +16,7 @@ import logging
 testfile = 'testcsv.csv'
 
 num = 0
-additionalCols = 6
+additionalCols = 8
 
 csvfile = open(testfile, 'wb')
 csvwriter = csv.writer(csvfile)

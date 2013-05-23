@@ -20,16 +20,18 @@ from profilecreator import *
     - incomplete set of data in DATA_DICT when graphs are updated
     - Different graphs are affected by terminal/shell activity due to them
         technically being on the same look/update information. This is likely
-        not fixable by simply seperating them, probably threading is necessary.
+        not fixable by simply separating them, probably threading is necessary.
+        (This is probably not an issue anymore.)
 
     TO DO:
     - determine condition for reader thread to end
     - take data on certain conditions?
     - try/catch with partial rows (and other places)
-    - Where to actually save the profiles
-    - Do we want to only run with a file?
-    - figure out if importing a file twice is bad
     - fix reader so it doesn't put partial lines in dictionary
+
+    More things to consider:
+    - Is importing a file more than once dangerous?
+    - Should we use a QListWidget for the profile creator?
 """
 
 """ main window of the application """
@@ -57,23 +59,28 @@ class GraphWindow(QtGui.QMainWindow):
         
         self.main_widget = QtGui.QWidget(self)
 
-        # make drop-down menu for selecting graphs
+        # get variables from spreadsheet
         global DATA_HEADINGS
         self.vars = []
-        selectVar = QtGui.QComboBox()
         for index in range(2, len(DATA_HEADINGS)):
             self.vars += [DATA_HEADINGS.get(index)]
-        for var in self.vars:
-            selectVar.addItem(var)
-            
+
+        # initialize default graphs
         graph1 = Graph(self.main_widget, xvarname="Time", yvarname=self.vars[0])
         graph2 = Graph(self.main_widget, xvarname="Time", yvarname=self.vars[0])
 
         self.activeGraphs += [graph1]
         self.activeGraphs += [graph2]
 
+        # make drop-down menu for selecting graphs      
+        self.selectVar = QtGui.QComboBox()
+        for var in self.vars:
+            self.selectVar.addItem(var)
+
+        self.selectVar.activated[str].connect(self.selectGraph)
+            
         layout = QtGui.QVBoxLayout(self.main_widget)
-        layout.addWidget(selectVar)
+        layout.addWidget(self.selectVar)
         layout.addWidget(graph1)
         layout.addWidget(graph2)
 
@@ -86,10 +93,15 @@ class GraphWindow(QtGui.QMainWindow):
         timer.start(1000)
         self.show()
 
-    def updateWindow(self):
-        
+    def selectGraph(self, varName):
+        varString = str(varName)
+        graph = Graph(self.main_widget, xvarname = "Time", yvarname = varString)
+        self.activeGraphs[0] = graph
+        print self.activeGraphs[0]
+
+    def updateWindow(self): 
         for x in self.activeGraphs:
-            x.updatePlot('Time', self.vars[0])
+            x.updatePlot()
 
     def createProfile(self):
         self.profileCreator = ProfileCreator()

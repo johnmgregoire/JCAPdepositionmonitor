@@ -35,15 +35,12 @@ class ProfileCreator(QtGui.QWidget):
         self.col2.setAlignment(QtCore.Qt.AlignTop)
         # add all checkboxes to col1 and col2
         self.getVars()
-        okButton = QtGui.QPushButton("OK")
-        # this will need to be changed to actually add profiles
-        okButton.clicked.connect(self.saveProfile)
-        cancelButton = QtGui.QPushButton("Cancel")
-        cancelButton.clicked.connect(self.close)
-        buttons = QtGui.QHBoxLayout()
-        vBox.addLayout(buttons)
-        buttons.addWidget(okButton)
-        buttons.addWidget(cancelButton)
+        buttons = QtGui.QDialogButtonBox()
+        buttons.setStandardButtons(QtGui.QDialogButtonBox.Ok
+                                         | QtGui.QDialogButtonBox.Cancel)
+        buttons.accepted.connect(self.saveProfile)
+        buttons.rejected.connect(self.close)
+        vBox.addWidget(buttons)
 
     def getVars(self):
         global DATA_HEADINGS
@@ -66,13 +63,26 @@ class ProfileCreator(QtGui.QWidget):
             if box.isChecked():
                 varsList += [str(box.text())]
         if len(varsList) > 8:
-            tooManyVars()
+            self.tooManyVars()
             return
         elif len(varsList) < 1:
-            tooFewVars()
+            self.tooFewVars()
             return
         # eventually change to 'wb+' so we can append to file
         savefile = open('saved_profiles.txt', 'wb')
         pickle.dump(varsList, savefile)
+        print 'Saved!'
         self.close()
+
+    def tooManyVars(self):
+        error = QtGui.QMessageBox.question(self, 'None',
+                                           'You can only put 8 graphs in a profile.',
+                                           QtGui.QMessageBox.Ok)
+
+    def tooFewVars(self):
+        error = QtGui.QMessageBox.question(self, 'None',
+                                           'Please select at least one graph for this profile.',
+                                           QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
+        if (error == QtGui.QMessageBox.Cancel):
+            self.close()
             

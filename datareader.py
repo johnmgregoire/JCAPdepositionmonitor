@@ -37,6 +37,7 @@ class DataReader(QtCore.QThread):
         partial_rows = False
         partial_row_container = []
         global DATA_DICT
+        global DATA_HEADINGS
         numColumns = len(DATA_DICT)
         while True:
             # move to position where EOF was previously
