@@ -18,7 +18,7 @@ csvfile = open(testfile, 'wb')
 csvwriter = csv.writer(csvfile)
 csvwriter.writerow([ "Date" , "Time" , "Value" ])
 num = 0 
-while num < 100000:
+while num < 10000:
     fulldate = strftime("%x %H:%M:%S", gmtime())
     microSec = str(time.time()).split('.')
     currentDT = fulldate.split()
