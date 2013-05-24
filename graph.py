@@ -43,9 +43,18 @@ class Graph(FigureCanvas):
         yvars = DATA_DICT.get(self.yvar)
         list_of_times = []
         for date_string in DATA_DICT.get(self.xvar):
-            list_of_times += [datetime.datetime.strptime(date_string, "%H:%M:%S:%f")]
+            try:
+                list_of_times += [datetime.datetime.strptime
+                                  (date_string, "%H:%M:%S:%f")]
+            except ValueError:
+                print "time cut off"
+                pass
         time = matplotlib.dates.date2num(list_of_times)
-        self.axes.plot_date(time, yvars) 
+        try:
+            self.axes.plot_date(time, yvars)
+        except ValueError:
+            print "column not updated: " + self.yvar
+            pass
 
         self.draw()
 

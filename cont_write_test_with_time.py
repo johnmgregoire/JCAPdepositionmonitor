@@ -27,7 +27,7 @@ for j in range(additionalCols):
 
 csvwriter.writerow(headers)
 
-while num < 1000:
+while num < 100000:
     
     # Date handeling
     x = time.time()
@@ -45,7 +45,7 @@ while num < 1000:
     # Ttime = currentDT[1]
 
     # Done in order to slow down the processing
-    # print Ttime
+    print Ttime
 
     content = [ date , Ttime , str(num%50)]
     
