@@ -3,7 +3,7 @@
 # Last Updated: 5/23/2013
 # For JCAP
 
-import csv
+import csv, time
 from PyQt4 import QtCore
 
 DATA_DICT = {}
@@ -13,6 +13,7 @@ DATA_HEADINGS = {}
 class DataReader(QtCore.QThread):
     def __init__(self, parent=None, filename='default.csv'):
         super(DataReader, self).__init__()
+        self.parent = parent
 
         self.initData(filename)
 
@@ -39,32 +40,19 @@ class DataReader(QtCore.QThread):
         global DATA_DICT
         global DATA_HEADINGS
         numColumns = len(DATA_DICT)
+
         while True:
-            # move to position where EOF was previously
+            time.sleep(0.05)
+            print "I'm still alive"
             self.datafile.seek(self.lastEOFpos)
-            data = csv.reader(self.datafile)
-            for row in data:
-                """ process colums:
-                    check if row is complete
-                    if so, add data to each appropriate column array
-                    if not, save partial row to local variable container
-                    if partial container is full, parse container
-                """
-                if len(row) == numColumns:
-                    for col in range(len(row)):
-                       heading = DATA_HEADINGS.get(col)
-                       DATA_DICT[heading] += [row[col]]
-                    #print row
-                else:
-                    partial_rows = True
-                    partial_row_container += row
-                    if len(partial_row_container) == numColumns:
-                        for col in range(len(partial_row_container)):
-                           heading = DATA_HEADINGS.get(col)
-                           DATA_DICT[heading] += partial_row_container[col]
-                        partial_rows = False
-                        #print partial_row_container
-                        partial_row_container = []
-            # save current EOF position
-            self.lastEOFpos = self.datafile.tell()
+            data = self.datafile.readline()
+            row = data.split(',')
+            if len(row) == numColumns:
+                partial_rows = False
+                for col in range(len(row)):
+                    heading = DATA_HEADINGS.get(col)
+                    DATA_DICT[heading] += [row[col]]
+                self.lastEOFpos = self.datafile.tell()
+            else:
+                partial_rows = True
 

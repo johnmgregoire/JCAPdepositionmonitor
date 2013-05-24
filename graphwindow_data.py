@@ -32,6 +32,9 @@ from profilecreator import *
     More things to consider:
     - Is importing a file more than once dangerous?
     - Should we use a QListWidget for the profile creator?
+    - Can we detect when the writer has closed the data file?
+    - Does it take up too much processing power to keep reading when
+        no new data is being sent?
 """
 
 """ main window of the application """
@@ -39,8 +42,8 @@ class GraphWindow(QtGui.QMainWindow):
 
     def __init__(self):
         super(GraphWindow, self).__init__()
-        reader = DataReader(filename='testcsv.csv')
-        reader.start()
+        self.reader = DataReader(parent=self, filename='testcsv.csv')
+        self.reader.start()
         self.initUI()
 
     def initUI(self):
@@ -92,6 +95,7 @@ class GraphWindow(QtGui.QMainWindow):
         # update graph every 1000 milliseconds
         timer.start(1000)
         self.show()
+        print "INIT UI FINISHED"
 
     def selectGraph(self, varName):
         self.graph.clearPlot()
@@ -99,7 +103,7 @@ class GraphWindow(QtGui.QMainWindow):
         varString = str(varName)
         self.graph = Graph(self.main_widget, xvarname = "Time", yvarname = varString)
         self.layout.addWidget(self.graph)
-
+        
     def updateWindow(self): 
         #for x in self.activeGraphs:
             #x.updatePlot()
@@ -110,10 +114,14 @@ class GraphWindow(QtGui.QMainWindow):
         self.profileCreator = ProfileCreator()
         self.profileCreator.launch()
 
+    def closeEvent(self, event):
+        print "Closing window..."
+        self.reader.quit()
+        event.accept()
 
 
 def main():
-    app = QtGui.QApplication(sys.argv) 
+    app = QtGui.QApplication(sys.argv)
     window = GraphWindow()
     sys.exit(app.exec_())
 

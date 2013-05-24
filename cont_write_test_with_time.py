@@ -27,7 +27,7 @@ for j in range(additionalCols):
 
 csvwriter.writerow(headers)
 
-while num < 100000:
+while num < 10000:
     
     # Date handeling
     x = time.time()

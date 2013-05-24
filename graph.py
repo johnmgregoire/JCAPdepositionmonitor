@@ -43,6 +43,7 @@ class Graph(FigureCanvas):
         yvars = DATA_DICT.get(self.yvar)
         list_of_times = []
         for date_string in DATA_DICT.get(self.xvar):
+            #print "DATA_DICT accessed"
             try:
                 list_of_times += [datetime.datetime.strptime
                                   (date_string, "%H:%M:%S:%f")]
