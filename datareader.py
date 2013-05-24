@@ -42,7 +42,6 @@ class DataReader(QtCore.QThread):
         numColumns = len(DATA_DICT)
 
         while self.running:
-            print self.running
             time.sleep(0.05)
             self.datafile.seek(self.lastEOFpos)
             data = self.datafile.readline()

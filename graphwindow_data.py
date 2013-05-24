@@ -115,7 +115,7 @@ class GraphWindow(QtGui.QMainWindow):
         self.profileCreator = ProfileCreator()
         self.profileCreator.launch()
 
-    def closeEvent(self):
+    def closeEvent(self, event):
         print "signal transmitted"
         self.reader.end()
         event.accept()
