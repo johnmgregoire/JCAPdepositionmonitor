@@ -31,8 +31,7 @@ class Graph(FigureCanvas):
 
         self.draw()
         
-    """ draws plot of first variable versus time
-        that is displayed when application is opened """
+    """ draws and labels axes """
     def initPlot(self):
         self.axes = self.figure.add_subplot(111)
         self.axes.set_xlabel(self.xvar)

@@ -37,6 +37,7 @@ from profilecreator import *
     - How regularly does information get sent to the data file?
     - Is the data file saved (so we can detect that it's been modified)
         after each write?
+    - Format of data files
 """
 
 """ main window of the application """
@@ -44,7 +45,7 @@ class GraphWindow(QtGui.QMainWindow):
 
     def __init__(self):
         super(GraphWindow, self).__init__()
-        self.reader = DataReader(parent=self, filename='testcsv.csv')
+        self.reader = DataReader(parent=self, filename='sample_data.csv')
         self.reader.start()
 
         self.initUI()

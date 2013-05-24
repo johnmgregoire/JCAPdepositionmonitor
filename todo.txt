@@ -1,0 +1,14 @@
+Things to do next week:
+1. Make main menu
+2. Implement time scrolling (1 min - 10 days)
+	- parsing dates
+3. Load profiles
+4. Load most recently modified file (use oswalk)
+5. Put multiple variables on same graph
+	- legend for each graph
+6. pause/start buttons (jumps to present when restarted)
+7. save image of graph (?)
+8. default window sizes/location
+9. y min/max options for single graph
+10. COLOR WHEELS?!?!?!
+	- normalize by center/don't normalize
