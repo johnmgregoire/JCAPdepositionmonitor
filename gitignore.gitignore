@@ -1,2 +1,5 @@
 # To ignore the excedutables
+
 *.py[cod]
+*.pyc
+*.csv

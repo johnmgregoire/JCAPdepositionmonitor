@@ -16,7 +16,7 @@ import logging
 testfile = 'testcsv.csv'
 
 num = 0
-additionalCols = 8
+additionalCols = 20
 
 csvfile = open(testfile, 'wb')
 csvwriter = csv.writer(csvfile)
@@ -26,6 +26,8 @@ for j in range(additionalCols):
     headers += [ "Value"+str(j) ]
 
 csvwriter.writerow(headers)
+
+origTime = time.time()
 
 while num < 100:
     
@@ -55,7 +57,14 @@ while num < 100:
     # Modifiy to simulate writing speed
     time.sleep(0.5)
     csvwriter.writerow(content)
-    csvfile.flush()
+
+    y = time.time()
+
+    # Flush every second
+    if(y - origTime >= 1):
+    
+        origTime = y
+        csvfile.flush()
     
     num += 1
 
