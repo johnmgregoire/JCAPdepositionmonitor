@@ -45,9 +45,9 @@ class GraphWindow(QtGui.QMainWindow):
 
     def initUI(self):
         # set window size and position on screen
-        self.setGeometry(300, 200, 600, 800)
+        self.setGeometry(300, 200, 800, 600)
         self.setWindowTitle('Graph')
-        self.activeGraphs = []
+        #self.activeGraphs = []
 
         # set up the menu bar and pop up windows
         menubar = self.menuBar()
@@ -66,11 +66,11 @@ class GraphWindow(QtGui.QMainWindow):
             self.vars += [DATA_HEADINGS.get(index)]
 
         # initialize default graphs
-        graph1 = Graph(self.main_widget, xvarname="Time", yvarname=self.vars[0])
-        graph2 = Graph(self.main_widget, xvarname="Time", yvarname=self.vars[0])
+        self.graph = Graph(self.main_widget, xvarname="Time", yvarname=self.vars[0])
+        #graph2 = Graph(self.main_widget, xvarname="Time", yvarname=self.vars[0])
 
-        self.activeGraphs += [graph1]
-        self.activeGraphs += [graph2]
+        #self.activeGraphs += [graph1]
+        #self.activeGraphs += [graph2]
 
         # make drop-down menu for selecting graphs      
         self.selectVar = QtGui.QComboBox()
@@ -79,10 +79,10 @@ class GraphWindow(QtGui.QMainWindow):
 
         self.selectVar.activated[str].connect(self.selectGraph)
             
-        layout = QtGui.QVBoxLayout(self.main_widget)
-        layout.addWidget(self.selectVar)
-        layout.addWidget(graph1)
-        layout.addWidget(graph2)
+        self.layout = QtGui.QVBoxLayout(self.main_widget)
+        self.layout.addWidget(self.selectVar)
+        self.layout.addWidget(self.graph)
+        #self.layout.addWidget(graph2)
 
         self.setCentralWidget(self.main_widget)
         
@@ -94,14 +94,17 @@ class GraphWindow(QtGui.QMainWindow):
         self.show()
 
     def selectGraph(self, varName):
+        self.graph.clearPlot()
+        self.layout.removeWidget(self.graph)
         varString = str(varName)
-        graph = Graph(self.main_widget, xvarname = "Time", yvarname = varString)
-        self.activeGraphs[0] = graph
-        print self.activeGraphs[0]
+        self.graph = Graph(self.main_widget, xvarname = "Time", yvarname = varString)
+        self.layout.addWidget(self.graph)
 
     def updateWindow(self): 
-        for x in self.activeGraphs:
-            x.updatePlot()
+        #for x in self.activeGraphs:
+            #x.updatePlot()
+        self.graph.updatePlot()
+        #self.show()
 
     def createProfile(self):
         self.profileCreator = ProfileCreator()

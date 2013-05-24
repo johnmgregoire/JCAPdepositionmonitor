@@ -48,3 +48,6 @@ class Graph(FigureCanvas):
         self.axes.plot_date(time, yvars) 
 
         self.draw()
+
+    def clearPlot(self):
+        self.figure.clf()
