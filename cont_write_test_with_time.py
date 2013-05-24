@@ -27,7 +27,7 @@ for j in range(additionalCols):
 
 csvwriter.writerow(headers)
 
-while num < 10000:
+while num < 100:
     
     # Date handeling
     x = time.time()
@@ -51,7 +51,9 @@ while num < 10000:
     
     for j in range(2,additionalCols+2):
         content += [ str(num % (j*50))]
-        
+
+    # Modifiy to simulate writing speed
+    time.sleep(0.5)
     csvwriter.writerow(content)
     
     num += 1
