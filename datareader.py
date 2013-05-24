@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/23/2013
-# Last Updated: 5/23/2013
+# Last Updated: 5/24/2013
 # For JCAP
 
 import csv, time
@@ -19,7 +19,7 @@ class DataReader(QtCore.QThread):
 
     def initData(self, filename):
         self.datafile = open(filename, 'rb')
-        # read first line and create data arrays
+        # read column headings and create lists to hold data
         headings = self.datafile.readline().split(',')
         self.numColumns = len(headings)
         # strip off '/r/n' at end of line - only works on Windows
@@ -35,29 +35,29 @@ class DataReader(QtCore.QThread):
         self.lastEOFpos = self.datafile.tell()
 
     def run(self):
-        partial_rows = False
-        partial_row_container = []
         global DATA_DICT
         global DATA_HEADINGS
         numColumns = len(DATA_DICT)
 
         while self.running:
-            time.sleep(0.05)
+            time.sleep(0.01)
             self.datafile.seek(self.lastEOFpos)
             data = self.datafile.readline()
             row = data.split(',')
             if len(row) == numColumns:
-                partial_rows = False
+                print row
                 for col in range(len(row)):
                     heading = DATA_HEADINGS.get(col)
                     DATA_DICT[heading] += [row[col]]
+                # move the reader cursor only if we read in a full line
                 self.lastEOFpos = self.datafile.tell()
-            else:
-                partial_rows = True
+
+        # close file after end() has been called
+        self.datafile.close()
 
     def end(self):
         print "message received"
-        self.datafile.close()
+        #self.datafile.close()
         self.running = False
         
 

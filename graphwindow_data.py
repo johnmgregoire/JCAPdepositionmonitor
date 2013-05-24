@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/21/2013
-# Last Updated: 5/23/2013
+# Last Updated: 5/24/2013
 # For JCAP
 
 """
@@ -24,7 +24,6 @@ from profilecreator import *
         (This is probably not an issue anymore.)
 
     TO DO:
-    - determine condition for reader thread to end
     - take data on certain conditions?
     - try/catch with partial rows (and other places)
     - fix reader so it doesn't put partial lines in dictionary
@@ -35,6 +34,8 @@ from profilecreator import *
     - Can we detect when the writer has closed the data file?
     - Does it take up too much processing power to keep reading when
         no new data is being sent?
+    - How regularly does information get sent to the data file?
+    - Is the data file saved 
 """
 
 """ main window of the application """
@@ -51,8 +52,7 @@ class GraphWindow(QtGui.QMainWindow):
         # set window size and position on screen
         self.setGeometry(300, 200, 800, 600)
         self.setWindowTitle('Graph')
-        #self.activeGraphs = []
-
+        
         # set up the menu bar and pop up windows
         menubar = self.menuBar()
         fileMenu = menubar.addMenu('&File')
@@ -69,12 +69,9 @@ class GraphWindow(QtGui.QMainWindow):
         for index in range(2, len(DATA_HEADINGS)):
             self.vars += [DATA_HEADINGS.get(index)]
 
-        # initialize default graphs
-        self.graph = Graph(self.main_widget, xvarname="Time", yvarname=self.vars[0])
-        #graph2 = Graph(self.main_widget, xvarname="Time", yvarname=self.vars[0])
-
-        #self.activeGraphs += [graph1]
-        #self.activeGraphs += [graph2]
+        # initialize default graph
+        self.graph = Graph(self.main_widget, xvarname="Time",
+                           yvarname=self.vars[0])
 
         # make drop-down menu for selecting graphs      
         self.selectVar = QtGui.QComboBox()
@@ -102,14 +99,12 @@ class GraphWindow(QtGui.QMainWindow):
         self.graph.clearPlot()
         self.layout.removeWidget(self.graph)
         varString = str(varName)
-        self.graph = Graph(self.main_widget, xvarname = "Time", yvarname = varString)
+        self.graph = Graph(self.main_widget, xvarname = "Time",
+                           yvarname = varString)
         self.layout.addWidget(self.graph)
         
     def updateWindow(self): 
-        #for x in self.activeGraphs:
-            #x.updatePlot()
         self.graph.updatePlot()
-        #self.show()
 
     def createProfile(self):
         self.profileCreator = ProfileCreator()

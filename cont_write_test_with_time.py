@@ -29,7 +29,7 @@ csvwriter.writerow(headers)
 
 while num < 100:
     
-    # Date handeling
+    # Date handling
     x = time.time()
 
     #Getting the MS data
@@ -55,6 +55,7 @@ while num < 100:
     # Modifiy to simulate writing speed
     time.sleep(0.5)
     csvwriter.writerow(content)
+    csvfile.flush()
     
     num += 1
 
