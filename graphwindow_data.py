@@ -26,16 +26,17 @@ from profilecreator import *
     TO DO:
     - take data on certain conditions?
     - try/catch with partial rows (and other places)
-    - fix reader so it doesn't put partial lines in dictionary
+    - fix reader so it doesn't put partial last columns into dictionary
 
     More things to consider:
-    - Is importing a file more than once dangerous?
+    - Is importing a library file more than once dangerous?
     - Should we use a QListWidget for the profile creator?
     - Can we detect when the writer has closed the data file?
     - Does it take up too much processing power to keep reading when
         no new data is being sent?
     - How regularly does information get sent to the data file?
-    - Is the data file saved 
+    - Is the data file saved (so we can detect that it's been modified)
+        after each write?
 """
 
 """ main window of the application """
@@ -51,7 +52,6 @@ class GraphWindow(QtGui.QMainWindow):
     def initUI(self):
         # set window size and position on screen
         self.setGeometry(300, 200, 800, 600)
-        self.setWindowTitle('Graph')
         
         # set up the menu bar and pop up windows
         menubar = self.menuBar()
@@ -72,6 +72,7 @@ class GraphWindow(QtGui.QMainWindow):
         # initialize default graph
         self.graph = Graph(self.main_widget, xvarname="Time",
                            yvarname=self.vars[0])
+        self.setWindowTitle(self.vars[0])
 
         # make drop-down menu for selecting graphs      
         self.selectVar = QtGui.QComboBox()
@@ -102,6 +103,7 @@ class GraphWindow(QtGui.QMainWindow):
         self.graph = Graph(self.main_widget, xvarname = "Time",
                            yvarname = varString)
         self.layout.addWidget(self.graph)
+        self.setWindowTitle(varString)
         
     def updateWindow(self): 
         self.graph.updatePlot()

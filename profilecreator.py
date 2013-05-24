@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/23/2013
-# Last Updated: 5/23/2013
+# Last Updated: 5/24/2013
 # For JCAP
 
 from PyQt4 import QtGui
@@ -75,12 +75,12 @@ class ProfileCreator(QtGui.QWidget):
         self.close()
 
     def tooManyVars(self):
-        error = QtGui.QMessageBox.question(self, 'None',
+        error = QtGui.QMessageBox.question(None, 'Error',
                                            'You can only put 8 graphs in a profile.',
                                            QtGui.QMessageBox.Ok)
 
     def tooFewVars(self):
-        error = QtGui.QMessageBox.question(self, 'None',
+        error = QtGui.QMessageBox.question(None, 'Error',
                                            'Please select at least one graph for this profile.',
                                            QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
         if (error == QtGui.QMessageBox.Cancel):

@@ -40,7 +40,7 @@ class DataReader(QtCore.QThread):
         numColumns = len(DATA_DICT)
 
         while self.running:
-            time.sleep(0.01)
+            time.sleep(0.001)
             self.datafile.seek(self.lastEOFpos)
             data = self.datafile.readline()
             row = data.split(',')
@@ -57,7 +57,6 @@ class DataReader(QtCore.QThread):
 
     def end(self):
         print "message received"
-        #self.datafile.close()
         self.running = False
         
 
