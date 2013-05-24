@@ -57,7 +57,7 @@ class DataReader(QtCore.QThread):
                 partial_rows = True
 
     def end(self):
-        print "signal received"
+        print "message received"
         self.datafile.close()
         self.running = False
         

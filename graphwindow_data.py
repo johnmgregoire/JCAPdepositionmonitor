@@ -43,7 +43,7 @@ class GraphWindow(QtGui.QMainWindow):
     def __init__(self):
         super(GraphWindow, self).__init__()
         self.reader = DataReader(parent=self, filename='testcsv.csv')
-        self.reader.exec_()
+        self.reader.start()
 
         self.initUI()
 
@@ -116,6 +116,7 @@ class GraphWindow(QtGui.QMainWindow):
         self.profileCreator.launch()
 
     def closeEvent(self):
+        print "signal transmitted"
         self.reader.end()
         event.accept()
 
