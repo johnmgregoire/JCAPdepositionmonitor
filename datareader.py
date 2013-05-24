@@ -13,7 +13,7 @@ DATA_HEADINGS = {}
 class DataReader(QtCore.QThread):
     def __init__(self, parent=None, filename='default.csv'):
         super(DataReader, self).__init__()
-        self.parent = parent
+        self.running = True
 
         self.initData(filename)
 
@@ -41,9 +41,9 @@ class DataReader(QtCore.QThread):
         global DATA_HEADINGS
         numColumns = len(DATA_DICT)
 
-        while True:
+        while self.running:
+            print self.running
             time.sleep(0.05)
-            print "I'm still alive"
             self.datafile.seek(self.lastEOFpos)
             data = self.datafile.readline()
             row = data.split(',')
@@ -55,4 +55,10 @@ class DataReader(QtCore.QThread):
                 self.lastEOFpos = self.datafile.tell()
             else:
                 partial_rows = True
+
+    def end(self):
+        print "signal received"
+        self.datafile.close()
+        self.running = False
+        
 

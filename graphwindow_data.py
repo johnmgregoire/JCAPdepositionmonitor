@@ -43,7 +43,8 @@ class GraphWindow(QtGui.QMainWindow):
     def __init__(self):
         super(GraphWindow, self).__init__()
         self.reader = DataReader(parent=self, filename='testcsv.csv')
-        self.reader.start()
+        self.reader.exec_()
+
         self.initUI()
 
     def initUI(self):
@@ -114,9 +115,8 @@ class GraphWindow(QtGui.QMainWindow):
         self.profileCreator = ProfileCreator()
         self.profileCreator.launch()
 
-    def closeEvent(self, event):
-        print "Closing window..."
-        self.reader.quit()
+    def closeEvent(self):
+        self.reader.end()
         event.accept()
 
 
