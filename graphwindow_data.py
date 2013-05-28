@@ -86,6 +86,7 @@ class GraphWindow(QtGui.QMainWindow):
         self.layout = QtGui.QVBoxLayout(self.main_widget)
         self.gridlayout = QtGui.QGridLayout(self.main_widget)
         self.axeslayout = QtGui.QGridLayout(self.main_widget)
+        self.timelayout = QtGui.QGridLayout(self.main_widget)
 
         # setup the column stretches - 0 is the default
         # setup minimum column widths
@@ -107,14 +108,20 @@ class GraphWindow(QtGui.QMainWindow):
         self.hold_cb = QtGui.QCheckBox('Hold', self)
         self.hold_cb.stateChanged.connect(self.graph.hold)
     
-        self.Xmin = QtGui.QLineEdit(self)
-        self.Xmax = QtGui.QLineEdit(self)
+        self.minutes = QtGui.QLineEdit(self)
+        self.minutes.setFixedWidth(40)
+        self.hours = QtGui.QLineEdit(self)
+        self.hours.setFixedWidth(40)
+        self.days = QtGui.QLineEdit(self)
+        self.days.setFixedWidth(40)
         self.Ymin = QtGui.QLineEdit(self)
         self.Ymax = QtGui.QLineEdit(self)
 
         # Lables for the input boxes
-        self.label_Xmin = QtGui.QLabel('X Min:')
-        self.label_Xmax = QtGui.QLabel('X Max:')
+        self.label_time = QtGui.QLabel('Show data from the last:')
+        self.label_minutes = QtGui.QLabel('minutes')
+        self.label_hours = QtGui.QLabel('hours')
+        self.label_days = QtGui.QLabel('days')
         self.label_Ymin = QtGui.QLabel('Y Min:')
         self.label_Ymax = QtGui.QLabel('Y Max:')
 
@@ -122,18 +129,22 @@ class GraphWindow(QtGui.QMainWindow):
         self.layout.addWidget(self.grid_widget)
 
         # Add items to the grid widget
-        self.gridlayout.addWidget(self.graph,0,0)
-        self.gridlayout.addWidget(self.axes_widget, 0,1)
+        self.gridlayout.addWidget(self.graph,0, 0)
+        self.gridlayout.addWidget(self.axes_widget, 0, 1)
 
         # Set alignments for the widgets
         self.axeslayout.setAlignment(QtCore.Qt.AlignTop)
 
         # Add items to the axis widget
-        self.axeslayout.addWidget(self.hold_cb)
-        self.axeslayout.addWidget(self.label_Xmin)
-        self.axeslayout.addWidget(self.Xmin)
-        self.axeslayout.addWidget(self.label_Xmax)
-        self.axeslayout.addWidget(self.Xmax)
+        self.axeslayout.addWidget(self.hold_cb, 0, 0)
+        self.axeslayout.addWidget(self.label_time, 1, 0)
+        self.axeslayout.addLayout(self.timelayout, 2, 0)
+        self.timelayout.addWidget(self.minutes, 0, 0)
+        self.timelayout.addWidget(self.label_minutes, 0, 1)
+        self.timelayout.addWidget(self.hours, 1, 0)
+        self.timelayout.addWidget(self.label_hours, 1, 1)
+        self.timelayout.addWidget(self.days, 2, 0)
+        self.timelayout.addWidget(self.label_days, 2, 1)
         self.axeslayout.addWidget(self.label_Ymin)
         self.axeslayout.addWidget(self.Ymin)
         self.axeslayout.addWidget(self.label_Ymax)
