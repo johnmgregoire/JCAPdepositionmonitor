@@ -97,11 +97,9 @@ class MainMenu(QtGui.QWidget):
     def updateAll(self):
         for window in self.windows:
             if window.isHidden():
-                print 'window closed'
                 self.windows.remove(window)
             else:
                 window.updateWindow()
-        print self.windows
 
     def closeEvent(self, event):
         print "signal transmitted"

@@ -105,6 +105,8 @@ class GraphWindow(QtGui.QMainWindow):
 
         # Input boxes for axes and checkboxes for gui
         self.hold_cb = QtGui.QCheckBox('Hold', self)
+        self.hold_cb.stateChanged.connect(self.graph.hold)
+    
         self.Xmin = QtGui.QLineEdit(self)
         self.Xmax = QtGui.QLineEdit(self)
         self.Ymin = QtGui.QLineEdit(self)

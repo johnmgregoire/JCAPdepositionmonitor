@@ -17,6 +17,7 @@ class Graph(FigureCanvas):
     def __init__(self, parent="None", width=3, height=2, dpi=80,
                  xvarname="None", yvarname="None"):
 
+        self.updating = True
         self.xvar = xvarname
         self.yvar = yvarname
         self.figure = Figure(figsize=(width, height), dpi=dpi)
@@ -29,7 +30,6 @@ class Graph(FigureCanvas):
                                    QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
 
-
         self.draw()
         
     """ draws and labels axes """
@@ -40,23 +40,32 @@ class Graph(FigureCanvas):
 
     """ function that updates plot every second """
     def updatePlot(self):
-        yvars = DATA_DICT.get(self.yvar)
-        list_of_times = []
-        for date_string in DATA_DICT.get(self.xvar):
+        if self.updating == True:
+            yvars = DATA_DICT.get(self.yvar)
+            list_of_times = []
+            for date_string in DATA_DICT.get(self.xvar):
+                try:
+                    list_of_times += [datetime.datetime.strptime
+                                      (date_string, "%H:%M:%S:%f")]
+                except ValueError:
+                    print "time cut off"
+                    pass
+            time = matplotlib.dates.date2num(list_of_times)
             try:
-                list_of_times += [datetime.datetime.strptime
-                                  (date_string, "%H:%M:%S:%f")]
+                self.axes.plot_date(time, yvars)
             except ValueError:
-                print "time cut off"
+                print "column not updated: " + self.yvar
                 pass
-        time = matplotlib.dates.date2num(list_of_times)
-        try:
-            self.axes.plot_date(time, yvars)
-        except ValueError:
-            print "column not updated: " + self.yvar
+
+            self.draw()
+        else:
             pass
 
-        self.draw()
+    def hold(self):
+        if self.updating == True:
+            self.updating = False
+        else:
+            self.updating = True
 
     def clearPlot(self):
         self.figure.clf()
