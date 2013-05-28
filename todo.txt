@@ -1,9 +1,10 @@
 Things to do next week:
-1. Make main menu
+1. Make main menu [DONE!]
 2. Implement time scrolling (1 min - 10 days)
 	- parsing dates
-3. Load profiles
-4. Load most recently modified file (use oswalk)
+3. Load profiles [DONE!]
+4. Load most recently modified file (use oswalk) [done for now]
+	* need to know where data files are going to be stored
 5. Put multiple variables on same graph
 	- legend for each graph
 6. pause/start buttons (jumps to present when restarted)

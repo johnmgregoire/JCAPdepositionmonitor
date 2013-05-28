@@ -24,14 +24,11 @@ class DataReader(QtCore.QThread):
         self.numColumns = len(headings)
         # strip off '/r/n' at end of line - only works on Windows
         headings[self.numColumns-1] = headings[self.numColumns-1][:-2]
-        #print headings
-        #print self.numColumns
         global DATA_DICT
         global DATA_HEADINGS
         for col in range(len(headings)):
             DATA_HEADINGS[col] = headings[col]
             DATA_DICT[headings[col]] = []
-        #print DATA_HEADINGS
         self.lastEOFpos = self.datafile.tell()
 
     def run(self):
@@ -45,7 +42,7 @@ class DataReader(QtCore.QThread):
             data = self.datafile.readline()
             row = data.split(',')
             if len(row) == numColumns:
-                print row
+                #print row
                 for col in range(len(row)):
                     heading = DATA_HEADINGS.get(col)
                     DATA_DICT[heading] += [row[col]]

@@ -12,7 +12,7 @@ class ProfileWindow(QtGui.QMainWindow):
         super(ProfileWindow, self).__init__()
         self.name = name
         self.varsList = varsList
-        self.graphs = []
+        self.graphs = [] 
         
         self.initUI()
 
@@ -45,6 +45,8 @@ class ProfileWindow(QtGui.QMainWindow):
 
 class LoadMenu(QtGui.QDialog):
 
+    profileChosen = QtCore.pyqtSignal(str)
+
     def __init__(self, menuList = []):
         super(LoadMenu, self).__init__()
 
@@ -64,7 +66,8 @@ class LoadMenu(QtGui.QDialog):
         
     def sendName(self):
         name = str(self.list.currentItem().text())
-        self.emit(QtCore.SIGNAL("profileChosen"), name)
+        self.profileChosen.emit(name)
+        #self.emit(QtCore.SIGNAL("profileChosen"), name)
         self.close()
 
     def updateWindow(self):

@@ -5,6 +5,7 @@
 
 from graphwindow_data import *
 from profilewindow import *
+import os
 
 class MainMenu(QtGui.QWidget):
 
@@ -12,10 +13,25 @@ class MainMenu(QtGui.QWidget):
         super(MainMenu, self).__init__()
         self.windows = []
         self.profiles = {}
-        self.reader = DataReader(parent=self, filename='sample_data.csv')
+        defaultFile = self.initReader()
+        self.reader = DataReader(parent=self, filename=defaultFile)
         self.reader.start()
-
+        
         self.initUI()
+
+    def initReader(self):
+        targetDir = 'C:/Users/JCAP-HTE/Documents/GitHub/JCAPdepositionmonitor'
+        lastModifiedFile = ''
+        lastModifiedTime = 0
+        # use os.walk() to recursively traverse directories if necessary
+        allFiles = os.listdir(targetDir)
+        data = filter(lambda filename: filename.endswith('.csv'), allFiles)
+        for filename in data:
+            statbuf = os.stat(filename)
+            if statbuf.st_mtime > lastModifiedTime:
+                lastModifiedTime = statbuf.st_mtime
+                lastModifiedFile = filename
+        return lastModifiedFile
 
     def initUI(self):
         self.setGeometry(50, 150, 300, 400)
@@ -23,9 +39,9 @@ class MainMenu(QtGui.QWidget):
         self.layout = QtGui.QVBoxLayout(self)
 
         # load data file
-        # choose graph
-        # create profile
-        # load profile
+        # choose graph [check]
+        # create profile [check]
+        # load profile [check]
         # color wheel
 
         makeGraphButton = QtGui.QPushButton('Show Graph')
@@ -70,19 +86,22 @@ class MainMenu(QtGui.QWidget):
         loadMenu = LoadMenu(menuList)
         self.windows += [loadMenu]
         loadMenu.show()
-        #loadMenu.profileChosen.connect(loadProfile) doesn't work
-        # figure out how to write this in current format
-        QtCore.QObject.connect(loadMenu, QtCore.SIGNAL("profileChosen"), self.loadProfile)
+        loadMenu.profileChosen.connect(self.loadProfile)
 
     def loadProfile(self, name):
-        varsList = self.profiles.get(name)
+        varsList = self.profiles.get(str(name))
         profileWindow = ProfileWindow(name, varsList)
         self.windows += [profileWindow]
         profileWindow.show()
 
     def updateAll(self):
         for window in self.windows:
-            window.updateWindow()
+            if window.isHidden():
+                print 'window closed'
+                self.windows.remove(window)
+            else:
+                window.updateWindow()
+        print self.windows
 
     def closeEvent(self, event):
         print "signal transmitted"
