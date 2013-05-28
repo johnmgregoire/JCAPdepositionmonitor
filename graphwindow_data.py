@@ -167,6 +167,14 @@ class GraphWindow(QtGui.QMainWindow):
         varString = str(varName)
         self.graph = Graph(self.main_widget, xvarname = "Time",
                            yvarname = varString)
+
+        ## The following is just for testing remove when done
+        elmin = datetime.datetime.strptime('15:32:25:4', "%H:%M:%S:%f")
+        elmax = datetime.datetime.strptime('15:32:27:76', "%H:%M:%S:%f")
+        self.graph.setXlim(elmin,elmax)
+
+
+        
         self.gridlayout.addWidget(self.graph,0,0)
         self.setWindowTitle(varString)
         

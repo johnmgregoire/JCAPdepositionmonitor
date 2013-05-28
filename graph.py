@@ -67,5 +67,10 @@ class Graph(FigureCanvas):
         else:
             self.updating = True
 
+    def setXlim(self,amin,amax):
+        self.axes.set_xlim(amin,amax,True)
+        self.axes.relim()
+        self.draw()
+
     def clearPlot(self):
         self.figure.clf()
