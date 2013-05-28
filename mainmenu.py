@@ -4,6 +4,7 @@
 # For JCAP
 
 from graphwindow_data import *
+from profilewindow import *
 
 class MainMenu(QtGui.QWidget):
 
@@ -30,6 +31,14 @@ class MainMenu(QtGui.QWidget):
         self.layout.addWidget(makeGraphButton)
         makeGraphButton.clicked.connect(self.makeGraph)
 
+        makeProfileButton = QtGui.QPushButton('Create a New Profile')
+        self.layout.addWidget(makeProfileButton)
+        makeProfileButton.clicked.connect(self.makeProfile)
+
+        loadProfileButton = QtGui.QPushButton('Load a Saved Profile')
+        self.layout.addWidget(loadProfileButton)
+        loadProfileButton.clicked.connect(self.loadProfile)
+
         timer = QtCore.QTimer(self)
         timer.timeout.connect(self.updateAll)
         # update graph every 1000 milliseconds
@@ -41,6 +50,20 @@ class MainMenu(QtGui.QWidget):
         graph = GraphWindow()
         self.windows += [graph]
         graph.show()
+
+    def makeProfile(self):
+        profileCreator = ProfileCreator()
+        self.windows += [profileCreator]
+        profileCreator.show()
+
+    def loadProfile(self):
+        savefile = open('saved_profiles.txt', 'rb')
+        # eventually will need to distinguish between multiple
+        #   saved profiles in the savefile
+        varsList = pickle.load(savefile)
+        profileWindow = ProfileWindow(varsList)
+        self.windows += [profileWindow]
+        profileWindow.show()
 
     def updateAll(self):
         for window in self.windows:

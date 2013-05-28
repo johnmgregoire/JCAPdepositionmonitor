@@ -53,9 +53,6 @@ class ProfileCreator(QtGui.QWidget):
             else:
                 self.col2.addWidget(self.checkboxes[index])
 
-    def launch(self):
-        self.show()
-
     def saveProfile(self):
         #get varsList from checked boxes
         varsList = []
@@ -85,4 +82,7 @@ class ProfileCreator(QtGui.QWidget):
                                            QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
         if (error == QtGui.QMessageBox.Cancel):
             self.close()
+
+    def updateWindow(self):
+        pass
             
