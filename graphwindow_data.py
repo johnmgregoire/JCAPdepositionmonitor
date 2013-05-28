@@ -85,7 +85,14 @@ class GraphWindow(QtGui.QMainWindow):
         # widget  - TODO
         self.layout = QtGui.QVBoxLayout(self.main_widget)
         self.gridlayout = QtGui.QGridLayout(self.main_widget)
-        self.axeslayout = QtGui.QGridLayout(self.main_widget) 
+        self.axeslayout = QtGui.QGridLayout(self.main_widget)
+
+        # setup the column stretches - 0 is the default
+        # setup minimum column widths
+        self.gridlayout.setColumnStretch(0,4)
+        self.gridlayout.setColumnStretch(1,0)
+        self.gridlayout.setColumnMinimumWidth(0,300)
+        self.gridlayout.setRowMinimumHeight(0,375)
 
         # drop down menu
         self.layout.addWidget(self.selectVar)
@@ -96,7 +103,8 @@ class GraphWindow(QtGui.QMainWindow):
         self.axes_widget = QtGui.QWidget()
         self.axes_widget.setLayout(self.axeslayout)
 
-        # Input boxes for axes 
+        # Input boxes for axes and checkboxes for gui
+        self.hold_cb = QtGui.QCheckBox('Hold', self)
         self.Xmin = QtGui.QLineEdit(self)
         self.Xmax = QtGui.QLineEdit(self)
         self.Ymin = QtGui.QLineEdit(self)
@@ -119,6 +127,7 @@ class GraphWindow(QtGui.QMainWindow):
         self.axeslayout.setAlignment(QtCore.Qt.AlignTop)
 
         # Add items to the axis widget
+        self.axeslayout.addWidget(self.hold_cb)
         self.axeslayout.addWidget(self.label_Xmin)
         self.axeslayout.addWidget(self.Xmin)
         self.axeslayout.addWidget(self.label_Xmax)
@@ -140,15 +149,15 @@ class GraphWindow(QtGui.QMainWindow):
         # clear plot and set parent to None so it can be deleted
         self.graph.clearPlot()
         self.graph.setParent(None)
-        
         self.gridlayout.removeWidget(self.graph)
+        self.graph =  None
         varString = str(varName)
         self.graph = Graph(self.main_widget, xvarname = "Time",
                            yvarname = varString)
         self.gridlayout.addWidget(self.graph,0,0)
         self.setWindowTitle(varString)
         
-    def updateWindow(self): 
+    def updateWindow(self):
         self.graph.updatePlot()
 
     def createProfile(self):
