@@ -14,7 +14,7 @@ from datareader import *
 class Graph(FigureCanvas):
 
     """ sets up Figure object, plot, and auto-updating timer """
-    def __init__(self, parent="None", width=3, height=2, dpi=100,
+    def __init__(self, parent="None", width=3, height=2, dpi=80,
                  xvarname="None", yvarname="None"):
 
         self.xvar = xvarname
@@ -28,6 +28,7 @@ class Graph(FigureCanvas):
                                    QtGui.QSizePolicy.Expanding,
                                    QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
+
 
         self.draw()
         

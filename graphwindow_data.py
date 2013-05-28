@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/21/2013
-# Last Updated: 5/24/2013
+# Last Updated: 5/28/2013
 # For JCAP
 
 """
@@ -81,24 +81,54 @@ class GraphWindow(QtGui.QMainWindow):
 
         self.selectVar.activated[str].connect(self.selectGraph)
 
+        # setup all the layouts - verify that they take in the correct
+        # widget  - TODO
         self.layout = QtGui.QVBoxLayout(self.main_widget)
-        #self.layout = QtGui.QGridLayout(self.main_widget)
-        self.grid_layout = QtGui.QGridLayout(self.main_widget)
-        #self.grid_layout.setColumnMinimumWidth(1, 10)
-        #self.grid_layout.setColumnMaximumWidth(1, 10)
+        self.gridlayout = QtGui.QGridLayout(self.main_widget)
+        self.axeslayout = QtGui.QGridLayout(self.main_widget) 
 
-
-        self.qle = QtGui.QLineEdit(self)
-        
+        # drop down menu
         self.layout.addWidget(self.selectVar)
-        self.grid_layout.addWidget(self.graph,0,0)
 
-        self.grid_layout.addWidget(self.qle,0,1,10,10)
-
-
+        # made widgets for layouts
         self.grid_widget = QtGui.QWidget()
-        self.grid_widget.setLayout(self.grid_layout)
+        self.grid_widget.setLayout(self.gridlayout)
+        self.axes_widget = QtGui.QWidget()
+        self.axes_widget.setLayout(self.axeslayout)
+
+        # Input boxes for axes 
+        self.Xmin = QtGui.QLineEdit(self)
+        self.Xmax = QtGui.QLineEdit(self)
+        self.Ymin = QtGui.QLineEdit(self)
+        self.Ymax = QtGui.QLineEdit(self)
+
+        # Lables for the input boxes
+        self.label_Xmin = QtGui.QLabel('X Min:')
+        self.label_Xmax = QtGui.QLabel('X Max:')
+        self.label_Ymin = QtGui.QLabel('Y Min:')
+        self.label_Ymax = QtGui.QLabel('Y Max:')
+
+        # place the layouts inside the other layouts
         self.layout.addWidget(self.grid_widget)
+
+        # Add items to the grid widget
+        self.gridlayout.addWidget(self.graph,0,0)
+        self.gridlayout.addWidget(self.axes_widget, 0,1)
+
+        # Set alignments for the widgets
+        self.axeslayout.setAlignment(QtCore.Qt.AlignTop)
+
+        # Add items to the axis widget
+        self.axeslayout.addWidget(self.label_Xmin)
+        self.axeslayout.addWidget(self.Xmin)
+        self.axeslayout.addWidget(self.label_Xmax)
+        self.axeslayout.addWidget(self.Xmax)
+        self.axeslayout.addWidget(self.label_Ymin)
+        self.axeslayout.addWidget(self.Ymin)
+        self.axeslayout.addWidget(self.label_Ymax)
+        self.axeslayout.addWidget(self.Ymax)
+        
+        
         
         self.setCentralWidget(self.main_widget)
         
@@ -107,12 +137,15 @@ class GraphWindow(QtGui.QMainWindow):
         print "INIT UI FINISHED"
 
     def selectGraph(self, varName):
+        # clear plot and set parent to None so it can be deleted
         self.graph.clearPlot()
-        self.layout.removeWidget(self.graph)
+        self.graph.setParent(None)
+        
+        self.gridlayout.removeWidget(self.graph)
         varString = str(varName)
         self.graph = Graph(self.main_widget, xvarname = "Time",
                            yvarname = varString)
-        self.layout.addWidget(self.graph)
+        self.gridlayout.addWidget(self.graph,0,0)
         self.setWindowTitle(varString)
         
     def updateWindow(self): 
