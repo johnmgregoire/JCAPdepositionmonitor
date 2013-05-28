@@ -45,8 +45,7 @@ class GraphWindow(QtGui.QMainWindow):
 
     def __init__(self):
         super(GraphWindow, self).__init__()
-        self.reader = DataReader(parent=self, filename='sample_data.csv')
-        self.reader.start()
+        
 
         self.initUI()
 
@@ -85,15 +84,10 @@ class GraphWindow(QtGui.QMainWindow):
         self.layout = QtGui.QVBoxLayout(self.main_widget)
         self.layout.addWidget(self.selectVar)
         self.layout.addWidget(self.graph)
-        #self.layout.addWidget(graph2)
 
         self.setCentralWidget(self.main_widget)
         
-        timer = QtCore.QTimer(self)
-        QtCore.QObject.connect(timer, QtCore.SIGNAL("timeout()"), self.updateWindow)
         
-        # update graph every 1000 milliseconds
-        timer.start(1000)
         self.show()
         print "INIT UI FINISHED"
 
@@ -113,17 +107,14 @@ class GraphWindow(QtGui.QMainWindow):
         self.profileCreator = ProfileCreator()
         self.profileCreator.launch()
 
-    def closeEvent(self, event):
-        print "signal transmitted"
-        self.reader.end()
-        event.accept()
+    
 
 
-def main():
+"""def main():
     app = QtGui.QApplication(sys.argv)
     window = GraphWindow()
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
-    main()
+    main()"""
         
