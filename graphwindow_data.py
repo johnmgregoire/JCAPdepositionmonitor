@@ -80,11 +80,26 @@ class GraphWindow(QtGui.QMainWindow):
             self.selectVar.addItem(var)
 
         self.selectVar.activated[str].connect(self.selectGraph)
-            
-        self.layout = QtGui.QVBoxLayout(self.main_widget)
-        self.layout.addWidget(self.selectVar)
-        self.layout.addWidget(self.graph)
 
+        self.layout = QtGui.QVBoxLayout(self.main_widget)
+        #self.layout = QtGui.QGridLayout(self.main_widget)
+        self.grid_layout = QtGui.QGridLayout(self.main_widget)
+        #self.grid_layout.setColumnMinimumWidth(1, 10)
+        #self.grid_layout.setColumnMaximumWidth(1, 10)
+
+
+        self.qle = QtGui.QLineEdit(self)
+        
+        self.layout.addWidget(self.selectVar)
+        self.grid_layout.addWidget(self.graph,0,0)
+
+        self.grid_layout.addWidget(self.qle,0,1,10,10)
+
+
+        self.grid_widget = QtGui.QWidget()
+        self.grid_widget.setLayout(self.grid_layout)
+        self.layout.addWidget(self.grid_widget)
+        
         self.setCentralWidget(self.main_widget)
         
         
@@ -105,7 +120,7 @@ class GraphWindow(QtGui.QMainWindow):
 
     def createProfile(self):
         self.profileCreator = ProfileCreator()
-        self.profileCreator.launch()
+        self.profileCreator.show()
 
     
 
