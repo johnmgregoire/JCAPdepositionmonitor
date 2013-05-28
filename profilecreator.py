@@ -5,7 +5,7 @@
 
 from PyQt4 import QtGui
 from datareader import *
-import pickle 
+import cPickle as pickle
 
 """widget to make profiles"""
 class ProfileCreator(QtGui.QWidget):
@@ -65,10 +65,13 @@ class ProfileCreator(QtGui.QWidget):
         elif len(varsList) < 1:
             self.tooFewVars()
             return
-        # eventually change to 'wb+' so we can append to file
-        savefile = open('saved_profiles.txt', 'wb')
-        pickle.dump(varsList, savefile)
-        print 'Saved!'
+        name, ok = QtGui.QInputDialog.getText(self, 'Create a New Profile',
+                                              'Please enter a name for this profile.')
+        if ok:
+            # 'ab+' indicates append to file
+            savefile = open('saved_profiles.txt', 'ab+')
+            pickle.dump((str(name), varsList), savefile)
+            print 'Saved!'
         self.close()
 
     def tooManyVars(self):

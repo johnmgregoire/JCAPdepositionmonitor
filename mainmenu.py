@@ -11,6 +11,7 @@ class MainMenu(QtGui.QWidget):
     def __init__(self):
         super(MainMenu, self).__init__()
         self.windows = []
+        self.profiles = {}
         self.reader = DataReader(parent=self, filename='sample_data.csv')
         self.reader.start()
 
@@ -37,7 +38,7 @@ class MainMenu(QtGui.QWidget):
 
         loadProfileButton = QtGui.QPushButton('Load a Saved Profile')
         self.layout.addWidget(loadProfileButton)
-        loadProfileButton.clicked.connect(self.loadProfile)
+        loadProfileButton.clicked.connect(self.selectProfile)
 
         timer = QtCore.QTimer(self)
         timer.timeout.connect(self.updateAll)
@@ -56,12 +57,26 @@ class MainMenu(QtGui.QWidget):
         self.windows += [profileCreator]
         profileCreator.show()
 
-    def loadProfile(self):
+    def selectProfile(self):
         savefile = open('saved_profiles.txt', 'rb')
-        # eventually will need to distinguish between multiple
-        #   saved profiles in the savefile
-        varsList = pickle.load(savefile)
-        profileWindow = ProfileWindow(varsList)
+        menuList = []
+        while True:
+            try:
+                name, varsList = pickle.load(savefile)
+                self.profiles[name] = varsList
+                menuList += [name]
+            except EOFError:
+                break
+        loadMenu = LoadMenu(menuList)
+        self.windows += [loadMenu]
+        loadMenu.show()
+        #loadMenu.profileChosen.connect(loadProfile) doesn't work
+        # figure out how to write this in current format
+        QtCore.QObject.connect(loadMenu, QtCore.SIGNAL("profileChosen"), self.loadProfile)
+
+    def loadProfile(self, name):
+        varsList = self.profiles.get(name)
+        profileWindow = ProfileWindow(name, varsList)
         self.windows += [profileWindow]
         profileWindow.show()
 
