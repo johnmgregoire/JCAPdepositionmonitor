@@ -9,6 +9,7 @@ Displays single auto-updating data graph
 
 from graph import *
 from profilecreator import *
+from time import strftime
 
 """ Functionality to add:
     - reset axis labels while maintaining same range (i.e., last 10 minutes)
@@ -87,6 +88,7 @@ class GraphWindow(QtGui.QMainWindow):
         self.gridlayout = QtGui.QGridLayout(self.main_widget)
         self.axeslayout = QtGui.QGridLayout(self.main_widget)
         self.timelayout = QtGui.QGridLayout(self.main_widget)
+        self.autolayout = QtGui.QGridLayout(self.main_widget)
 
         # setup the column stretches - 0 is the default
         # setup minimum column widths
@@ -101,10 +103,8 @@ class GraphWindow(QtGui.QMainWindow):
         # made widgets for layouts
         self.grid_widget = QtGui.QWidget()
         self.grid_widget.setLayout(self.gridlayout)
-        self.axes_widget = QtGui.QWidget()
-        self.axes_widget.setLayout(self.axeslayout)
 
-        # Input boxes for axes and checkboxes for gui
+        # input boxes for axes and checkboxes for gui
         self.hold_cb = QtGui.QCheckBox('Hold', self)
         self.hold_cb.stateChanged.connect(self.graph.hold)
     
@@ -117,7 +117,7 @@ class GraphWindow(QtGui.QMainWindow):
         self.Ymin = QtGui.QLineEdit(self)
         self.Ymax = QtGui.QLineEdit(self)
 
-        # Lables for the input boxes
+        # lables for the input boxes
         self.label_time = QtGui.QLabel('Show data from the last:')
         self.label_minutes = QtGui.QLabel('minutes')
         self.label_hours = QtGui.QLabel('hours')
@@ -125,35 +125,46 @@ class GraphWindow(QtGui.QMainWindow):
         self.label_Ymin = QtGui.QLabel('Y Min:')
         self.label_Ymax = QtGui.QLabel('Y Max:')
 
+        # buttons and their connections
         self.set_axes = QtGui.QPushButton('Enter')
+        self.auto_xaxes = QtGui.QPushButton('Auto X')
+        self.auto_yaxes = QtGui.QPushButton('Auto Y')
         self.set_axes.clicked.connect(self.setAxes)
+        self.auto_xaxes.clicked.connect(self.autoXAxes)
+        self.auto_yaxes.clicked.connect(self.autoYAxes)
+        
 
         # place the layouts inside the other layouts
         self.layout.addWidget(self.grid_widget)
 
-        # Add items to the grid widget
+        # add items to the grid widget
         self.gridlayout.addWidget(self.graph,0, 0)
-        self.gridlayout.addWidget(self.axes_widget, 0, 1)
+        self.gridlayout.addLayout(self.axeslayout, 0, 1)
 
-        # Set alignments for the widgets
+        # set alignments for the widgets
         self.axeslayout.setAlignment(QtCore.Qt.AlignTop)
 
-        # Add items to the axis widget
+        # add items to the axis widget
         self.axeslayout.addWidget(self.hold_cb, 0, 0)
         self.axeslayout.addWidget(self.label_time, 1, 0)
         self.axeslayout.addLayout(self.timelayout, 2, 0)
+
         self.timelayout.addWidget(self.minutes, 0, 0)
         self.timelayout.addWidget(self.label_minutes, 0, 1)
         self.timelayout.addWidget(self.hours, 1, 0)
         self.timelayout.addWidget(self.label_hours, 1, 1)
         self.timelayout.addWidget(self.days, 2, 0)
         self.timelayout.addWidget(self.label_days, 2, 1)
-        self.axeslayout.addWidget(self.label_Ymin)
-        self.axeslayout.addWidget(self.Ymin)
-        self.axeslayout.addWidget(self.label_Ymax)
-        self.axeslayout.addWidget(self.Ymax)
-        self.axeslayout.addWidget(self.set_axes)
         
+        self.axeslayout.addWidget(self.label_Ymin, 3, 0)
+        self.axeslayout.addWidget(self.Ymin, 4, 0)
+        self.axeslayout.addWidget(self.label_Ymax,5, 0)
+        self.axeslayout.addWidget(self.Ymax, 6, 0)
+        self.axeslayout.addWidget(self.set_axes, 7, 0)
+        self.axeslayout.addLayout(self.autolayout, 8, 0)
+
+        self.autolayout.addWidget(self.auto_xaxes, 0 , 0)
+        self.autolayout.addWidget(self.auto_yaxes, 0 , 1)
         
         
         self.setCentralWidget(self.main_widget)
@@ -170,14 +181,6 @@ class GraphWindow(QtGui.QMainWindow):
         varString = str(varName)
         self.graph = Graph(self.main_widget, xvarname = "Time",
                            yvarname = varString)
-
-        ## The following is just for testing remove when done
-        elmin = datetime.datetime.strptime('18:14:18:125', "%H:%M:%S:%f")
-        elmax = datetime.datetime.strptime('18:14:23:125', "%H:%M:%S:%f")
-        self.graph.setXlim(elmin,elmax)
-
-
-        
         self.gridlayout.addWidget(self.graph,0,0)
         self.setWindowTitle(varString)
         
@@ -185,7 +188,15 @@ class GraphWindow(QtGui.QMainWindow):
         self.graph.updatePlot()
 
     def setAxes(self):
+        setXAxes = [False, None, None]
         setYAxes = [False, None, None]
+
+        # dealing with the current time and the time that we have to
+        # go back
+        currTime = time.time()
+        timeBack = currTime
+        setXAxes[2] = dateObj(currTime)
+
         min_input = self.minutes.text()
         hour_input = self.hours.text()
         day_input = self.days.text()
@@ -204,15 +215,42 @@ class GraphWindow(QtGui.QMainWindow):
                 elif axis_tuple[0] == 'Ymax':
                     setYAxes[0] = True
                     setYAxes[2] = value
+                elif axis_tuple[0] == 'min':
+                    setXAxes[0] = True
+                    timeBack -= value*60
+                elif axis_tuple[0] == 'hour':
+                    setXAxes[0] = True
+                    timeBack -= value*60*60
+                elif axis_tuple[0] == 'day':
+                    setXAxes[0] = True
+                    timeBack -= value*60*60*24
             except ValueError:
                 pass
+        print setXAxes
         print setYAxes
+        
+        setXAxes[1] = dateObj(timeBack)
+        
         if setYAxes[0]:
             self.graph.setYlim(amin=setYAxes[1], amax=setYAxes[2])
+        if setXAxes[0]:
+            self.graph.setXlim(amin=setXAxes[1], amax=setXAxes[2])
+
+    def autoXAxes(self):
+        self.graph.axes.set_xlim(auto=True)
+        
+    def autoYAxes(self):
+        self.graph.axes.set_ylim(auto=True)
 
     def createProfile(self):
         self.profileCreator = ProfileCreator()
         self.profileCreator.show()
+
+
+    # Give a time.time() object and it returns a datetime object
+def dateObj(atime):
+    localCurrTime = strftime("%H:%M:%S", time.localtime(atime))
+    return datetime.datetime.strptime(localCurrTime, "%H:%M:%S")
 
     
 

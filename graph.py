@@ -68,9 +68,7 @@ class Graph(FigureCanvas):
             self.updating = True
 
     def setXlim(self, amin=None, amax=None):
-        self.axes.set_xlim(left=amin, right=amax, auto=True)
-        #self.axes.relim()
-        #self.draw()
+        self.axes.set_xlim(left=amin, right=amax)
 
     def setYlim(self, amin=None, amax=None):
         self.axes.set_ylim(bottom=amin, top=amax)
