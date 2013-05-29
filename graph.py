@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/23/2013
-# Last Updated: 5/24/2013
+# Last Updated: 5/29/2013
 # For JCAP
 
 import datetime
@@ -16,7 +16,8 @@ class Graph(FigureCanvas):
     """ sets up Figure object, plot, and auto-updating timer """
     def __init__(self, parent="None", width=3, height=2, dpi=80,
                  xvarname="None", yvarname="None"):
-
+        self.auto = True
+        self.timeWindow = 0
         self.updating = True
         self.xvar = xvarname
         self.yvar = yvarname
