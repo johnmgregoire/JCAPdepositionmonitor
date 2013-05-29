@@ -194,7 +194,7 @@ class GraphWindow(QtGui.QMainWindow):
         # dealing with the current time and the time that we have to
         # go back
         currTime = time.time()
-        timeBack = currTime
+        timeBack = 0
         setXAxes[2] = dateObj(currTime)
 
         min_input = self.minutes.text()
@@ -217,19 +217,19 @@ class GraphWindow(QtGui.QMainWindow):
                     setYAxes[2] = value
                 elif axis_tuple[0] == 'min':
                     setXAxes[0] = True
-                    timeBack -= value*60
+                    timeBack += value*60
                 elif axis_tuple[0] == 'hour':
                     setXAxes[0] = True
-                    timeBack -= value*60*60
+                    timeBack += value*60*60
                 elif axis_tuple[0] == 'day':
                     setXAxes[0] = True
-                    timeBack -= value*60*60*24
+                    timeBack += value*60*60*24
             except ValueError:
                 pass
         print setXAxes
         print setYAxes
         
-        setXAxes[1] = dateObj(timeBack)
+        setXAxes[1] = dateObj(currTime - timeBack)
         
         if setYAxes[0]:
             self.graph.setYlim(amin=setYAxes[1], amax=setYAxes[2])
@@ -247,7 +247,7 @@ class GraphWindow(QtGui.QMainWindow):
         self.profileCreator.show()
 
 
-    # Give a time.time() object and it returns a datetime object
+# give a time.time() object and it returns a datetime object
 def dateObj(atime):
     localCurrTime = strftime("%H:%M:%S", time.localtime(atime))
     return datetime.datetime.strptime(localCurrTime, "%H:%M:%S")
