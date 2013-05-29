@@ -11,8 +11,9 @@ import cPickle as pickle
 class ProfileCreator(QtGui.QWidget):
 
     """sets up the Widget"""
-    def __init__(self):
+    def __init__(self, datafile="None"):
         super(ProfileCreator, self).__init__()
+        self.source = datafile
 
         self.initUI()
 
@@ -85,7 +86,7 @@ class ProfileCreator(QtGui.QWidget):
             # 'ab+' indicates append to file
             savefile = open('saved_profiles.txt', 'ab+')
             # save tuple of profile name and list of variables in profile
-            pickle.dump((str(name), varsList), savefile)
+            pickle.dump((self.source, str(name), varsList), savefile)
             print 'Saved!'
         self.close()
 

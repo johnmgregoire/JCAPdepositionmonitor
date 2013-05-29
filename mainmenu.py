@@ -13,8 +13,8 @@ class MainMenu(QtGui.QWidget):
         super(MainMenu, self).__init__()
         self.windows = []
         self.profiles = {}
-        defaultFile = self.initReader()
-        self.reader = DataReader(parent=self, filename=defaultFile)
+        self.defaultFile = self.initReader()
+        self.reader = DataReader(parent=self, filename=self.defaultFile)
         self.reader.start()
         
         self.initUI()
@@ -64,12 +64,12 @@ class MainMenu(QtGui.QWidget):
         self.show()
 
     def makeGraph(self):
-        graph = GraphWindow()
+        graph = GraphWindow(datafile=self.defaultFile)
         self.windows += [graph]
         graph.show()
 
     def makeProfile(self):
-        profileCreator = ProfileCreator()
+        profileCreator = ProfileCreator(datafile=self.defaultFile)
         self.windows += [profileCreator]
         profileCreator.show()
 
@@ -78,9 +78,10 @@ class MainMenu(QtGui.QWidget):
         menuList = []
         while True:
             try:
-                name, varsList = pickle.load(savefile)
-                self.profiles[name] = varsList
-                menuList += [name]
+                datafile, name, varsList = pickle.load(savefile)
+                if datafile == self.defaultFile:
+                    self.profiles[name] = varsList
+                    menuList += [name]
             except EOFError:
                 break
         loadMenu = LoadMenu(menuList)

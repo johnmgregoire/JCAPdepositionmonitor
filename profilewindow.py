@@ -67,7 +67,6 @@ class LoadMenu(QtGui.QDialog):
     def sendName(self):
         name = str(self.list.currentItem().text())
         self.profileChosen.emit(name)
-        #self.emit(QtCore.SIGNAL("profileChosen"), name)
         self.close()
 
     def updateWindow(self):

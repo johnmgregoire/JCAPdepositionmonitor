@@ -44,9 +44,10 @@ from date_helpers import *
 """ main window of the application """
 class GraphWindow(QtGui.QMainWindow):
 
-    def __init__(self):
+    def __init__(self, datafile = "None"):
         super(GraphWindow, self).__init__()
         
+        self.source = datafile
 
         self.initUI()
 
@@ -324,7 +325,7 @@ class GraphWindow(QtGui.QMainWindow):
         self.graph.rightAxes.set_ylim(auto=True)
 
     def createProfile(self):
-        self.profileCreator = ProfileCreator()
+        self.profileCreator = ProfileCreator(datafile=self.source)
         self.profileCreator.show()
 
     def takeScreenShot(self):
