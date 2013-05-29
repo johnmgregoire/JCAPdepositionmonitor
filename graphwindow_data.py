@@ -9,7 +9,7 @@ Displays single auto-updating data graph
 
 from graph import *
 from profilecreator import *
-from time import strftime
+from date_helpers import *
 
 """ Functionality to add:
     - reset axis labels while maintaining same range (i.e., last 10 minutes)
@@ -239,6 +239,7 @@ class GraphWindow(QtGui.QMainWindow):
             self.graph.setXlim(amin=setXAxes[1], amax=setXAxes[2])
 
     def autoXAxes(self):
+        self.graph.auto = True
         self.graph.axes.set_xlim(auto=True)
         
     def autoYAxes(self):
@@ -248,11 +249,6 @@ class GraphWindow(QtGui.QMainWindow):
         self.profileCreator = ProfileCreator()
         self.profileCreator.show()
 
-
-# give a time.time() object and it returns a datetime object
-def dateObj(atime):
-    localCurrTime = strftime("%H:%M:%S", time.localtime(atime))
-    return datetime.datetime.strptime(localCurrTime, "%H:%M:%S")
 
     
 
