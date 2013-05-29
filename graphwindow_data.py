@@ -129,9 +129,11 @@ class GraphWindow(QtGui.QMainWindow):
         self.set_axes = QtGui.QPushButton('Enter')
         self.auto_xaxes = QtGui.QPushButton('Auto X')
         self.auto_yaxes = QtGui.QPushButton('Auto Y')
+        self.screen_shot = QtGui.QPushButton('Screen Shot')
         self.set_axes.clicked.connect(self.setAxes)
         self.auto_xaxes.clicked.connect(self.autoXAxes)
         self.auto_yaxes.clicked.connect(self.autoYAxes)
+        self.auto_yaxes.clicked.connect(self.takeScreenShot)
         
 
         # place the layouts inside the other layouts
@@ -165,6 +167,8 @@ class GraphWindow(QtGui.QMainWindow):
 
         self.autolayout.addWidget(self.auto_xaxes, 0 , 0)
         self.autolayout.addWidget(self.auto_yaxes, 0 , 1)
+
+        self.axeslayout.addWidget(self.screen_shot,9,0)
         
         
         self.setCentralWidget(self.main_widget)
@@ -249,7 +253,9 @@ class GraphWindow(QtGui.QMainWindow):
         self.profileCreator = ProfileCreator()
         self.profileCreator.show()
 
-
+    def takeScreenShot(self):
+        pass
+        
     
 
 
