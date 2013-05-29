@@ -108,7 +108,7 @@ class Graph(FigureCanvas):
     def setYlim(self, amin=None, amax=None):
         self.axes.set_ylim(bottom=amin, top=amax)
 
-    def setRYLim(self, amin=None, amax=None):
+    def setRYlim(self, amin=None, amax=None):
         self.rightAxes.set_ylim(bottom=amin, top=amax)
 
     def clearPlot(self):

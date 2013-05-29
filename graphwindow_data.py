@@ -88,7 +88,10 @@ class GraphWindow(QtGui.QMainWindow):
         self.gridlayout = QtGui.QGridLayout(self.main_widget)
         self.axeslayout = QtGui.QGridLayout(self.main_widget)
         self.timelayout = QtGui.QGridLayout(self.main_widget)
-        self.autolayout = QtGui.QGridLayout(self.main_widget)
+
+        # this exists so auto buttons can move if necessary
+        self.autowidget = QtGui.QWidget(self.main_widget)
+        self.autolayout = QtGui.QGridLayout(self.autowidget)
 
         # setup the column stretches - 0 is the default
         # setup minimum column widths
@@ -104,10 +107,11 @@ class GraphWindow(QtGui.QMainWindow):
         self.grid_widget = QtGui.QWidget()
         self.grid_widget.setLayout(self.gridlayout)
 
-        # input boxes for axes and checkboxes for gui
+        # checkbox to pause graph
         self.hold_cb = QtGui.QCheckBox('Hold', self)
         self.hold_cb.stateChanged.connect(self.graph.hold)
     
+        # input boxes for axis limits
         self.minutes = QtGui.QLineEdit(self)
         self.minutes.setFixedWidth(40)
         self.hours = QtGui.QLineEdit(self)
@@ -128,7 +132,9 @@ class GraphWindow(QtGui.QMainWindow):
         # buttons and their connections
         self.set_axes = QtGui.QPushButton('Enter')
         self.auto_xaxes = QtGui.QPushButton('Auto X')
-        self.auto_yaxes = QtGui.QPushButton('Auto Y')
+        self.auto_yaxes = QtGui.QPushButton('Auto Y (left)')
+        self.auto_yraxes = QtGui.QPushButton('Auto Y (right)')
+        self.auto_yraxes.clicked.connect(self.autoYRAxes)
         self.screen_shot = QtGui.QPushButton('Screen Shot')
         self.set_axes.clicked.connect(self.setAxes)
         self.auto_xaxes.clicked.connect(self.autoXAxes)
@@ -140,7 +146,13 @@ class GraphWindow(QtGui.QMainWindow):
             self.choose_var.addItem(var)
         self.set_raxis = QtGui.QPushButton('Plot')
         self.set_raxis.clicked.connect(self.addRAxis)
-        
+
+        self.label_YminR = QtGui.QLabel('Y Min (right):')
+        self.label_YmaxR = QtGui.QLabel('Y Max (right):')
+        self.YminR = QtGui.QLineEdit(self)
+        self.YmaxR = QtGui.QLineEdit(self)
+        self.axeslayout.removeWidget(self.set_axes)
+        self.axeslayout.removeWidget(self.autowidget)   
 
         # place the layouts inside the other layouts
         self.layout.addWidget(self.grid_widget)
@@ -154,9 +166,15 @@ class GraphWindow(QtGui.QMainWindow):
 
         # add items to the axis widget
         self.axeslayout.addWidget(self.hold_cb, 0, 0)
-        self.axeslayout.addWidget(self.label_time, 1, 0)
-        self.axeslayout.addLayout(self.timelayout, 2, 0)
 
+        self.axeslayout.addWidget(self.label_raxis)
+        self.axeslayout.addWidget(self.choose_var)
+        self.axeslayout.addWidget(self.set_raxis)
+
+        self.axeslayout.addWidget(self.screen_shot)
+
+        self.axeslayout.addWidget(self.label_time)
+        self.axeslayout.addLayout(self.timelayout, 6, 0)
         self.timelayout.addWidget(self.minutes, 0, 0)
         self.timelayout.addWidget(self.label_minutes, 0, 1)
         self.timelayout.addWidget(self.hours, 1, 0)
@@ -164,24 +182,33 @@ class GraphWindow(QtGui.QMainWindow):
         self.timelayout.addWidget(self.days, 2, 0)
         self.timelayout.addWidget(self.label_days, 2, 1)
         
-        self.axeslayout.addWidget(self.label_Ymin, 3, 0)
-        self.axeslayout.addWidget(self.Ymin, 4, 0)
-        self.axeslayout.addWidget(self.label_Ymax,5, 0)
-        self.axeslayout.addWidget(self.Ymax, 6, 0)
-        self.axeslayout.addWidget(self.set_axes, 7, 0)
-        self.axeslayout.addLayout(self.autolayout, 8, 0)
+        self.axeslayout.addWidget(self.label_Ymin)
+        self.axeslayout.addWidget(self.Ymin)
+        self.axeslayout.addWidget(self.label_Ymax)
+        self.axeslayout.addWidget(self.Ymax)
 
+        self.axeslayout.addWidget(self.label_YminR)
+        self.axeslayout.addWidget(self.YminR)
+        self.axeslayout.addWidget(self.label_YmaxR)
+        self.axeslayout.addWidget(self.YmaxR)
+        self.axeslayout.addWidget(self.set_axes)
+
+        self.label_YminR.hide()
+        self.YminR.hide()
+        self.label_YmaxR.hide()
+        self.YmaxR.hide()
+        
+        self.axeslayout.addWidget(self.set_axes)
+        
+        self.axeslayout.addWidget(self.autowidget)
+        #self.axeslayout.addLayout(self.autolayout, 12, 0)
         self.autolayout.addWidget(self.auto_xaxes, 0 , 0)
         self.autolayout.addWidget(self.auto_yaxes, 0 , 1)
+        self.autolayout.addWidget(self.auto_yraxes, 0 , 2)
 
-        self.axeslayout.addWidget(self.screen_shot,9,0)
-
-        self.axeslayout.addWidget(self.label_raxis)
-        self.axeslayout.addWidget(self.choose_var)
-        self.axeslayout.addWidget(self.set_raxis)
+        self.auto_yraxes.hide()
         
         self.setCentralWidget(self.main_widget)
-        
         
         self.show()
 
@@ -197,10 +224,22 @@ class GraphWindow(QtGui.QMainWindow):
         self.gridlayout.addWidget(self.graph,0,0)
         self.setWindowTitle(varString)
 
+        self.label_YminR.hide()
+        self.YminR.hide()
+        self.label_YmaxR.hide()
+        self.YmaxR.hide()
+        self.auto_yraxes.hide()
+
     def addRAxis(self):
         varName = self.choose_var.currentText()
         varString = str(varName)
         self.graph.addRightAxis(varString)
+
+        self.label_YminR.show()
+        self.YminR.show()
+        self.label_YmaxR.show()
+        self.YmaxR.show()
+        self.auto_yraxes.show()
         
     def updateWindow(self):
         self.graph.updatePlot()
@@ -244,8 +283,6 @@ class GraphWindow(QtGui.QMainWindow):
                     timeBack += value*60*60*24
             except ValueError:
                 pass
-        print setXAxes
-        print setYAxes
         
         setXAxes[1] = dateObj(currTime - timeBack)
         
@@ -256,12 +293,35 @@ class GraphWindow(QtGui.QMainWindow):
             self.graph.timeWindow = timeBack
             self.graph.setXlim(amin=setXAxes[1], amax=setXAxes[2])
 
+        if self.graph.hasRightAxis:
+            self.setRAxis()
+
+    def setRAxis(self):
+        setAxes = [False, None, None]
+        YminR_input = self.YminR.text()
+        YmaxR_input = self.YmaxR.text()
+        try:
+            setAxes[0] = True
+            setAxes[1] = float(YminR_input)
+        except ValueError:
+            pass
+        try:
+            setAxes[0] = True
+            setAxes[2] = float(YmaxR_input)
+        except ValueError:
+            pass
+        if setAxes:
+            self.graph.setRYlim(amin=setAxes[1], amax=setAxes[2])
+
     def autoXAxes(self):
         self.graph.auto = True
         self.graph.axes.set_xlim(auto=True)
         
     def autoYAxes(self):
         self.graph.axes.set_ylim(auto=True)
+
+    def autoYRAxes(self):
+        self.graph.rightAxes.set_ylim(auto=True)
 
     def createProfile(self):
         self.profileCreator = ProfileCreator()
