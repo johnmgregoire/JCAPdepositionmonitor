@@ -133,7 +133,7 @@ class GraphWindow(QtGui.QMainWindow):
         self.set_axes.clicked.connect(self.setAxes)
         self.auto_xaxes.clicked.connect(self.autoXAxes)
         self.auto_yaxes.clicked.connect(self.autoYAxes)
-        self.auto_yaxes.clicked.connect(self.takeScreenShot)
+        self.screen_shot.clicked.connect(self.takeScreenShot)
         
 
         # place the layouts inside the other layouts
@@ -254,7 +254,11 @@ class GraphWindow(QtGui.QMainWindow):
         self.profileCreator.show()
 
     def takeScreenShot(self):
-        pass
+        print "Taking screen shot"
+        #self.graph.figure.savefig("C:\Users\JCAP-HTE\Documents\GitHub\JCAPdepositionmonitor\test.png")
+        #self.graph.figure.savefig("test.png")
+        print "Screen shot saved"
+        
         
     
 
