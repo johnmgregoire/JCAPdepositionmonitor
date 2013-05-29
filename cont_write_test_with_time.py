@@ -37,7 +37,7 @@ while num < 100:
     #Getting the MS data
     ms = (str(x).split('.'))[1]
     
-    fulldate = strftime("%x %H:%M:%S", time.localtime(x))
+    fulldate = strftime("%m/%d/%Y %H:%M:%S", time.localtime(x))
     currentDT = fulldate.split()
     
     # The date in the form mm/dd/yyyy
