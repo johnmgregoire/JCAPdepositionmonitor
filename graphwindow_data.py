@@ -125,6 +125,9 @@ class GraphWindow(QtGui.QMainWindow):
         self.label_Ymin = QtGui.QLabel('Y Min:')
         self.label_Ymax = QtGui.QLabel('Y Max:')
 
+        self.set_axes = QtGui.QPushButton('Enter')
+        self.set_axes.clicked.connect(self.setAxes)
+
         # place the layouts inside the other layouts
         self.layout.addWidget(self.grid_widget)
 
@@ -149,6 +152,7 @@ class GraphWindow(QtGui.QMainWindow):
         self.axeslayout.addWidget(self.Ymin)
         self.axeslayout.addWidget(self.label_Ymax)
         self.axeslayout.addWidget(self.Ymax)
+        self.axeslayout.addWidget(self.set_axes)
         
         
         
@@ -156,7 +160,6 @@ class GraphWindow(QtGui.QMainWindow):
         
         
         self.show()
-        print "INIT UI FINISHED"
 
     def selectGraph(self, varName):
         # clear plot and set parent to None so it can be deleted
@@ -169,8 +172,8 @@ class GraphWindow(QtGui.QMainWindow):
                            yvarname = varString)
 
         ## The following is just for testing remove when done
-        elmin = datetime.datetime.strptime('15:32:25:4', "%H:%M:%S:%f")
-        elmax = datetime.datetime.strptime('15:32:27:76', "%H:%M:%S:%f")
+        elmin = datetime.datetime.strptime('18:14:18:125', "%H:%M:%S:%f")
+        elmax = datetime.datetime.strptime('18:14:23:125', "%H:%M:%S:%f")
         self.graph.setXlim(elmin,elmax)
 
 
@@ -180,6 +183,32 @@ class GraphWindow(QtGui.QMainWindow):
         
     def updateWindow(self):
         self.graph.updatePlot()
+
+    def setAxes(self):
+        setYAxes = [False, None, None]
+        min_input = self.minutes.text()
+        hour_input = self.hours.text()
+        day_input = self.days.text()
+        Ymin_input = self.Ymin.text()
+        Ymax_input = self.Ymax.text()
+        axes_input = [('min', min_input), ('hour', hour_input),
+                      ('day', day_input), ('Ymin', Ymin_input),
+                      ('Ymax', Ymax_input)]
+        for axis_tuple in axes_input:
+            try:
+                value = float(axis_tuple[1])
+                #self.axesToSet += [(axis_tuple[0], value)]
+                if axis_tuple[0] == 'Ymin':
+                    setYAxes[0] = True
+                    setYAxes[1] = value
+                elif axis_tuple[0] == 'Ymax':
+                    setYAxes[0] = True
+                    setYAxes[2] = value
+            except ValueError:
+                pass
+        print setYAxes
+        if setYAxes[0]:
+            self.graph.setYlim(amin=setYAxes[1], amax=setYAxes[2])
 
     def createProfile(self):
         self.profileCreator = ProfileCreator()
