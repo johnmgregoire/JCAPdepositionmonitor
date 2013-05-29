@@ -1,14 +1,16 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/23/2013
-# Last Updated: 5/29/2013
+# Last Updated: 5/24/2013
 # For JCAP
 
 import datetime
+import time
 from PyQt4 import QtGui
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from pylab import *
 from datareader import *
+from date_helpers import *
 
 """ widget to represent an auto-updating graph """
 class Graph(FigureCanvas):
@@ -16,6 +18,7 @@ class Graph(FigureCanvas):
     """ sets up Figure object, plot, and auto-updating timer """
     def __init__(self, parent="None", width=3, height=2, dpi=80,
                  xvarname="None", yvarname="None"):
+
         self.auto = True
         self.timeWindow = 0
         self.updating = True
@@ -51,9 +54,16 @@ class Graph(FigureCanvas):
                 except ValueError:
                     print "time cut off"
                     pass
-            time = matplotlib.dates.date2num(list_of_times)
+            timeToPlot = matplotlib.dates.date2num(list_of_times)
             try:
-                self.axes.plot_date(time, yvars)
+                self.axes.plot_date(timeToPlot, yvars)
+                if not self.auto:
+                    currTime = time.time()
+                    rightLim = dateObj(currTime)
+                    leftLim = dateObj(currTime - self.timeWindow)
+                    print "The current time:", dateObj(currTime)
+                    print "The time before:", leftLim
+                    self.setXlim(amin=leftLim, amax=rightLim)
             except ValueError:
                 print "column not updated: " + self.yvar
                 pass
