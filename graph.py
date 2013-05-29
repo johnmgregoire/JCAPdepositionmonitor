@@ -69,8 +69,6 @@ class Graph(FigureCanvas):
                     currTime = time.time()
                     rightLim = dateObj(currTime)
                     leftLim = dateObj(currTime - self.timeWindow)
-                    print "The current time:", dateObj(currTime)
-                    print "The time before:", leftLim
                     self.setXlim(amin=leftLim, amax=rightLim)
             except ValueError:
                 print "column not updated: " + self.yvar

@@ -13,5 +13,5 @@ import datetime
 
 # give a time.time() object and it returns a datetime object
 def dateObj(atime):
-    localCurrTime = strftime("%H:%M:%S", time.localtime(atime))
-    return datetime.datetime.strptime(localCurrTime, "%H:%M:%S")
+    localCurrTime = strftime("%m/%d/%Y %H:%M:%S", time.localtime(atime))
+    return datetime.datetime.strptime(localCurrTime, "%m/%d/%Y %H:%M:%S")
