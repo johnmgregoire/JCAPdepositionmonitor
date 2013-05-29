@@ -47,14 +47,20 @@ class Graph(FigureCanvas):
         if self.updating == True:
             yvars = DATA_DICT.get(self.yvar)
             list_of_times = []
-            for date_string in DATA_DICT.get(self.xvar):
+            time_array = DATA_DICT.get(self.xvar)
+            date_array = DATA_DICT.get("Date")
+            for index in range(len(time_array)):
                 try:
-                    list_of_times += [datetime.datetime.strptime
-                                      (date_string, "%H:%M:%S:%f")]
+                    full_time = date_array[index] + " " + time_array[index]
+                    formatted_time = datetime.datetime.strptime(full_time,
+                                                                "%m/%d/%Y %H:%M:%S:%f")
+                    list_of_times += [formatted_time]
+                    print formatted_time
                 except ValueError:
                     print "time cut off"
                     pass
             timeToPlot = matplotlib.dates.date2num(list_of_times)
+            print timeToPlot
             try:
                 self.axes.plot_date(timeToPlot, yvars)
                 if not self.auto:
