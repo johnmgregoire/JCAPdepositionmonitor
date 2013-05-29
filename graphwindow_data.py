@@ -122,8 +122,8 @@ class GraphWindow(QtGui.QMainWindow):
         self.label_minutes = QtGui.QLabel('minutes')
         self.label_hours = QtGui.QLabel('hours')
         self.label_days = QtGui.QLabel('days')
-        self.label_Ymin = QtGui.QLabel('Y Min:')
-        self.label_Ymax = QtGui.QLabel('Y Max:')
+        self.label_Ymin = QtGui.QLabel('Y Min (left):')
+        self.label_Ymax = QtGui.QLabel('Y Max (left):')
 
         # buttons and their connections
         self.set_axes = QtGui.QPushButton('Enter')
@@ -134,6 +134,12 @@ class GraphWindow(QtGui.QMainWindow):
         self.auto_xaxes.clicked.connect(self.autoXAxes)
         self.auto_yaxes.clicked.connect(self.autoYAxes)
         self.screen_shot.clicked.connect(self.takeScreenShot)
+        self.label_raxis = QtGui.QLabel('Choose a variable to plot on the right-hand axis:')
+        self.choose_var = QtGui.QComboBox()
+        for var in self.vars:
+            self.choose_var.addItem(var)
+        self.set_raxis = QtGui.QPushButton('Plot')
+        self.set_raxis.clicked.connect(self.addRAxis)
         
 
         # place the layouts inside the other layouts
@@ -169,7 +175,10 @@ class GraphWindow(QtGui.QMainWindow):
         self.autolayout.addWidget(self.auto_yaxes, 0 , 1)
 
         self.axeslayout.addWidget(self.screen_shot,9,0)
-        
+
+        self.axeslayout.addWidget(self.label_raxis)
+        self.axeslayout.addWidget(self.choose_var)
+        self.axeslayout.addWidget(self.set_raxis)
         
         self.setCentralWidget(self.main_widget)
         
@@ -187,6 +196,11 @@ class GraphWindow(QtGui.QMainWindow):
                            yvarname = varString)
         self.gridlayout.addWidget(self.graph,0,0)
         self.setWindowTitle(varString)
+
+    def addRAxis(self):
+        varName = self.choose_var.currentText()
+        varString = str(varName)
+        self.graph.addRightAxis(varString)
         
     def updateWindow(self):
         self.graph.updatePlot()
@@ -255,8 +269,7 @@ class GraphWindow(QtGui.QMainWindow):
 
     def takeScreenShot(self):
         print "Taking screen shot"
-        #self.graph.figure.savefig("C:\Users\JCAP-HTE\Documents\GitHub\JCAPdepositionmonitor\test.png")
-        #self.graph.figure.savefig("test.png")
+        self.graph.figure.savefig("test.png")
         print "Screen shot saved"
         
         

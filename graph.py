@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/23/2013
-# Last Updated: 5/24/2013
+# Last Updated: 5/29/2013
 # For JCAP
 
 import datetime
@@ -18,12 +18,13 @@ class Graph(FigureCanvas):
     """ sets up Figure object, plot, and auto-updating timer """
     def __init__(self, parent="None", width=3, height=2, dpi=80,
                  xvarname="None", yvarname="None"):
-
         self.auto = True
         self.timeWindow = 0
         self.updating = True
+        self.hasRightAxis = False
         self.xvar = xvarname
-        self.yvar = yvarname
+        self.yvarL = yvarname
+        self.yvarR = None
         self.figure = Figure(figsize=(width, height), dpi=dpi)
         self.initPlot()
         FigureCanvas.__init__(self, self.figure)
@@ -42,14 +43,16 @@ class Graph(FigureCanvas):
         self.axes.set_xlabel(self.xvar)
         self.axes.xaxis_date()
         self.figure.autofmt_xdate()
-        time_format = matplotlib.dates.DateFormatter('%m/%d/%y %H:%M:%S')
-        self.axes.xaxis.set_major_formatter(time_format)
-        self.axes.set_ylabel(self.yvar)
+        self.time_format = matplotlib.dates.DateFormatter('%m/%d/%y %H:%M:%S')
+        self.axes.xaxis.set_major_formatter(self.time_format)
+        self.axes.set_ylabel(self.yvarL)
 
     """ function that updates plot every second """
     def updatePlot(self):
         if self.updating == True:
-            yvars = DATA_DICT.get(self.yvar)
+            ydata = DATA_DICT.get(self.yvarL)
+            if self.hasRightAxis:
+                yrightdata = DATA_DICT.get(self.yvarR)
             list_of_times = []
             time_array = DATA_DICT.get(self.xvar)
             date_array = DATA_DICT.get("Date")
@@ -64,19 +67,34 @@ class Graph(FigureCanvas):
                     pass
             timeToPlot = matplotlib.dates.date2num(list_of_times)
             try:
-                self.axes.plot_date(timeToPlot, yvars)
+                self.axes.plot_date(timeToPlot, ydata)
                 if not self.auto:
                     currTime = time.time()
                     rightLim = dateObj(currTime)
                     leftLim = dateObj(currTime - self.timeWindow)
                     self.setXlim(amin=leftLim, amax=rightLim)
             except ValueError:
-                print "column not updated: " + self.yvar
+                print "column not updated: " + self.yvarL
                 pass
-
+            if self.hasRightAxis:
+                try:
+                    self.rightAxes.plot_date(timeToPlot, yrightdata, "ro")
+                except ValueError:
+                    print "column not updated: " + self.yvarR
+                    pass
             self.draw()
         else:
             pass
+
+    def addRightAxis(self, rightvar):
+        self.yvarR = rightvar
+        self.hasRightAxis = True
+        self.rightAxes = self.figure.add_subplot(111, sharex=self.axes, frameon=False)
+        self.rightAxes.yaxis.tick_right()
+        self.rightAxes.yaxis.set_label_position("right")
+        self.rightAxes.set_ylabel(self.yvarR)
+        self.rightAxes.xaxis.set_major_formatter(self.time_format)
+        self.rightAxes.get_xaxis().set_visible(False)
 
     def hold(self):
         if self.updating == True:
@@ -89,6 +107,9 @@ class Graph(FigureCanvas):
 
     def setYlim(self, amin=None, amax=None):
         self.axes.set_ylim(bottom=amin, top=amax)
+
+    def setRYLim(self, amin=None, amax=None):
+        self.rightAxes.set_ylim(bottom=amin, top=amax)
 
     def clearPlot(self):
         self.figure.clf()
