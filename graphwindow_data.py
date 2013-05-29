@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/21/2013
-# Last Updated: 5/28/2013
+# Last Updated: 5/29/2013
 # For JCAP
 
 """
@@ -234,6 +234,8 @@ class GraphWindow(QtGui.QMainWindow):
         if setYAxes[0]:
             self.graph.setYlim(amin=setYAxes[1], amax=setYAxes[2])
         if setXAxes[0]:
+            self.graph.auto = False
+            self.graph.timeWindow = timeBack
             self.graph.setXlim(amin=setXAxes[1], amax=setXAxes[2])
 
     def autoXAxes(self):

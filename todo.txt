@@ -11,5 +11,7 @@ Things to do next week:
 7. save image of graph (?)
 8. default window sizes/location
 9. y min/max options for single graph
-10. COLOR WHEELS?!?!?!
+10. read dates from data file
+	- scroll back by days
+11. COLOR WHEELS?!?!?!
 	- normalize by center/don't normalize
