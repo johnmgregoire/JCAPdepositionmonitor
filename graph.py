@@ -40,6 +40,10 @@ class Graph(FigureCanvas):
     def initPlot(self):
         self.axes = self.figure.add_subplot(111)
         self.axes.set_xlabel(self.xvar)
+        self.axes.xaxis_date()
+        self.figure.autofmt_xdate()
+        time_format = matplotlib.dates.DateFormatter('%m/%d/%y %H:%M:%S')
+        self.axes.xaxis.set_major_formatter(time_format)
         self.axes.set_ylabel(self.yvar)
 
     """ function that updates plot every second """
@@ -55,12 +59,10 @@ class Graph(FigureCanvas):
                     formatted_time = datetime.datetime.strptime(full_time,
                                                                 "%m/%d/%Y %H:%M:%S:%f")
                     list_of_times += [formatted_time]
-                    print formatted_time
                 except ValueError:
                     print "time cut off"
                     pass
             timeToPlot = matplotlib.dates.date2num(list_of_times)
-            print timeToPlot
             try:
                 self.axes.plot_date(timeToPlot, yvars)
                 if not self.auto:
