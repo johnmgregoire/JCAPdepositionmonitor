@@ -101,6 +101,8 @@ class Graph(FigureCanvas):
             pass
 
     def addRightAxis(self, rightvar):
+        if self.hasRightAxis:
+            self.figure.delaxes(self.rightAxes)
         self.yvarR = rightvar
         self.hasRightAxis = True
         #self.rightAxes = self.figure.add_subplot(111, sharex=self.axes, frameon=False)
