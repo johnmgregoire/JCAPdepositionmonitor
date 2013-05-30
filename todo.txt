@@ -4,9 +4,13 @@ Things to do:
 	* need to know where data files are going to be stored
 - Put multiple variables on same graph
 	- legend for each graph
+	* how many variables can be plotted on same axis?
 - Create menu for loading file
 	- definitely in main menu - also in graph window? 
 - Clicking on data point gives info (x, y coordinates)
+- Default window sizes/locations
+	- fix aspect ratio of profile window
 
 - COLOR WHEELS?!?!?!
 	- normalize by center/don't normalize
+	* get theta/radius calculation program from John
