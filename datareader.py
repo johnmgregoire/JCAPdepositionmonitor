@@ -46,7 +46,7 @@ class DataReader(QtCore.QThread):
             self.datafile.seek(self.lastEOFpos)
             data = self.datafile.readline()
             row = data.split(',')
-            if len(row) == numColumns:
+            if len(row) == numColumns and row[numColumns-1].endswith('\r\n'):
                 # add the new info to the respective column
                 for col in range(len(row)):
                     heading = DATA_HEADINGS.get(col)

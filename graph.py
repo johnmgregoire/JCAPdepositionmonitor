@@ -61,17 +61,17 @@ class Graph(FigureCanvas):
             time_array = DATA_DICT.get(self.xvar)
             date_array = DATA_DICT.get("Date")
             for index in range(len(time_array)):
-                try:
-                    full_time = date_array[index] + " " + time_array[index]
-                    formatted_time = datetime.datetime.strptime(full_time,
-                                                                "%m/%d/%Y %H:%M:%S:%f")
-                    list_of_times += [formatted_time]
-                except ValueError:
-                    print "time cut off"
-                    pass
+                full_time = date_array[index] + " " + time_array[index]
+                formatted_time = datetime.datetime.strptime(full_time,
+                                                            "%m/%d/%Y %H:%M:%S:%f")
+                list_of_times += [formatted_time]
             timeToPlot = matplotlib.dates.date2num(list_of_times)
             try:
-                self.axes.plot_date(timeToPlot, ydata)
+                del self.axes.lines[0]
+            except IndexError:
+                pass
+            try:
+                self.axes.plot_date(timeToPlot, ydata, label = self.yvarL)
                 if not self.auto:
                     currTime = time.time()
                     rightLim = dateObj(currTime)
@@ -80,12 +80,22 @@ class Graph(FigureCanvas):
             except ValueError:
                 print "column not updated: " + self.yvarL
                 pass
+
             if self.hasRightAxis:
                 try:
-                    self.rightAxes.plot_date(timeToPlot, yrightdata, "ro")
+                    del self.rightAxes.lines[0]
+                except IndexError:
+                    pass
+                try:
+                    self.rightAxes.plot_date(timeToPlot, yrightdata, "ro", label = self.yvarR) 
                 except ValueError:
                     print "column not updated: " + self.yvarR
                     pass
+                # add legend to graph
+                linesL, labelsL = self.axes.get_legend_handles_labels()
+                linesR, labelsR = self.rightAxes.get_legend_handles_labels()
+                self.rightAxes.legend(linesL + linesR, labelsL + labelsR, loc=0)
+                self.legendVisible = True
             self.draw()
         else:
             pass
@@ -93,7 +103,8 @@ class Graph(FigureCanvas):
     def addRightAxis(self, rightvar):
         self.yvarR = rightvar
         self.hasRightAxis = True
-        self.rightAxes = self.figure.add_subplot(111, sharex=self.axes, frameon=False)
+        #self.rightAxes = self.figure.add_subplot(111, sharex=self.axes, frameon=False)
+        self.rightAxes = self.axes.twinx()
         self.rightAxes.yaxis.tick_right()
         self.rightAxes.yaxis.set_label_position("right")
         self.rightAxes.set_ylabel(self.yvarR)
@@ -119,6 +130,7 @@ class Graph(FigureCanvas):
         self.figure.clf()
 
     def onclick(self,event):
+        print "clicked graph"
         if not self.hasRightAxis:
             try:
                 datetime_date = matplotlib.dates.num2date(event.xdata)
