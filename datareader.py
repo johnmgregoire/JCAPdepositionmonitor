@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/23/2013
-# Last Updated: 5/24/2013
+# Last Updated: 5/30/2013
 # For JCAP
 
 import csv, time
@@ -26,6 +26,7 @@ class DataReader(QtCore.QThread):
         headings[self.numColumns-1] = headings[self.numColumns-1][:-2]
         global DATA_DICT
         global DATA_HEADINGS
+        # initialize each heading with an array to store the column data
         for col in range(len(headings)):
             DATA_HEADINGS[col] = headings[col]
             DATA_DICT[headings[col]] = []
@@ -37,12 +38,13 @@ class DataReader(QtCore.QThread):
         numColumns = len(DATA_DICT)
 
         while self.running:
+            # control the speed that we get data
             time.sleep(0.001)
             self.datafile.seek(self.lastEOFpos)
             data = self.datafile.readline()
             row = data.split(',')
             if len(row) == numColumns:
-                #print row
+                # add the new info to the respective column
                 for col in range(len(row)):
                     heading = DATA_HEADINGS.get(col)
                     DATA_DICT[heading] += [row[col]]
