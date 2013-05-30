@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/21/2013
-# Last Updated: 5/29/2013
+# Last Updated: 5/30/2013
 # For JCAP
 
 """
@@ -337,16 +337,23 @@ class GraphWindow(QtGui.QMainWindow):
     def autoXAxes(self):
         self.graph.auto = True
         self.graph.axes.set_xlim(auto=True)
+        self.minutes.clear()
+        self.hours.clear()
+        self.days.clear()
 
     """ called when 'Auto Y (left)' button is clicked
         sets y axis limits automatically to fit all data """        
     def autoYAxes(self):
         self.graph.axes.set_ylim(auto=True)
+        self.Ymin.clear()
+        self.Ymax.clear()
 
     """ called when 'Auto Y (right)' button is clicked
         sets right-hand y axis limits automatically to fit all data """   
     def autoYRAxes(self):
         self.graph.rightAxes.set_ylim(auto=True)
+        self.YminR.clear()
+        self.YmaxR.clear()
 
     """ called when 'Create Profile' is chosen from options menu """
     def createProfile(self):
