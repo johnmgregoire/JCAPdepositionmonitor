@@ -13,9 +13,9 @@ DATA_HEADINGS = {}
 class DataReader(QtCore.QThread):
     def __init__(self, parent=None, filename='default.csv'):
         super(DataReader, self).__init__()
-        self.running = True
 
         self.initData(filename)
+        self.running = True
 
     def initData(self, filename):
         self.datafile = open(filename, 'rb')
@@ -26,6 +26,9 @@ class DataReader(QtCore.QThread):
         headings[self.numColumns-1] = headings[self.numColumns-1][:-2]
         global DATA_DICT
         global DATA_HEADINGS
+        # clear dictionary in case it has already been used for a different file
+        DATA_DICT.clear()
+        DATA_HEADINGS.clear()
         # initialize each heading with an array to store the column data
         for col in range(len(headings)):
             DATA_HEADINGS[col] = headings[col]
@@ -38,7 +41,7 @@ class DataReader(QtCore.QThread):
         numColumns = len(DATA_DICT)
 
         while self.running:
-            # control the speed that we get data
+            # control the reading speed
             time.sleep(0.001)
             self.datafile.seek(self.lastEOFpos)
             data = self.datafile.readline()

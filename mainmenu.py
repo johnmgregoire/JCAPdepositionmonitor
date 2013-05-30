@@ -17,9 +17,9 @@ class MainMenu(QtGui.QWidget):
         # holds all profiles associated with current file
         self.profiles = {}
         # save name of file from which application will read
-        self.defaultFile = self.initReader()
+        self.file = self.initReader()
         # initializes reader on data file
-        self.reader = DataReader(parent=self, filename=self.defaultFile)
+        self.reader = DataReader(parent=self, filename=self.file)
         self.reader.start()
         
         self.initUI()
@@ -52,6 +52,11 @@ class MainMenu(QtGui.QWidget):
         # load profile [check]
         # color wheel
 
+        # load data file
+        loadFileButton = QtGui.QPushButton('Choose Data File')
+        self.layout.addWidget(loadFileButton)
+        loadFileButton.clicked.connect(self.loadDataFile)
+
         # show single graph
         makeGraphButton = QtGui.QPushButton('Show Graph')
         self.layout.addWidget(makeGraphButton)
@@ -75,15 +80,31 @@ class MainMenu(QtGui.QWidget):
 
         self.show()
 
+    """ allows user to choose another data file """
+    def loadDataFile(self):
+        dirname = QtGui.QFileDialog.getOpenFileName(self, 'Open data file',
+                                                      'C:/Users/JCAP-HTE/Documents/GitHub/JCAPdepositionmonitor',
+                                                      'CSV files (*.csv)')
+        # if Cancel is clicked, dirname will be empty string
+        if dirname != '':
+            # converts Qstring to string
+            dirString = str(dirname)
+            # gets filename from current directory (will be changed eventually)
+            dirList = dirString.split('/')
+            self.file = dirList[len(dirList)-1]
+            self.reader.end()
+            self.reader = DataReader(parent=self, filename=self.file)
+            self.reader.start()
+
     """ creates window for single graph """
     def makeGraph(self):
-        graph = GraphWindow(datafile=self.defaultFile)
+        graph = GraphWindow(datafile=self.file)
         self.windows += [graph]
         graph.show()
 
     """ shows profile creator window """
     def makeProfile(self):
-        profileCreator = ProfileCreator(datafile=self.defaultFile)
+        profileCreator = ProfileCreator(datafile=self.file)
         self.windows += [profileCreator]
         profileCreator.show()
 
@@ -96,7 +117,7 @@ class MainMenu(QtGui.QWidget):
             try:
                 datafile, name, varsList = pickle.load(savefile)
                 # only show profiles associated with current data file
-                if datafile == self.defaultFile:
+                if datafile == self.file:
                     self.profiles[name] = varsList
                     menuList += [name]
             except EOFError:
