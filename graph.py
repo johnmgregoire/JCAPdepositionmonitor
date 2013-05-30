@@ -34,8 +34,9 @@ class Graph(FigureCanvas):
                                    QtGui.QSizePolicy.Expanding,
                                    QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
-
-        # set up connection to click - todo
+        
+        # clicking on graph gives x and y coordinates
+        #   (not enabled when right y axis is present)
         self.figure.canvas.mpl_connect('button_press_event', self.onclick)
         
         self.draw()
@@ -118,9 +119,10 @@ class Graph(FigureCanvas):
         self.figure.clf()
 
     def onclick(self,event):
-        try:
-            datetime_date = matplotlib.dates.num2date(event.xdata)
-            formatted_xdate = datetime_date.strftime("%m/%d/%Y %H:%M:%S")
-            print 'xdata=%s, ydata=%f'%(formatted_xdate, event.ydata)
-        except TypeError:
-            pass
+        if not self.hasRightAxis:
+            try:
+                datetime_date = matplotlib.dates.num2date(event.xdata)
+                formatted_xdate = datetime_date.strftime("%m/%d/%Y %H:%M:%S")
+                print 'xdata=%s, ydata=%f'%(formatted_xdate, event.ydata)
+            except TypeError:
+                pass

@@ -5,9 +5,9 @@ Things to do:
 - Put multiple variables on same graph
 	- legend for each graph
 	* how many variables can be plotted on same axis?
-- Create menu for loading file
+- Create menu for loading file [done for now]
 	- definitely in main menu - also in graph window? 
-- Clicking on data point gives info (x, y coordinates)
+- Clicking on data point gives info (x, y coordinates) [DONE!]
 - Default window sizes/locations
 	- fix aspect ratio of profile window
 
