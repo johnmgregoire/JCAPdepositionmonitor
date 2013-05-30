@@ -35,6 +35,9 @@ class Graph(FigureCanvas):
                                    QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
 
+        # set up connection to click - todo
+        self.figure.canvas.mpl_connect('button_press_event', self.onclick)
+        
         self.draw()
         
     """ draws and labels axes """
@@ -113,3 +116,9 @@ class Graph(FigureCanvas):
 
     def clearPlot(self):
         self.figure.clf()
+
+    def onclick(self,event):
+        try:
+            print 'xdata=%f, ydata=%f'%(event.xdata, event.ydata)
+        except TypeError:
+            pass
