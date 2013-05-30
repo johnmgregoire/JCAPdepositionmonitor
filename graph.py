@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/23/2013
-# Last Updated: 5/29/2013
+# Last Updated: 5/30/2013
 # For JCAP
 
 import datetime
@@ -119,6 +119,8 @@ class Graph(FigureCanvas):
 
     def onclick(self,event):
         try:
-            print 'xdata=%f, ydata=%f'%(event.xdata, event.ydata)
+            datetime_date = matplotlib.dates.num2date(event.xdata)
+            formatted_xdate = datetime_date.strftime("%m/%d/%Y %H:%M:%S")
+            print 'xdata=%s, ydata=%f'%(formatted_xdate, event.ydata)
         except TypeError:
             pass
