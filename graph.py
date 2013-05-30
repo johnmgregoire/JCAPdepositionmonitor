@@ -94,8 +94,7 @@ class Graph(FigureCanvas):
                 # add legend to graph
                 linesL, labelsL = self.axes.get_legend_handles_labels()
                 linesR, labelsR = self.rightAxes.get_legend_handles_labels()
-                self.rightAxes.legend(linesL + linesR, labelsL + labelsR, loc=0)
-                self.legendVisible = True
+                self.rightAxes.legend(linesL + linesR, labelsL + labelsR, loc=0, prop={"size":"small"})
             self.draw()
         else:
             pass

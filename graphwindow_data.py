@@ -97,7 +97,7 @@ class GraphWindow(QtGui.QMainWindow):
         # first column holds graph, second column holds graph options
         # set the column stretches - 0 is the default
         # set minimum column widths
-        self.gridlayout.setColumnStretch(0,4)
+        self.gridlayout.setColumnStretch(0,6)
         self.gridlayout.setColumnStretch(1,0)
         self.gridlayout.setColumnMinimumWidth(0,300)
         self.gridlayout.setRowMinimumHeight(0,375)
