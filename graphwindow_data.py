@@ -85,7 +85,7 @@ class GraphWindow(QtGui.QMainWindow):
         self.selectVar.activated[str].connect(self.selectGraph)
 
         # setup all the layouts - verify that they take in the correct
-        # widget  - TODO
+        # widget  - TODO figure out what QT as parent means
         self.layout = QtGui.QVBoxLayout(self.main_widget)
         self.gridlayout = QtGui.QGridLayout(self.main_widget)
         self.axeslayout = QtGui.QGridLayout(self.main_widget)
