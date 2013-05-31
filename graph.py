@@ -79,6 +79,8 @@ class Graph(FigureCanvas):
                 leftLim = dateObj(currTime - self.timeWindow)
                 self.setXlim(amin=leftLim, amax=rightLim)
         except ValueError:
+            print "size of dictionary entry: " + str(len(time_array))
+            print "length of list_of_times: " + str(len(list_of_times))
             print "size of x array: " + str(len(timeToPlot))
             print "size of y array: " + str(len(ydata))
             print "column not updated: " + self.yvarL
