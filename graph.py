@@ -94,13 +94,12 @@ class Graph(FigureCanvas):
             print "column not updated: " + theYvar
             pass
 
-    # TODO: self,row
     def updatePlot(self,row):
         time_value = dateObjFloat(row[self.colNum[0]] + " " + row[self.colNum[1]])
         self.axes.plot_date(time_value, row[self.colNum[2]])
 
         if self.hasRightAxis:
-            self.axes.plot_date(time_value, row[self.colNum[3]])
+            self.rightAxes.plot_date(time_value, row[self.colNum[3]])
         
         pass
         
