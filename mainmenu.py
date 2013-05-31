@@ -114,7 +114,10 @@ class MainMenu(QtGui.QWidget):
 
     """ shows load profile window """
     def selectProfile(self):
-        savefile = open('saved_profiles.txt', 'rb')
+        try:
+            savefile = open('saved_profiles.txt', 'rb')
+        except IOError:
+            pass
         menuList = []
         while True:
             # unpickle each profile individually
