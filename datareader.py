@@ -54,7 +54,7 @@ class DataReader(QtCore.QThread):
                 # add the new info to the respective column
                 for col in range(len(row)):
                     heading = DATA_HEADINGS.get(col)
-                    DATA_DICT[heading] += [row[col]]
+                    DATA_DICT[heading].append(row[col])
                 # SEND SIGNAL
                 self.lineRead.emit()
                 # move the reader cursor only if we read in a full line
