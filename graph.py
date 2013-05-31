@@ -96,10 +96,16 @@ class Graph(FigureCanvas):
 
     def updatePlot(self,row):
         time_value = dateObjFloat(row[self.colNum[0]] + " " + row[self.colNum[1]])
-        self.axes.plot_date(time_value, row[self.colNum[2]])
+        self.axes.plot_date(time_value, row[self.colNum[2]], "bo")
 
         if self.hasRightAxis:
-            self.rightAxes.plot_date(time_value, row[self.colNum[3]])
+            self.rightAxes.plot_date(time_value, row[self.colNum[3]], "ro")
+
+        if not self.auto:
+            currTime = time.time()
+            rightLim = dateObj(currTime)
+            leftLim = dateObj(currTime - self.timeWindow)
+            self.setXlim(amin=leftLim, amax=rightLim)
         
         pass
         
@@ -156,10 +162,10 @@ class Graph(FigureCanvas):
 ##
 ##        self.draw()
 
+
     def getCol(self,colName):
         theCol = [k for k, v in DATA_HEADINGS.iteritems() if v == colName]
         return theCol[0]
-
 
     def addRightAxis(self, rightvar):
         if self.hasRightAxis:
@@ -174,6 +180,7 @@ class Graph(FigureCanvas):
         self.rightAxes.set_ylabel(self.yvarR)
         self.rightAxes.xaxis.set_major_formatter(self.time_format)
         self.rightAxes.get_xaxis().set_visible(False)
+        self.firstPlot("right", "ro")
 
     def setXlim(self, amin=None, amax=None):
         self.axes.set_xlim(left=amin, right=amax)
