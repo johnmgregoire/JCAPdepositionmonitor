@@ -47,6 +47,7 @@ class Graph(FigureCanvas):
     def initPlot(self):
         self.axes = self.figure.add_subplot(111)
         self.axes.set_xlabel(self.xvar)
+        self.axes.set_ylabel(self.yvarL)
         self.axes.xaxis_date()
         self.figure.autofmt_xdate()
         self.time_format = matplotlib.dates.DateFormatter('%m/%d/%y %H:%M:%S')
@@ -59,7 +60,6 @@ class Graph(FigureCanvas):
     """function that does the first plotting of the graph"""
     def firstPlot(self,nameOfAxis, lineDes):
 
-        #### TODO add lengend
         list_of_times = []
         theAxes = None
         theYvar = None
@@ -186,6 +186,10 @@ class Graph(FigureCanvas):
         self.rightAxes.xaxis.set_major_formatter(self.time_format)
         self.rightAxes.get_xaxis().set_visible(False)
         self.firstPlot("right", "ro")
+        #add legend to graph
+        linesL, labelsL = self.axes.get_legend_handles_labels()
+        linesR, labelsR = self.rightAxes.get_legend_handles_labels()
+        self.rightAxes.legend(linesL + linesR, labelsL + labelsR, loc=2, prop={"size":"small"})
 
     def setXlim(self, amin=None, amax=None):
         self.axes.set_xlim(left=amin, right=amax)

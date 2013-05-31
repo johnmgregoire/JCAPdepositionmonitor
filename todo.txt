@@ -20,3 +20,10 @@ Reducing memory usage (Graph):
 - windows update (graphs call draw()) every second
 - build legend based on initial plot - find some way to save "artists"
 	(2D lines? plots?)
+[5/31 - DONE!]
+
+In order for the program to run correctly,
+the following need to happen in this order:
+- Start writing to data file before opening file in program
+- Wait a couple of seconds before opening graph so
+	reader can initialize (?)
