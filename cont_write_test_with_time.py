@@ -29,7 +29,10 @@ csvwriter.writerow(headers)
 
 origTime = time.time()
 
-while num < 100:
+# flush to the file ever "flushTime" seconds
+flushTime = 0.1
+
+while num < 1000:
     
     # Date handling
     x = time.time()
@@ -55,13 +58,13 @@ while num < 100:
         content += [ str(num % (j*50))]
 
     # Modifiy to simulate writing speed
-    time.sleep(0.5)
+    time.sleep(0.1)
     csvwriter.writerow(content)
 
     y = time.time()
 
     # Flush every second
-    if(y - origTime >= 1):
+    if(y - origTime >= flushTime):
     
         origTime = y
         csvfile.flush()
