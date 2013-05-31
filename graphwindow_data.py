@@ -152,6 +152,8 @@ class GraphWindow(QtGui.QMainWindow):
         # set the possible streches of input boxes
         self.Ymin.setSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Preferred)
         self.Ymax.setSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Preferred)
+        self.YminR.setSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Preferred)
+        self.YmaxR.setSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Preferred)
         #self.set_axes.setSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Preferred)
 
         # initialize menu to choose variable for right-hand axis
@@ -241,6 +243,14 @@ class GraphWindow(QtGui.QMainWindow):
         self.label_YmaxR.hide()
         self.YmaxR.hide()
         self.auto_yraxes.hide()
+        # clear axis label fields
+        self.minutes.clear()
+        self.hours.clear()
+        self.days.clear()
+        self.Ymin.clear()
+        self.Ymax.clear()
+        self.YminR.clear()
+        self.YmaxR.clear()
 
     """ called when request to add plot to right-hand axis is made """
     def addRAxis(self):
@@ -249,6 +259,9 @@ class GraphWindow(QtGui.QMainWindow):
         # convert QString to string
         varString = str(varName)
         self.graph.addRightAxis(varString)
+        # reset right y-axis limit fields
+        self.YminR.clear()
+        self.YmaxR.clear()
         # show all options for right-hand axis
         self.label_YminR.show()
         self.YminR.show()
