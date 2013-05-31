@@ -94,19 +94,22 @@ class MainMenu(QtGui.QWidget):
             dirList = dirString.split('/')
             self.file = dirList[len(dirList)-1]
             self.reader.end()
+            # hides all windows so they can be removed later
+            for window in self.windows:
+                window.hide()
             self.reader = DataReader(parent=self, filename=self.file)
             self.reader.start()
 
     """ creates window for single graph """
     def makeGraph(self):
         graph = GraphWindow(datafile=self.file)
-        self.windows += [graph]
+        self.windows.append(graph)
         graph.show()
 
     """ shows profile creator window """
     def makeProfile(self):
         profileCreator = ProfileCreator(datafile=self.file)
-        self.windows += [profileCreator]
+        self.windows.append(profileCreator)
         profileCreator.show()
 
     """ shows load profile window """
@@ -124,7 +127,7 @@ class MainMenu(QtGui.QWidget):
             except EOFError:
                 break
         loadMenu = LoadMenu(menuList)
-        self.windows += [loadMenu]
+        self.windows.append(loadMenu)
         loadMenu.show()
         loadMenu.profileChosen.connect(self.loadProfile)
 
@@ -132,7 +135,7 @@ class MainMenu(QtGui.QWidget):
     def loadProfile(self, name):
         varsList = self.profiles.get(str(name))
         profileWindow = ProfileWindow(name, varsList)
-        self.windows += [profileWindow]
+        self.windows.append(profileWindow)
         profileWindow.show()
 
     """ sends new data received by reader to active graph windows """
@@ -142,8 +145,11 @@ class MainMenu(QtGui.QWidget):
 
     """ updates all active graph windows every second """
     def redrawAll(self):
+        print "time to update!"
+        print len(self.windows)
         for window in self.windows:
             if window.isHidden():
+                print "removing ", window
                 self.windows.remove(window)
             else:
                 window.redrawWindow()

@@ -19,7 +19,7 @@ class ProfileCreator(QtGui.QWidget):
 
     """creates all graphics in the Widget"""
     def initUI(self):
-        self.setGeometry(400, 400, 400, 300)
+        self.setGeometry(400, 200, 400, 300)
         self.setWindowTitle('Create a New Profile')
         # top-level vertical layout
         vBox = QtGui.QVBoxLayout(self)
@@ -106,7 +106,7 @@ class ProfileCreator(QtGui.QWidget):
             self.close()
 
     """function called on all windows by MainMenu"""
-    def updateWindow(self):
+    def updateWindow(self, newRow):
         # no figures to update
         pass
 
