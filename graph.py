@@ -106,59 +106,7 @@ class Graph(FigureCanvas):
         self.timeFrame()
         
         pass
-        
-##    """ function that updates plot every second """
-##    def updatePlot(self,row):
-##        ydata = copy.deepcopy(DATA_DICT.get(self.yvarL))
-##        if self.hasRightAxis:
-##            yrightdata = copy.deepcopy(DATA_DICT.get(self.yvarR))
-##        list_of_times = []
-##        time_array = copy.deepcopy(DATA_DICT.get(self.xvar))
-##        date_array = copy.deepcopy(DATA_DICT.get("Date"))
-##        for index in range(len(time_array)):
-##            full_time = date_array[index] + " " + time_array[index]
-##            formatted_time = dateObjFloat(full_time)
-##            list_of_times += [formatted_time]
-##        timeToPlot = matplotlib.dates.date2num(list_of_times)
-##        try:
-##            del self.axes.lines[0]
-##        except IndexError:
-##            pass
-##        
-##        try:
-##            self.axes.plot_date(timeToPlot, ydata, label = self.yvarL)
-##            if not self.auto:
-##                currTime = time.time()
-##                rightLim = dateObj(currTime)
-##                leftLim = dateObj(currTime - self.timeWindow)
-##                self.setXlim(amin=leftLim, amax=rightLim)
-##        except ValueError:
-##            print "size of time_array - DICT " + str(len(time_array))
-##            print "size of date_array - DICT " + str(len(date_array))
-##            print "length of list_of_times: " + str(len(list_of_times))
-##            print "size of x array: " + str(len(timeToPlot))
-##            print "size of y array: " + str(len(ydata))
-##            print "column not updated: " + self.yvarL
-##            pass
-##
-##        if self.hasRightAxis:
-##            try:
-##                del self.rightAxes.lines[0]
-##            except IndexError:
-##                pass
-##            try:
-##                self.rightAxes.plot_date(timeToPlot, yrightdata, "ro", label = self.yvarR) 
-##            except ValueError:
-##                print "size of x array: " + str(len(timeToPlot))
-##                print "size of y array: " + str(len(yrightdata))
-##                print "column not updated: " + self.yvarR
-##                pass
-##            #add legend to graph
-##            linesL, labelsL = self.axes.get_legend_handles_labels()
-##            linesR, labelsR = self.rightAxes.get_legend_handles_labels()
-##            self.rightAxes.legend(linesL + linesR, labelsL + labelsR, loc=2, prop={"size":"small"})
-##
-##        self.draw()
+
 
     def timeFrame(self):
             if not self.auto:
