@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/28/2013
-# Last Updated: 5/30/2013
+# Last Updated: 5/31/2013
 # For JCAP
 
 from graphwindow_data import *
@@ -145,11 +145,8 @@ class MainMenu(QtGui.QWidget):
 
     """ updates all active graph windows every second """
     def redrawAll(self):
-        print "time to update!"
-        print len(self.windows)
         for window in self.windows:
             if window.isHidden():
-                print "removing ", window
                 self.windows.remove(window)
             else:
                 window.redrawWindow()
