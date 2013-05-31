@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/21/2013
-# Last Updated: 5/30/2013
+# Last Updated: 5/31/2013
 # For JCAP
 
 """
@@ -11,23 +11,9 @@ from graph import *
 from profilecreator import *
 from date_helpers import *
 
-""" Functionality to add:
-    - reset axis labels while maintaining same range (i.e., last 10 minutes)
-
-    Concerns for multiple graphs:
-    - loading previous data when switching graphs
-    - should all graphs be initialized at the beginning, or initialized
-        only when clicked on?
-    - incomplete set of data in DATA_DICT when graphs are updated
-    - Different graphs are affected by terminal/shell activity due to them
-        technically being on the same look/update information. This is likely
-        not fixable by simply separating them, probably threading is necessary.
-        (This is probably not an issue anymore.)
-
-    TO DO:
+""" TO DO:
     - take data on certain conditions?
     - try/catch with partial rows (and other places)
-    - fix reader so it doesn't put partial last columns into dictionary
 
     More things to consider:
     - Is importing a library file more than once dangerous?
@@ -99,8 +85,8 @@ class GraphWindow(QtGui.QMainWindow):
         # first column holds graph, second column holds graph options
         # set the column stretches - 0 is the default
         # set minimum column widths
-        self.gridlayout.setColumnStretch(0,7)
-        self.gridlayout.setColumnStretch(1,1)
+        self.gridlayout.setColumnStretch(0,4)
+        self.gridlayout.setColumnStretch(1,0)
         self.gridlayout.setColumnMinimumWidth(0,300)
         self.gridlayout.setRowMinimumHeight(0,375)
 

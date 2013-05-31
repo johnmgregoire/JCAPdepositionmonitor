@@ -7,10 +7,16 @@ Things to do:
 	* how many variables can be plotted on same axis?
 - Create menu for loading file [done for now]
 	- definitely in main menu - also in graph window? 
-- Clicking on data point gives info (x, y coordinates) [DONE!]
-- Default window sizes/locations
-	- fix aspect ratio of profile window
 
 - COLOR WHEELS?!?!?!
 	- normalize by center/don't normalize
 	* get theta/radius calculation program from John
+
+Reducing memory usage (Graph):
+- drawing plot the first time makes deep copies of DATA_DICT entries
+- reader sends signal with new row each time row is read
+- something needs to parse signal to send graphs relevant data
+- after initial drawing, graph plots whenever signal comes in
+- windows update (graphs call draw()) every second
+- build legend based on initial plot - find some way to save "artists"
+	(2D lines? plots?)

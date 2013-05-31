@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/28/2013
-# Last Updated: 5/30/2013
+# Last Updated: 5/31/2013
 # For JCAP
 
 from PyQt4 import QtCore, QtGui
