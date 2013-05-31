@@ -21,6 +21,7 @@ class MainMenu(QtGui.QWidget):
         # initializes reader on data file
         self.reader = DataReader(parent=self, filename=self.file)
         self.reader.start()
+        self.reader.lineRead.connect(self.doStuff)
         
         self.initUI()
 
@@ -73,10 +74,10 @@ class MainMenu(QtGui.QWidget):
         loadProfileButton.clicked.connect(self.selectProfile)
 
         # initialize the timer that updates all graphs in application
-        timer = QtCore.QTimer(self)
-        timer.timeout.connect(self.updateAll)
+        #timer = QtCore.QTimer(self)
+        #timer.timeout.connect(self.updateAll)
         # update graph every 1000 milliseconds
-        timer.start(1000)
+        #timer.start(1000)
 
         self.show()
 
@@ -147,6 +148,11 @@ class MainMenu(QtGui.QWidget):
         print "signal transmitted"
         self.reader.end()
         event.accept()
+
+    def doStuff(self):
+        print 'I read a line!'
+        self.updateAll() #<- don't want to do this because it calls
+        #   update a million times after reader gets started ...
 
 """ main event loop """
 def main():
