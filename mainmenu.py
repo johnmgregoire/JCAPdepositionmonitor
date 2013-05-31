@@ -21,7 +21,7 @@ class MainMenu(QtGui.QWidget):
         # initializes reader on data file
         self.reader = DataReader(parent=self, filename=self.file)
         self.reader.start()
-        self.reader.lineRead.connect(self.doStuff)
+        self.reader.lineRead.connect(self.newLineRead)
         
         self.initUI()
 
@@ -149,7 +149,7 @@ class MainMenu(QtGui.QWidget):
         self.reader.end()
         event.accept()
 
-    def doStuff(self):
+    def newLineRead(self):
         print 'I read a line!'
         self.updateAll() #<- don't want to do this because it calls
         #   update a million times after reader gets started ...

@@ -48,6 +48,7 @@ class GraphWindow(QtGui.QMainWindow):
         super(GraphWindow, self).__init__()
         # save spreadsheet filename
         self.source = datafile
+        self.updating = False
 
         self.initUI()
 
@@ -76,6 +77,7 @@ class GraphWindow(QtGui.QMainWindow):
         # initialize default graph
         self.graph = Graph(self.main_widget, xvarname="Time",
                            yvarname=self.vars[0])
+        self.updating = True
         self.setWindowTitle(self.vars[0])
 
         # make drop-down menu for selecting graphs      
@@ -111,7 +113,7 @@ class GraphWindow(QtGui.QMainWindow):
 
         # initialize checkbox that acts as pause button
         self.hold_cb = QtGui.QCheckBox('Hold', self)
-        self.hold_cb.stateChanged.connect(self.graph.hold)
+        self.hold_cb.stateChanged.connect(self.hold)
     
         # initialize input boxes for axis limits
         self.minutes = QtGui.QLineEdit(self)
@@ -256,7 +258,15 @@ class GraphWindow(QtGui.QMainWindow):
 
     """ called by MainMenu at every 1-second interval """        
     def updateWindow(self):
-        self.graph.updatePlot()
+        if self.updating:
+            self.graph.updatePlot()
+
+    """ toggles auto-updating property of graphs in window """
+    def hold(self):
+        if self.updating == True:
+            self.updating = False
+        else:
+            self.updating = True
 
     """ called when user gives input for axis limits """
     def setAxes(self):
