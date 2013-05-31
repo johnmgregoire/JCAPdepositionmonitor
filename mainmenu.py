@@ -156,7 +156,7 @@ class MainMenu(QtGui.QWidget):
 
 ### this is currently redundant - can connect signal directly to updateGraphs ###
     def newLineRead(self, newRow):
-        print 'I read a line: ', newRow
+        #print 'I read a line: ', newRow
         self.updateGraphs(newRow)
 
 """ main event loop """

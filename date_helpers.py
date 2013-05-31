@@ -15,3 +15,7 @@ import datetime
 def dateObj(atime):
     localCurrTime = strftime("%m/%d/%Y %H:%M:%S", time.localtime(atime))
     return datetime.datetime.strptime(localCurrTime, "%m/%d/%Y %H:%M:%S")
+
+# give it a string of the from m/d/Y H:M:S:f and it returns a date time object
+def dateObjFloat(fullTime):
+    return datetime.datetime.strptime(fullTime,"%m/%d/%Y %H:%M:%S:%f")
