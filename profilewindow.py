@@ -56,7 +56,7 @@ class ProfileWindow(QtGui.QMainWindow):
     """ called by MainMenu every second """  
     def redrawWindow(self):
         for graph in self.graphs:
-            self.graph.draw()
+            graph.draw()
 
 """ menu that shows avaiable profiles and loads user's selection """
 class LoadMenu(QtGui.QDialog):
