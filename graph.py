@@ -25,6 +25,7 @@ class Graph(FigureCanvas):
         self.xvar = xvarname
         self.yvarL = yvarname
         self.yvarR = None
+        self.colNum = [self.getCol("Date"),self.getCol(self.xvar),self.getCol(self.yvarL), None]
         self.figure = Figure(figsize=(width, height), dpi=dpi)
 
         FigureCanvas.__init__(self, self.figure)
@@ -95,6 +96,12 @@ class Graph(FigureCanvas):
 
     # TODO: self,row
     def updatePlot(self,row):
+        time_value = dateObjFloat(row[self.colNum[0]] + " " + row[self.colNum[1]])
+        self.axes.plot_date(time_value, row[self.colNum[2]])
+
+        if self.hasRightAxis:
+            self.axes.plot_date(time_value, row[self.colNum[3]])
+        
         pass
         
 ##    """ function that updates plot every second """
@@ -150,10 +157,16 @@ class Graph(FigureCanvas):
 ##
 ##        self.draw()
 
+    def getCol(self,colName):
+        theCol = [k for k, v in DATA_HEADINGS.iteritems() if v == colName]
+        return theCol[0]
+
+
     def addRightAxis(self, rightvar):
         if self.hasRightAxis:
             self.figure.delaxes(self.rightAxes)
         self.yvarR = rightvar
+        self.colNum[3] = self.getCol(self.yvarR)
         self.hasRightAxis = True
         #self.rightAxes = self.figure.add_subplot(111, sharex=self.axes, frameon=False)
         self.rightAxes = self.axes.twinx()
