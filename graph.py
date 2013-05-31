@@ -82,6 +82,8 @@ class Graph(FigureCanvas):
             
         timeToPlot = matplotlib.dates.date2num(list_of_times)
 
+        self.timeFrame()
+
         try:
             theAxes.plot_date(timeToPlot, ydata, lineDes, label = theYvar)
             
@@ -100,12 +102,8 @@ class Graph(FigureCanvas):
 
         if self.hasRightAxis:
             self.rightAxes.plot_date(time_value, row[self.colNum[3]], "ro")
-
-        if not self.auto:
-            currTime = time.time()
-            rightLim = dateObj(currTime)
-            leftLim = dateObj(currTime - self.timeWindow)
-            self.setXlim(amin=leftLim, amax=rightLim)
+            
+        self.timeFrame()
         
         pass
         
@@ -161,6 +159,13 @@ class Graph(FigureCanvas):
 ##            self.rightAxes.legend(linesL + linesR, labelsL + labelsR, loc=2, prop={"size":"small"})
 ##
 ##        self.draw()
+
+    def timeFrame(self):
+            if not self.auto:
+                currTime = time.time()
+                rightLim = dateObj(currTime)
+                leftLim = dateObj(currTime - self.timeWindow)
+                self.setXlim(amin=leftLim, amax=rightLim)
 
 
     def getCol(self,colName):
