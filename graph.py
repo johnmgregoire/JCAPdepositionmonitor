@@ -90,7 +90,7 @@ class Graph(FigureCanvas):
             print "length of list_of_times: " + str(len(list_of_times))
             print "size of x array: " + str(len(timeToPlot))
             print "size of y array: " + str(len(ydata))
-            print "column not updated: " + theAxes
+            print "column not updated: " + theYvar
             pass
 
     # TODO: self,row
