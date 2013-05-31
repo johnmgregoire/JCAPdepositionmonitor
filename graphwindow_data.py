@@ -269,11 +269,15 @@ class GraphWindow(QtGui.QMainWindow):
         self.YmaxR.show()
         self.auto_yraxes.show()
 
-    """ called by MainMenu at every 1-second interval """        
-    def updateWindow(self):
+    """ called whenever new data is ready to be plotted """
+    def updateWindow(self, newRow):
+        self.graph.updatePlot(newRow)
+            
+    """ called by MainMenu every second """  
+    def redrawWindow(self):
         if self.updating:
-            self.graph.updatePlot()
-
+            self.graph.draw()
+        
     """ toggles auto-updating property of graphs in window """
     def hold(self):
         if self.updating == True:

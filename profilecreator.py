@@ -109,4 +109,9 @@ class ProfileCreator(QtGui.QWidget):
     def updateWindow(self):
         # no figures to update
         pass
+
+    """function called on all windows by MainMenu"""
+    def redrawWindow(self):
+        # no figures to draw
+        pass
             

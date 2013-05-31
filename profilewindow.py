@@ -48,10 +48,15 @@ class ProfileWindow(QtGui.QMainWindow):
             self.graphs += [newGraph]
             grid.addWidget(newGraph, 1, index)
 
-    """ called by MainMenu every second """
-    def updateWindow(self):
+    """ called whenever new data is ready to be plotted """
+    def updateWindow(self, newRow):
         for graph in self.graphs:
-            graph.updatePlot()
+            graph.updatePlot(newRow)
+
+    """ called by MainMenu every second """  
+    def redrawWindow(self):
+        for graph in self.graphs:
+            self.graph.draw()
 
 """ menu that shows avaiable profiles and loads user's selection """
 class LoadMenu(QtGui.QDialog):
@@ -88,4 +93,8 @@ class LoadMenu(QtGui.QDialog):
 
     """ called by MainMenu every second; nothing for this widget to do """
     def updateWindow(self):
+        pass
+
+    """ called by MainMenu every second; nothing for this widget to do """
+    def redrawWindow(self):
         pass

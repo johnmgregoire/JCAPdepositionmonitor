@@ -21,7 +21,7 @@ class MainMenu(QtGui.QWidget):
         # initializes reader on data file
         self.reader = DataReader(parent=self, filename=self.file)
         self.reader.start()
-        #self.reader.lineRead.connect(self.newLineRead)
+        self.reader.lineRead.connect(self.newLineRead)
         
         self.initUI()
 
@@ -135,13 +135,18 @@ class MainMenu(QtGui.QWidget):
         self.windows += [profileWindow]
         profileWindow.show()
 
-    """ updates all active windows every second """
-    def updateAll(self):
+    """ sends new data received by reader to active graph windows """
+    def updateGraphs(self, newRow):
+        for window in self.windows:
+            window.updateWindow(newRow)
+
+    """ updates all active graph windows every second """
+    def redrawAll(self):
         for window in self.windows:
             if window.isHidden():
                 self.windows.remove(window)
             else:
-                window.updateWindow()
+                window.redrawWindow()
 
     """ terminates reader when window is closed """
     def closeEvent(self, event):
@@ -149,9 +154,10 @@ class MainMenu(QtGui.QWidget):
         self.reader.end()
         event.accept()
 
-    """def newLineRead(self):
-        print 'I read a line!'
-        self.updateAll()"""
+### this is currently redundant - can connect signal directly to updateGraphs ###
+    def newLineRead(self, newRow):
+        print 'I read a line: ', newRow
+        self.updateGraphs(newRow)
 
 """ main event loop """
 def main():
