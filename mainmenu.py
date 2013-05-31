@@ -119,6 +119,7 @@ class MainMenu(QtGui.QWidget):
         except IOError:
             error = QtGui.QMessageBox.information(None, "Load Profile Error",
                                                   "You have not saved any profiles.")
+            return
         menuList = []
         while True:
             # unpickle each profile individually
