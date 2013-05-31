@@ -97,8 +97,8 @@ class GraphWindow(QtGui.QMainWindow):
         # first column holds graph, second column holds graph options
         # set the column stretches - 0 is the default
         # set minimum column widths
-        self.gridlayout.setColumnStretch(0,6)
-        self.gridlayout.setColumnStretch(1,0)
+        self.gridlayout.setColumnStretch(0,7)
+        self.gridlayout.setColumnStretch(1,1)
         self.gridlayout.setColumnMinimumWidth(0,300)
         self.gridlayout.setRowMinimumHeight(0,375)
 
@@ -146,6 +146,11 @@ class GraphWindow(QtGui.QMainWindow):
         self.auto_yaxes.clicked.connect(self.autoYAxes)
         self.auto_yraxes.clicked.connect(self.autoYRAxes)
         self.screen_shot.clicked.connect(self.takeScreenShot)
+
+        # set the possible streches of input boxes
+        self.Ymin.setSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Preferred)
+        self.Ymax.setSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Preferred)
+        #self.set_axes.setSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Preferred)
 
         # initialize menu to choose variable for right-hand axis
         self.label_raxis = QtGui.QLabel('Choose a variable to plot on the right-hand axis:')
