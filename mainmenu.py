@@ -75,7 +75,7 @@ class MainMenu(QtGui.QWidget):
 
         # initialize the timer that updates all graphs in application
         timer = QtCore.QTimer(self)
-        timer.timeout.connect(self.updateAll)
+        timer.timeout.connect(self.redrawAll)
         # update graph every 1000 milliseconds
         timer.start(1000)
 
