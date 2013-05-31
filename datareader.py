@@ -13,7 +13,7 @@ DATA_HEADINGS = {}
 class DataReader(QtCore.QThread):
 
     # initialize signal to graph when a full line has been read
-    lineRead = QtCore.pyqtSignal()
+    #lineRead = QtCore.pyqtSignal()
     
     def __init__(self, parent=None, filename='default.csv'):
         super(DataReader, self).__init__()
@@ -56,7 +56,7 @@ class DataReader(QtCore.QThread):
                     heading = DATA_HEADINGS.get(col)
                     DATA_DICT[heading].append(row[col])
                 # SEND SIGNAL
-                self.lineRead.emit()
+                #self.lineRead.emit()
                 # move the reader cursor only if we read in a full line
                 self.lastEOFpos = self.datafile.tell()
 
