@@ -383,7 +383,7 @@ class GraphWindow(QtGui.QMainWindow):
         sets x axis limits automatically to fit all data """
     def autoXAxes(self):
         self.graph.auto = True
-        self.graph.axes.set_xlim(auto=True)
+        self.graph.axes.autoscale(axis ='x')
         self.minutes.clear()
         self.hours.clear()
         self.days.clear()
@@ -391,14 +391,14 @@ class GraphWindow(QtGui.QMainWindow):
     """ called when 'Auto Y (left)' button is clicked
         sets y axis limits automatically to fit all data """        
     def autoYAxes(self):
-        self.graph.axes.set_ylim(auto=True)
+        self.graph.axes.autoscale(axis ='y')
         self.Ymin.clear()
         self.Ymax.clear()
 
     """ called when 'Auto Y (right)' button is clicked
         sets right-hand y axis limits automatically to fit all data """   
     def autoYRAxes(self):
-        self.graph.rightAxes.set_ylim(auto=True)
+        self.graph.rightAxes.autoscale(axis ='y')
         self.YminR.clear()
         self.YmaxR.clear()
 
