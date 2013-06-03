@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/23/2013
-# Last Updated: 5/31/2013
+# Last Updated: 6/3/2013
 # For JCAP
 
 import datetime
@@ -12,6 +12,8 @@ from pylab import *
 from datareader import *
 from date_helpers import *
 import copy
+from yvariable import *
+
 
 """ widget to represent an auto-updating graph """
 class Graph(FigureCanvas):
@@ -24,8 +26,10 @@ class Graph(FigureCanvas):
         self.hasRightAxis = False
         self.xvar = xvarname
         self.yvarL = yvarname
+        self.yvarL_var = YVariable(varName = self.yvarL,
+                                   columnNumber = self.getCol(self.yvarL), color = "bo")
         self.yvarR = None
-        self.colNum = [self.getCol("Date"),self.getCol(self.xvar),self.getCol(self.yvarL), None]
+        self.colNums = [self.getCol("Date"),self.getCol(self.xvar)]
         self.figure = Figure(figsize=(width, height), dpi=dpi)
 
         FigureCanvas.__init__(self, self.figure)
@@ -54,21 +58,18 @@ class Graph(FigureCanvas):
         self.axes.xaxis.set_major_formatter(self.time_format)
         self.axes.set_ylabel(self.yvarL)
 
-        self.firstPlot("left", "bo")
+        # Set them as their axis
+        self.yvarL_var.axis = self.axes
+        
+        self.firstPlot(self.yvarL_var)
         #self.updatePlot()
 
     """function that does the first plotting of the graph"""
-    def firstPlot(self,nameOfAxis, lineDes):
+    def firstPlot(self, yvarIns):
 
         list_of_times = []
-        theAxes = None
-        theYvar = None
-
-        if nameOfAxis == "left":
-            (theAxes,theYvar) = (self.axes,self.yvarL)
-            
-        elif nameOfAxis == "right":
-            (theAxes,theYvar) = (self.rightAxes,self.yvarR)
+        theAxes = yvarIns.axis
+        theYvar = yvarIns.varName            
             
 
         ydata = copy.deepcopy(DATA_DICT.get(theYvar))
@@ -83,7 +84,8 @@ class Graph(FigureCanvas):
         timeToPlot = matplotlib.dates.date2num(list_of_times)
 
         try:
-            theAxes.plot_date(timeToPlot, ydata, lineDes, label = theYvar)
+            theAxes.plot_date(timeToPlot, ydata, yvarIns.color, label = theYvar)
+            self.timeFrame()
             
         except ValueError:
             print "size of time_array - dictionary " + str(len(time_array))
@@ -95,11 +97,11 @@ class Graph(FigureCanvas):
             pass
 
     def updatePlot(self,row):
-        time_value = dateObjFloat(row[self.colNum[0]] + " " + row[self.colNum[1]])
-        self.axes.plot_date(time_value, row[self.colNum[2]], "bo")
+        time_value = dateObjFloat(row[self.colNums[0]] + " " + row[self.colNums[1]])
+        self.axes.plot_date(time_value, row[self.yvarL_var.columnNumber], self.yvarL_var.color)
 
         if self.hasRightAxis:
-            self.rightAxes.plot_date(time_value, row[self.colNum[3]], "ro")
+            self.rightAxes.plot_date(time_value, row[self.yvarR_var.columnNumber], self.yvarR_var.color)
             
         
         pass
@@ -121,7 +123,6 @@ class Graph(FigureCanvas):
         if self.hasRightAxis:
             self.figure.delaxes(self.rightAxes)
         self.yvarR = rightvar
-        self.colNum[3] = self.getCol(self.yvarR)
         self.hasRightAxis = True
         #self.rightAxes = self.figure.add_subplot(111, sharex=self.axes, frameon=False)
         self.rightAxes = self.axes.twinx()
@@ -130,7 +131,12 @@ class Graph(FigureCanvas):
         self.rightAxes.set_ylabel(self.yvarR)
         self.rightAxes.xaxis.set_major_formatter(self.time_format)
         self.rightAxes.get_xaxis().set_visible(False)
-        self.firstPlot("right", "ro")
+
+        # Saving the rights information 
+        self.yvarR_var = YVariable(varName = self.yvarR, axis = self.rightAxes, columnNumber = self.getCol(self.yvarR), color = "ro")
+        print self.yvarR_var
+        self.firstPlot(self.yvarR_var)
+        
         #add legend to graph
         linesL, labelsL = self.axes.get_legend_handles_labels()
         linesR, labelsR = self.rightAxes.get_legend_handles_labels()
