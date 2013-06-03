@@ -26,8 +26,3 @@ the following need to happen in this order:
 - Start writing to data file before opening file in program
 - Wait a couple of seconds before opening graph so
 	reader can initialize (?)
-
-
-Bugs:
--Adding the same graph more than once
-- Auto Y's does not work
