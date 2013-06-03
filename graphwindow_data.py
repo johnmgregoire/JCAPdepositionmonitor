@@ -41,7 +41,7 @@ class GraphWindow(QtGui.QMainWindow):
     """ draws the user interface of the window """
     def initUI(self):
         # set window size and position on screen
-        self.setGeometry(300, 200, 800, 600)
+        self.setGeometry(300, 200, 1000, 600)
         
         # set up the menu bar and profile creator
         menubar = self.menuBar()
@@ -223,14 +223,14 @@ class GraphWindow(QtGui.QMainWindow):
 
     """ called when variable to plot is selected """
     def selectGraph(self, varName):
+        # convert QString to string
+        varString = str(varName)
         if self.plotOptionMenu.currentText() == 'Switch graph':
             # clear previous plot and set parent to None so it can be deleted
             self.graph.clearPlot()
             self.graph.setParent(None)
             self.gridlayout.removeWidget(self.graph)
             self.graph =None
-            # convert QString to string
-            varString = str(varName)
             self.graph = Graph(self.main_widget, xvarname = "Time",
                                yvarname = varString)
             self.gridlayout.addWidget(self.graph, 0, 0)
@@ -254,9 +254,11 @@ class GraphWindow(QtGui.QMainWindow):
             self.YminR.clear()
             self.YmaxR.clear()
         elif self.plotOptionMenu.currentText() == 'Add to left axis':
+            self.graph.addVarToAxis(varString)
             print 'Adding to left axis'
             return
         else:
+            self.graph.addVarToAxis(varString, "right")
             print 'Adding to right axis'
             return
 

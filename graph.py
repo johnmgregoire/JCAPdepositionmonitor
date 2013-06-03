@@ -25,8 +25,8 @@ class Graph(FigureCanvas):
         self.timeWindow = 0
         self.hasRightAxis = False
         self.xvar = xvarname
-        self.yvarL_var = YVariable(varName = yvarname,
-                                   columnNumber = self.getCol(yvarname), color = "bo")
+        self.yvarsL = [YVariable(varName = yvarname,
+                                   columnNumber = self.getCol(yvarname), color = "bo")]
         self.colNums = [self.getCol("Date"),self.getCol(self.xvar)]
         self.figure = Figure(figsize=(width, height), dpi=dpi)
 
@@ -49,17 +49,17 @@ class Graph(FigureCanvas):
     def initPlot(self):
         self.axes = self.figure.add_subplot(111)
         self.axes.set_xlabel(self.xvar)
-        self.axes.set_ylabel(self.yvarL_var.varName)
+        self.axes.set_ylabel(self.yvarsL[0].varName)
         self.axes.xaxis_date()
         self.figure.autofmt_xdate()
         self.time_format = matplotlib.dates.DateFormatter('%m/%d/%y %H:%M:%S')
         self.axes.xaxis.set_major_formatter(self.time_format)
-        self.axes.set_ylabel(self.yvarL_var.varName)
+        self.axes.set_ylabel(self.yvarsL[0].varName)
 
         # Set them as their axis
-        self.yvarL_var.axis = self.axes
+        self.yvarsL[0].axis = self.axes
         
-        self.firstPlot(self.yvarL_var)
+        self.firstPlot(self.yvarsL[0])
         #self.updatePlot()
 
     """function that does the first plotting of the graph"""
@@ -97,10 +97,10 @@ class Graph(FigureCanvas):
 
     def updatePlot(self,row):
         time_value = dateObjFloat(row[self.colNums[0]] + " " + row[self.colNums[1]])
-        self.axes.plot_date(time_value, row[self.yvarL_var.columnNumber], self.yvarL_var.color)
+        self.axes.plot_date(time_value, row[self.yvarsL[0].columnNumber], self.yvarsL[0].color)
 
         if self.hasRightAxis:
-            self.rightAxes.plot_date(time_value, row[self.yvarR_var.columnNumber], self.yvarR_var.color)
+            self.rightAxes.plot_date(time_value, row[self.yvarsR[0].columnNumber], self.yvarsR[0].color)
             
         
         pass
@@ -131,14 +131,35 @@ class Graph(FigureCanvas):
         self.rightAxes.get_xaxis().set_visible(False)
 
         # Saving the rights information 
-        self.yvarR_var = YVariable(varName = rightvar, axis = self.rightAxes, columnNumber = self.getCol(rightvar), color = "ro")
-        self.firstPlot(self.yvarR_var)
+        self.yvarsR = [YVariable(varName = rightvar, axis = self.rightAxes,
+                                 columnNumber = self.getCol(rightvar), color = "ro")]
+        self.firstPlot(self.yvarsR[0])
         
-        #add legend to graph
-        linesL, labelsL = self.axes.get_legend_handles_labels()
-        linesR, labelsR = self.rightAxes.get_legend_handles_labels()
-        self.rightAxes.legend(linesL + linesR, labelsL + labelsR, loc=2, prop={"size":"small"})
+        self.addLegend()
 
+    def addVarToAxis(self, varString, axis="left"):
+        newVar = YVariable(varName = varString, axis = self.axes,
+                                      columnNumber = self.getCol(varString), color = "go")
+        if axis == "left":
+            self.axes.get_yaxis().get_label().set_visible(False)
+            self.yvarsL += [newVar]
+        if axis == "right":
+            newVar.axis = self.rightAxes
+            newVar.color = "yo"
+            self.rightAxes.get_yaxis().get_label().set_visible(False)
+            self.yvarsR += [newVar]
+        self.firstPlot(newVar)
+
+        self.addLegend()
+
+    def addLegend(self):
+        linesL, labelsL = self.axes.get_legend_handles_labels()
+        if self.hasRightAxis:
+            linesR, labelsR = self.rightAxes.get_legend_handles_labels()
+            self.rightAxes.legend(linesL + linesR, labelsL + labelsR, loc=2, prop={"size":"small"})
+        else:
+            self.axes.legend(loc=2, prop={"size":"small"})
+        
     def setXlim(self, amin=None, amax=None):
         self.axes.set_xlim(left=amin, right=amax)
 
