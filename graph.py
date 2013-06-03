@@ -13,6 +13,7 @@ from datareader import *
 from date_helpers import *
 import copy
 from yvariable import *
+import itertools 
 
 
 """ widget to represent an auto-updating graph """
@@ -25,6 +26,7 @@ class Graph(FigureCanvas):
         self.timeWindow = 0
         self.hasRightAxis = False
         self.xvar = xvarname
+        self.colors = itertools.cycle(["go","co","mo","yo","ko","bo","ro"])
         self.yvarsL = [YVariable(varName = yvarname,
                                    columnNumber = self.getCol(yvarname), color = "bo")]
         self.colNums = [self.getCol("Date"),self.getCol(self.xvar)]
@@ -139,13 +141,12 @@ class Graph(FigureCanvas):
 
     def addVarToAxis(self, varString, axis="left"):
         newVar = YVariable(varName = varString, axis = self.axes,
-                                      columnNumber = self.getCol(varString), color = "go")
+                                      columnNumber = self.getCol(varString), color = self.colors.next())
         if axis == "left":
             self.axes.get_yaxis().get_label().set_visible(False)
             self.yvarsL += [newVar]
         if axis == "right":
             newVar.axis = self.rightAxes
-            newVar.color = "yo"
             self.rightAxes.get_yaxis().get_label().set_visible(False)
             self.yvarsR += [newVar]
         self.firstPlot(newVar)
