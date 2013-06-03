@@ -82,8 +82,6 @@ class Graph(FigureCanvas):
             
         timeToPlot = matplotlib.dates.date2num(list_of_times)
 
-        self.timeFrame()
-
         try:
             theAxes.plot_date(timeToPlot, ydata, lineDes, label = theYvar)
             
@@ -103,7 +101,6 @@ class Graph(FigureCanvas):
         if self.hasRightAxis:
             self.rightAxes.plot_date(time_value, row[self.colNum[3]], "ro")
             
-        self.timeFrame()
         
         pass
 

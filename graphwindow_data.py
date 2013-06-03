@@ -262,6 +262,7 @@ class GraphWindow(QtGui.QMainWindow):
     """ called by MainMenu every second """  
     def redrawWindow(self):
         if self.updating:
+            self.graph.timeFrame()
             self.graph.draw()
         
     """ toggles auto-updating property of graphs in window """
