@@ -24,6 +24,7 @@ class Graph(FigureCanvas):
         self.auto = True
         self.timeWindow = 0
         self.hasRightAxis = False
+        self.legend = None
         self.xvar = xvarname
         self.yvarsL = [YVariable(varName = yvarname,
                                    columnNumber = self.getCol(yvarname), color = "bo")]
@@ -153,12 +154,15 @@ class Graph(FigureCanvas):
         self.addLegend()
 
     def addLegend(self):
+        if self.legend:
+            self.legend.set_visible(False)
         linesL, labelsL = self.axes.get_legend_handles_labels()
         if self.hasRightAxis:
             linesR, labelsR = self.rightAxes.get_legend_handles_labels()
-            self.rightAxes.legend(linesL + linesR, labelsL + labelsR, loc=2, prop={"size":"small"})
+            self.legend = self.rightAxes.legend(linesL + linesR, labelsL + labelsR, loc=2, prop={"size":"small"})
         else:
-            self.axes.legend(loc=2, prop={"size":"small"})
+            self.legend = self.axes.legend(loc=2, prop={"size":"small"})
+        self.legend.draggable(state = True)
         
     def setXlim(self, amin=None, amax=None):
         self.axes.set_xlim(left=amin, right=amax)

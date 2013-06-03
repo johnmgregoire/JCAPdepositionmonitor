@@ -272,6 +272,9 @@ class GraphWindow(QtGui.QMainWindow):
         # reset right y-axis limit fields
         self.YminR.clear()
         self.YmaxR.clear()
+        # remove the "add to right axis" option from plotOptionMenu if
+        #    it is currently displayed
+        self.plotOptionMenu.removeItem(2)
         # show all options for right-hand axis
         self.plotOptionMenu.addItem('Add to right axis')
         self.label_YminR.show()
