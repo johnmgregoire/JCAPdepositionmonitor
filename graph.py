@@ -25,7 +25,7 @@ class Graph(FigureCanvas):
         self.auto = True
         self.timeWindow = 0
         self.hasRightAxis = False
-        self.legend = None
+        self.legendL = None
         self.xvar = xvarname
         self.colors = itertools.cycle(["go","co","mo","yo","ko","bo","ro"])
         self.yvarsL = [YVariable(varName = yvarname,
@@ -95,7 +95,8 @@ class Graph(FigureCanvas):
             print "column not updated: " + theYvar
             pass
 
-    def updatePlot(self,row):
+    """ adds new data to graph whenever reader sends new row """
+    def updatePlot(self, row):
         time_value = dateObjFloat(row[self.colNums[0]] + " " + row[self.colNums[1]])
         for i in range(len(self.yvarsL)):
             self.axes.plot_date(time_value, row[self.yvarsL[i].columnNumber], self.yvarsL[i].color)
@@ -104,6 +105,7 @@ class Graph(FigureCanvas):
             for i in range(len(self.yvarsR)):
                 self.rightAxes.plot_date(time_value, row[self.yvarsR[i].columnNumber], self.yvarsR[i].color)
 
+    """ resets the x-axis limits when specific time window is selected """
     def timeFrame(self):
             if not self.auto:
                 currTime = time.time()
@@ -111,8 +113,9 @@ class Graph(FigureCanvas):
                 leftLim = dateObj(currTime - self.timeWindow)
                 self.setXlim(amin=leftLim, amax=rightLim)
 
-
-    def getCol(self,colName):
+    """ helper function to get the column number associated with a heading
+        in the data spreadsheet """
+    def getCol(self, colName):
         theCol = [k for k, v in DATA_HEADINGS.iteritems() if v == colName]
         return theCol[0]
 
@@ -131,8 +134,10 @@ class Graph(FigureCanvas):
         self.yvarsR = [YVariable(varName = rightvar, axis = self.rightAxes,
                                  columnNumber = self.getCol(rightvar), color = "ro")]
         self.firstPlot(self.yvarsR[0])
-        
-        self.addLegend()
+
+        # 3 or more variables on same plot
+        if len(self.yvarsL) > 1:
+            self.addLegends()
 
     def addVarToAxis(self, varString, axis="left"):
         newVar = YVariable(varName = varString, axis = self.axes,
@@ -140,24 +145,31 @@ class Graph(FigureCanvas):
         if axis == "left":
             self.axes.get_yaxis().get_label().set_visible(False)
             self.yvarsL += [newVar]
-        if axis == "right":
+        elif axis == "right":
             newVar.axis = self.rightAxes
             self.rightAxes.get_yaxis().get_label().set_visible(False)
             self.yvarsR += [newVar]
         self.firstPlot(newVar)
 
-        self.addLegend()
+        self.addLegends()
 
-    def addLegend(self):
-        if self.legend:
-            self.legend.set_visible(False)
+    def addLegends(self):
+        if self.legendL:
+            self.legendL.set_visible(False)
         linesL, labelsL = self.axes.get_legend_handles_labels()
         if self.hasRightAxis:
             linesR, labelsR = self.rightAxes.get_legend_handles_labels()
-            self.legend = self.rightAxes.legend(linesL + linesR, labelsL + labelsR, loc=2, prop={"size":"small"})
+            self.legendL = self.rightAxes.legend(linesL, labelsL, loc=2,
+                                                 title="Left", prop={"size":"small"})
+            self.legendR = self.rightAxes.legend(linesR, labelsR, loc=1,
+                                                 title = "Right", prop={"size":"small"})
+            self.rightAxes.add_artist(self.legendL)
+            self.legendL.draggable(state = True)
+            self.legendR.draggable(state = True)
         else:
-            self.legend = self.axes.legend(loc=2, prop={"size":"small"})
-        self.legend.draggable(state = True)
+            self.legendL = self.axes.legend(linesL, labelsL, loc=2,
+                                title="Left", prop={"size":"small"})
+            self.legendL.draggable(state = True)
         
     def setXlim(self, amin=None, amax=None):
         self.axes.set_xlim(left=amin, right=amax)
