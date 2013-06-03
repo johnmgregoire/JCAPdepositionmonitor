@@ -149,6 +149,7 @@ class Graph(FigureCanvas):
             newVar.axis = self.rightAxes
             self.rightAxes.get_yaxis().get_label().set_visible(False)
             self.yvarsR += [newVar]
+  
         self.firstPlot(newVar)
 
         self.addLegends()
