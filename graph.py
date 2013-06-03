@@ -46,7 +46,6 @@ class Graph(FigureCanvas):
         #   (not enabled when right y axis is present)
         self.figure.canvas.mpl_connect('button_press_event', self.onclick)
         
-        #self.draw()
         
     """ draws and labels axes """
     def initPlot(self):
@@ -59,20 +58,18 @@ class Graph(FigureCanvas):
         self.axes.xaxis.set_major_formatter(self.time_format)
         self.axes.set_ylabel(self.yvarsL[0].varName)
 
-        # Set them as their axis
+        # Assign first y variable to left-hand axis
         self.yvarsL[0].axis = self.axes
         
         self.firstPlot(self.yvarsL[0])
-        #self.updatePlot()
 
-    """function that does the first plotting of the graph"""
+    """function that does the first plotting of the graph """
     def firstPlot(self, yvarIns):
 
         list_of_times = []
         theAxes = yvarIns.axis
         theYvar = yvarIns.varName            
             
-
         ydata = copy.deepcopy(DATA_DICT.get(theYvar))
         time_array = copy.deepcopy(DATA_DICT.get(self.xvar))
         date_array = copy.deepcopy(DATA_DICT.get("Date"))
@@ -100,14 +97,12 @@ class Graph(FigureCanvas):
 
     def updatePlot(self,row):
         time_value = dateObjFloat(row[self.colNums[0]] + " " + row[self.colNums[1]])
-        self.axes.plot_date(time_value, row[self.yvarsL[0].columnNumber], self.yvarsL[0].color)
+        for i in range(len(self.yvarsL)):
+            self.axes.plot_date(time_value, row[self.yvarsL[i].columnNumber], self.yvarsL[i].color)
 
         if self.hasRightAxis:
-            self.rightAxes.plot_date(time_value, row[self.yvarsR[0].columnNumber], self.yvarsR[0].color)
-            
-        
-        pass
-
+            for i in range(len(self.yvarsR)):
+                self.rightAxes.plot_date(time_value, row[self.yvarsR[i].columnNumber], self.yvarsR[i].color)
 
     def timeFrame(self):
             if not self.auto:
@@ -125,7 +120,6 @@ class Graph(FigureCanvas):
         if self.hasRightAxis:
             self.figure.delaxes(self.rightAxes)
         self.hasRightAxis = True
-        #self.rightAxes = self.figure.add_subplot(111, sharex=self.axes, frameon=False)
         self.rightAxes = self.axes.twinx()
         self.rightAxes.yaxis.tick_right()
         self.rightAxes.yaxis.set_label_position("right")
@@ -133,7 +127,7 @@ class Graph(FigureCanvas):
         self.rightAxes.xaxis.set_major_formatter(self.time_format)
         self.rightAxes.get_xaxis().set_visible(False)
 
-        # Saving the rights information 
+        # Saving the right axis information 
         self.yvarsR = [YVariable(varName = rightvar, axis = self.rightAxes,
                                  columnNumber = self.getCol(rightvar), color = "ro")]
         self.firstPlot(self.yvarsR[0])
