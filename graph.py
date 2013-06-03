@@ -85,6 +85,7 @@ class Graph(FigureCanvas):
 
         try:
             theAxes.plot_date(timeToPlot, ydata, yvarIns.color, label = theYvar)
+            
             self.timeFrame()
             
         except ValueError:
