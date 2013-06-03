@@ -90,8 +90,8 @@ class GraphWindow(QtGui.QMainWindow):
         # first column holds graph, second column holds graph options
         # set the column stretches - 0 is the default
         # set minimum column widths
-        self.gridlayout.setColumnStretch(0,4)
-        self.gridlayout.setColumnStretch(1,0)
+        self.gridlayout.setColumnStretch(0, 4)
+        self.gridlayout.setColumnStretch(1, 0)
         self.gridlayout.setColumnMinimumWidth(0,300)
         self.gridlayout.setRowMinimumHeight(0,375)
 
@@ -99,10 +99,6 @@ class GraphWindow(QtGui.QMainWindow):
         self.layout.addLayout(self.optionslayout)
         self.optionslayout.addWidget(self.plotOptionMenu, 0, 0)
         self.optionslayout.addWidget(self.selectVar, 0, 1, 1, 3)
-
-        # grid_widget holds the graph and options
-        self.grid_widget = QtGui.QWidget()
-        self.grid_widget.setLayout(self.gridlayout)
 
         # initialize checkbox that acts as pause button
         self.hold_cb = QtGui.QCheckBox('Hold', self)
@@ -158,23 +154,33 @@ class GraphWindow(QtGui.QMainWindow):
         self.set_raxis.clicked.connect(self.addRAxis)
 
         # place the main grid layout inside layout for window
-        self.layout.addWidget(self.grid_widget)
+        self.layout.addLayout(self.gridlayout)
 
         # add graph and options to main grid layout
         self.gridlayout.addWidget(self.graph, 0, 0)
         self.gridlayout.addLayout(self.axeslayout, 0, 1)
 
-        # set alignments for the widgets
+        # set alignment for the widgets
         self.axeslayout.setAlignment(QtCore.Qt.AlignTop)
 
+        # create spacers to separate fields in graph options layout
+        self.spacer1 = QtGui.QSpacerItem(1, 20)
+        self.spacer2 = QtGui.QSpacerItem(1, 20)
+        self.spacer3 = QtGui.QSpacerItem(1, 20)
+        self.spacer4 = QtGui.QSpacerItem(1, 20)
+
         # add items to the graph options layout
-        self.axeslayout.addWidget(self.hold_cb, 0, 0)
-        self.axeslayout.addWidget(self.label_raxis)
-        self.axeslayout.addWidget(self.choose_var)
-        self.axeslayout.addWidget(self.set_raxis)
-        self.axeslayout.addWidget(self.screen_shot)
-        self.axeslayout.addWidget(self.label_time)
-        self.axeslayout.addLayout(self.timelayout, 6, 0)
+        self.axeslayout.addItem(self.spacer1, 0, 0)
+        self.axeslayout.addWidget(self.hold_cb, 1, 0)
+        self.axeslayout.addItem(self.spacer2, 2, 0)
+        self.axeslayout.addWidget(self.screen_shot, 3, 0)
+        self.axeslayout.addItem(self.spacer3, 4, 0)
+        self.axeslayout.addWidget(self.label_raxis, 5, 0)
+        self.axeslayout.addWidget(self.choose_var, 6, 0)
+        self.axeslayout.addWidget(self.set_raxis, 7, 0)
+        self.axeslayout.addItem(self.spacer4, 8, 0)
+        self.axeslayout.addWidget(self.label_time, 9, 0)
+        self.axeslayout.addLayout(self.timelayout, 10, 0)
 
         # add options for time axis to a sub-grid
         self.timelayout.addWidget(self.minutes, 0, 0)
@@ -185,15 +191,15 @@ class GraphWindow(QtGui.QMainWindow):
         self.timelayout.addWidget(self.label_days, 2, 1)
 
         # add more items to graph options layout
-        self.axeslayout.addWidget(self.label_Ymin)
-        self.axeslayout.addWidget(self.Ymin)
-        self.axeslayout.addWidget(self.label_Ymax)
-        self.axeslayout.addWidget(self.Ymax)
-        self.axeslayout.addWidget(self.label_YminR)
-        self.axeslayout.addWidget(self.YminR)
-        self.axeslayout.addWidget(self.label_YmaxR)
-        self.axeslayout.addWidget(self.YmaxR)
-        self.axeslayout.addWidget(self.set_axes)
+        self.axeslayout.addWidget(self.label_Ymin, 13, 0)
+        self.axeslayout.addWidget(self.Ymin, 14, 0)
+        self.axeslayout.addWidget(self.label_Ymax, 15, 0)
+        self.axeslayout.addWidget(self.Ymax, 16, 0)
+        self.axeslayout.addWidget(self.label_YminR, 17, 0)
+        self.axeslayout.addWidget(self.YminR, 18, 0)
+        self.axeslayout.addWidget(self.label_YmaxR, 19, 0)
+        self.axeslayout.addWidget(self.YmaxR, 20, 0)
+        self.axeslayout.addWidget(self.set_axes, 21, 0)
 
         # hide options for second axis initially
         self.label_YminR.hide()
@@ -201,9 +207,8 @@ class GraphWindow(QtGui.QMainWindow):
         self.label_YmaxR.hide()
         self.YmaxR.hide()
         
-        self.axeslayout.addWidget(self.set_axes)
         # add widget that holds auto axis buttons
-        self.axeslayout.addWidget(self.autowidget)
+        self.axeslayout.addWidget(self.autowidget, 22, 0, 1, 2)
         # add auto axis buttons
         self.autolayout.addWidget(self.auto_xaxes, 0 , 0)
         self.autolayout.addWidget(self.auto_yaxes, 0 , 1)
@@ -280,6 +285,7 @@ class GraphWindow(QtGui.QMainWindow):
     """ called by MainMenu every second """  
     def redrawWindow(self):
         if self.updating:
+            self.graph.timeFrame()
             self.graph.draw()
         
     """ toggles auto-updating property of graphs in window """
