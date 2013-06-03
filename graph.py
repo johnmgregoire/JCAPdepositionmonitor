@@ -25,10 +25,8 @@ class Graph(FigureCanvas):
         self.timeWindow = 0
         self.hasRightAxis = False
         self.xvar = xvarname
-        self.yvarL = yvarname
-        self.yvarL_var = YVariable(varName = self.yvarL,
-                                   columnNumber = self.getCol(self.yvarL), color = "bo")
-        self.yvarR = None
+        self.yvarL_var = YVariable(varName = yvarname,
+                                   columnNumber = self.getCol(yvarname), color = "bo")
         self.colNums = [self.getCol("Date"),self.getCol(self.xvar)]
         self.figure = Figure(figsize=(width, height), dpi=dpi)
 
@@ -51,12 +49,12 @@ class Graph(FigureCanvas):
     def initPlot(self):
         self.axes = self.figure.add_subplot(111)
         self.axes.set_xlabel(self.xvar)
-        self.axes.set_ylabel(self.yvarL)
+        self.axes.set_ylabel(self.yvarL_var.varName)
         self.axes.xaxis_date()
         self.figure.autofmt_xdate()
         self.time_format = matplotlib.dates.DateFormatter('%m/%d/%y %H:%M:%S')
         self.axes.xaxis.set_major_formatter(self.time_format)
-        self.axes.set_ylabel(self.yvarL)
+        self.axes.set_ylabel(self.yvarL_var.varName)
 
         # Set them as their axis
         self.yvarL_var.axis = self.axes
@@ -123,19 +121,17 @@ class Graph(FigureCanvas):
     def addRightAxis(self, rightvar):
         if self.hasRightAxis:
             self.figure.delaxes(self.rightAxes)
-        self.yvarR = rightvar
         self.hasRightAxis = True
         #self.rightAxes = self.figure.add_subplot(111, sharex=self.axes, frameon=False)
         self.rightAxes = self.axes.twinx()
         self.rightAxes.yaxis.tick_right()
         self.rightAxes.yaxis.set_label_position("right")
-        self.rightAxes.set_ylabel(self.yvarR)
+        self.rightAxes.set_ylabel(rightvar)
         self.rightAxes.xaxis.set_major_formatter(self.time_format)
         self.rightAxes.get_xaxis().set_visible(False)
 
         # Saving the rights information 
-        self.yvarR_var = YVariable(varName = self.yvarR, axis = self.rightAxes, columnNumber = self.getCol(self.yvarR), color = "ro")
-        print self.yvarR_var
+        self.yvarR_var = YVariable(varName = rightvar, axis = self.rightAxes, columnNumber = self.getCol(rightvar), color = "ro")
         self.firstPlot(self.yvarR_var)
         
         #add legend to graph
