@@ -66,6 +66,10 @@ class GraphWindow(QtGui.QMainWindow):
         self.updating = True
         self.setWindowTitle(self.vars[0])
 
+        self.plotOptionMenu = QtGui.QComboBox()
+        self.plotOptionMenu.addItem('Switch graph')
+        self.plotOptionMenu.addItem('Add to left axis')
+
         # make drop-down menu for selecting graphs      
         self.selectVar = QtGui.QComboBox()
         for var in self.vars:
@@ -75,6 +79,7 @@ class GraphWindow(QtGui.QMainWindow):
         # setup all the layouts - verify that they take in the correct
         # widget  - TODO figure out what QT as parent means
         self.layout = QtGui.QVBoxLayout(self.main_widget)
+        self.optionslayout = QtGui.QGridLayout(self.main_widget)
         self.gridlayout = QtGui.QGridLayout(self.main_widget)
         self.axeslayout = QtGui.QGridLayout(self.main_widget)
         self.timelayout = QtGui.QGridLayout(self.main_widget)
@@ -90,8 +95,10 @@ class GraphWindow(QtGui.QMainWindow):
         self.gridlayout.setColumnMinimumWidth(0,300)
         self.gridlayout.setRowMinimumHeight(0,375)
 
-        # add drop-down menu to top of window
-        self.layout.addWidget(self.selectVar)
+        # add drop-down menus to top of window
+        self.layout.addLayout(self.optionslayout)
+        self.optionslayout.addWidget(self.plotOptionMenu, 0, 0)
+        self.optionslayout.addWidget(self.selectVar, 0, 1, 1, 3)
 
         # grid_widget holds the graph and options
         self.grid_widget = QtGui.QWidget()
@@ -211,32 +218,42 @@ class GraphWindow(QtGui.QMainWindow):
 
     """ called when variable to plot is selected """
     def selectGraph(self, varName):
-        # clear previous plot and set parent to None so it can be deleted
-        self.graph.clearPlot()
-        self.graph.setParent(None)
-        self.gridlayout.removeWidget(self.graph)
-        self.graph =None
-        # convert QString to string
-        varString = str(varName)
-        self.graph = Graph(self.main_widget, xvarname = "Time",
-                           yvarname = varString)
-        self.gridlayout.addWidget(self.graph, 0, 0)
-        self.setWindowTitle(varString)
-        # remove all options for right-hand axis because plot is initialized
-        #   without it
-        self.label_YminR.hide()
-        self.YminR.hide()
-        self.label_YmaxR.hide()
-        self.YmaxR.hide()
-        self.auto_yraxes.hide()
-        # clear axis label fields
-        self.minutes.clear()
-        self.hours.clear()
-        self.days.clear()
-        self.Ymin.clear()
-        self.Ymax.clear()
-        self.YminR.clear()
-        self.YmaxR.clear()
+        if self.plotOptionMenu.currentText() == 'Switch graph':
+            # clear previous plot and set parent to None so it can be deleted
+            self.graph.clearPlot()
+            self.graph.setParent(None)
+            self.gridlayout.removeWidget(self.graph)
+            self.graph =None
+            # convert QString to string
+            varString = str(varName)
+            self.graph = Graph(self.main_widget, xvarname = "Time",
+                               yvarname = varString)
+            self.gridlayout.addWidget(self.graph, 0, 0)
+            self.setWindowTitle(varString)
+            # remove all options for right-hand axis because plot is initialized
+            #   without it
+            self.label_YminR.hide()
+            self.YminR.hide()
+            self.label_YmaxR.hide()
+            self.YmaxR.hide()
+            self.auto_yraxes.hide()
+            # remove the "add to right axis" option from plotOptionMenu if
+            #    it is currently displayed
+            self.plotOptionMenu.removeItem(2)
+            # clear axis label fields
+            self.minutes.clear()
+            self.hours.clear()
+            self.days.clear()
+            self.Ymin.clear()
+            self.Ymax.clear()
+            self.YminR.clear()
+            self.YmaxR.clear()
+        elif self.plotOptionMenu.currentText() == 'Add to left axis':
+            print 'Adding to left axis'
+            return
+        else:
+            print 'Adding to right axis'
+            return
 
     """ called when request to add plot to right-hand axis is made """
     def addRAxis(self):
@@ -249,6 +266,7 @@ class GraphWindow(QtGui.QMainWindow):
         self.YminR.clear()
         self.YmaxR.clear()
         # show all options for right-hand axis
+        self.plotOptionMenu.addItem('Add to right axis')
         self.label_YminR.show()
         self.YminR.show()
         self.label_YmaxR.show()

@@ -18,8 +18,7 @@ Reducing memory usage (Graph):
 - something needs to parse signal to send graphs relevant data
 - after initial drawing, graph plots whenever signal comes in
 - windows update (graphs call draw()) every second
-- build legend based on initial plot - find some way to save "artists"
-	(2D lines? plots?)
+- build legend based on initial plot
 [5/31 - DONE!]
 
 In order for the program to run correctly,
