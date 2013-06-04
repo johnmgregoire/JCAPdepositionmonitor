@@ -1,0 +1,24 @@
+Things we need to keep track of:
+
+- in filename:
+	- element (for title)
+	- source (?)
+	- power supply
+	- wattage of power supply (not needed for graph)
+	- tilt
+	- z-positions (either one or two)
+
+- date and time (for computing averages)
+- 'Xtal2 Rate', 'Xtal3 Rate', 'Xtal4 Rate',
+  'Platen Zshift Motor 1 Position','Platen Motor Position',
+  'Capman Pressure', 'MFC1 Flow', 'MFC2 Flow',
+  'MFC3 Flow', 'MFC4 Flow'
+	- pressure and flow probably not needed for graphs
+- 'platenangle_profile' is essentially rounded raw data
+	from 'Platen Motor Position'
+- useful indices
+- process Xtal rates
+- taking averages over times where tilt, z-position, radius
+	is fixed
+- adding color values for different elements, computing
+	percentages based on sum

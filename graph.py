@@ -27,9 +27,9 @@ class Graph(FigureCanvas):
         self.hasRightAxis = False
         self.legendL = None
         self.xvar = xvarname
-        self.colors = itertools.cycle(["go","co","mo","yo","ko","bo","ro"])
+        self.colors = itertools.cycle(["g","c","m","y","k","b","r"])
         self.yvarsL = [YVariable(varName = yvarname,
-                                   columnNumber = self.getCol(yvarname), color = "bo")]
+                                   columnNumber = self.getCol(yvarname), color = "b")]
         self.colNums = [self.getCol("Date"),self.getCol(self.xvar)]
         self.figure = Figure(figsize=(width, height), dpi=dpi)
 
@@ -82,7 +82,8 @@ class Graph(FigureCanvas):
         timeToPlot = matplotlib.dates.date2num(list_of_times)
 
         try:
-            theAxes.plot_date(timeToPlot, ydata, yvarIns.color, label = theYvar)
+            theAxes.plot_date(timeToPlot, ydata, markerfacecolor=yvarIns.color, label = theYvar,
+                              markeredgecolor=yvarIns.color)
             
             self.timeFrame()
             
@@ -99,11 +100,15 @@ class Graph(FigureCanvas):
     def updatePlot(self, row):
         time_value = dateObjFloat(row[self.colNums[0]] + " " + row[self.colNums[1]])
         for i in range(len(self.yvarsL)):
-            self.axes.plot_date(time_value, row[self.yvarsL[i].columnNumber], self.yvarsL[i].color)
+            self.axes.plot_date(time_value, row[self.yvarsL[i].columnNumber],
+                                markerfacecolor=self.yvarsL[i].color,
+                                markeredgecolor=self.yvarsL[i].color)
 
         if self.hasRightAxis:
             for i in range(len(self.yvarsR)):
-                self.rightAxes.plot_date(time_value, row[self.yvarsR[i].columnNumber], self.yvarsR[i].color)
+                self.rightAxes.plot_date(time_value, row[self.yvarsR[i].columnNumber],
+                                         markerfacecolor=self.yvarsR[i].color,
+                                         markeredgecolor=self.yvarsR[i].color)
 
     """ resets the x-axis limits when specific time window is selected """
     def timeFrame(self):
@@ -132,7 +137,7 @@ class Graph(FigureCanvas):
 
         # Saving the right axis information 
         self.yvarsR = [YVariable(varName = rightvar, axis = self.rightAxes,
-                                 columnNumber = self.getCol(rightvar), color = "ro")]
+                                 columnNumber = self.getCol(rightvar), color = "r")]
         self.firstPlot(self.yvarsR[0])
 
         # 3 or more variables on same plot
