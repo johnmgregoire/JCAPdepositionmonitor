@@ -73,6 +73,10 @@ class MainMenu(QtGui.QWidget):
         self.layout.addWidget(loadProfileButton)
         loadProfileButton.clicked.connect(self.selectProfile)
 
+        # show a deposition graph
+        makeDepositionButton = QtGui.QPushButton('Create Deposition Graph')
+        self.layout.addWidget(makeDepositionButton)
+
         # initialize the timer that updates all graphs in application
         timer = QtCore.QTimer(self)
         timer.timeout.connect(self.redrawAll)
