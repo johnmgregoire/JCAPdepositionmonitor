@@ -1,10 +1,11 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/23/2013
-# Last Updated: 5/30/2013
+# Last Updated: 6/05/2013
 # For JCAP
 
 import csv, time
 from PyQt4 import QtCore
+from filename_handler import *
 
 DATA_DICT = {}
 DATA_HEADINGS = {}
@@ -23,6 +24,7 @@ class DataReader(QtCore.QThread):
 
     def initData(self, filename):
         self.datafile = open(filename, 'rb')
+        parseFilename(filename)
         # read column headings and create lists to hold data
         headings = self.datafile.readline().split(',')
         # strip off '/r/n' at end of line - only works on Windows
