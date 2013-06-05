@@ -13,7 +13,8 @@ from datareader import *
 from date_helpers import *
 import copy
 from yvariable import *
-import itertools 
+import itertools
+from dictionary_helpers import *
 
 
 """ widget to represent an auto-updating graph """
@@ -29,8 +30,8 @@ class Graph(FigureCanvas):
         self.xvar = xvarname
         self.colors = itertools.cycle(["g","c","m","y","k","b","r"])
         self.yvarsL = [YVariable(varName = yvarname,
-                                   columnNumber = self.getCol(yvarname), color = "b")]
-        self.colNums = [self.getCol("Date"),self.getCol(self.xvar)]
+                                   columnNumber = getCol(yvarname), color = "b")]
+        self.colNums = [getCol("Date"),getCol(self.xvar)]
         self.figure = Figure(figsize=(width, height), dpi=dpi)
 
         FigureCanvas.__init__(self, self.figure)
@@ -137,7 +138,7 @@ class Graph(FigureCanvas):
 
         # Saving the right axis information 
         self.yvarsR = [YVariable(varName = rightvar, axis = self.rightAxes,
-                                 columnNumber = self.getCol(rightvar), color = "r")]
+                                 columnNumber = getCol(rightvar), color = "r")]
         self.firstPlot(self.yvarsR[0])
 
         # 3 or more variables on same plot
@@ -146,7 +147,7 @@ class Graph(FigureCanvas):
 
     def addVarToAxis(self, varString, axis="left"):
         newVar = YVariable(varName = varString, axis = self.axes,
-                                      columnNumber = self.getCol(varString), color = self.colors.next())
+                                      columnNumber = getCol(varString), color = self.colors.next())
         if axis == "left":
             self.axes.get_yaxis().get_label().set_visible(False)
             self.yvarsL += [newVar]
