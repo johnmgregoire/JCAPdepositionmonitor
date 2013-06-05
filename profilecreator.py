@@ -52,12 +52,15 @@ class ProfileCreator(QtGui.QWidget):
     def getVars(self):
         global DATA_HEADINGS
         self.checkboxes = []
-        # this ignores first 2 columns in spreadsheet (date and time)
-        for index in range(len(DATA_HEADINGS)-2):
-            self.checkboxes += [QtGui.QCheckBox(DATA_HEADINGS.get(index+2),
-                                                self)]
+        # this ignores first date and time columns in spreadsheet
+        varNames = DATA_HEADINGS.values()
+        varNames.remove('Time')
+        varNames.remove('Date')
+        print varNames
+        for index in range(len(varNames)):
+            self.checkboxes += [QtGui.QCheckBox(varNames[index], self)]
             # first half of variables added to first column
-            if index <= (len(DATA_HEADINGS)-2)/2:
+            if index <= len(varNames)/2:
                 self.col1.addWidget(self.checkboxes[index])
             # second half of variables added to second column
             else:

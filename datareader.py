@@ -44,8 +44,6 @@ class DataReader(QtCore.QThread):
             DATA_DICT[headings[col]] = []
         self.numColumns = len(DATA_HEADINGS)
         self.lastEOFpos = self.datafile.tell()
-        print DATA_HEADINGS
-        print self.numColumns
 
     def run(self):
         global DATA_DICT
@@ -73,7 +71,6 @@ class DataReader(QtCore.QThread):
                 self.lastEOFpos = self.datafile.tell()
 
         # close file after end() has been called
-        print DATA_DICT
         self.datafile.close()
 
     def end(self):
