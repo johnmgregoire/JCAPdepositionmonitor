@@ -3,6 +3,7 @@
 # Last Updated: 5/31/2013
 # For JCAP
 
+from dictionary_helpers import *
 from graphwindow_data import *
 from profilewindow import *
 import os
@@ -24,6 +25,22 @@ class MainMenu(QtGui.QWidget):
         self.reader.lineRead.connect(self.newLineRead)
         
         self.initUI()
+
+        self.initSupplyVars()
+
+
+    """Initializes any variables that are useful for error checking"""
+    def initSupplyVars(self):
+        self.errors =[]
+        self.supply = int(FILE_INFO.get("Supply"))
+        if self.supply % 2 == 0:
+            self.rfl = getCol("Power Supply" + str(self.supply) + " Rfl Power")
+            self.fwd = getCol("Power Supply" + str(self.supply) + " Fwd Power")
+            self.dcbias = getCol("Power Supply" + str(self.supply) + " DC Bias")
+
+        if self.supply % 2 == 1:
+            self.output_power = getCol("Power Supply" + str(self.supply) + " Output Power")
+            self.output_voltage = getCol("Power Supply" + str(self.supply) + " Output Voltage")
 
     """ automatically loads last modified data file
         when application launches """
@@ -103,6 +120,9 @@ class MainMenu(QtGui.QWidget):
                 window.hide()
             self.reader = DataReader(parent=self, filename=self.file)
             self.reader.start()
+            self.reader.lineRead.connect(self.newLineRead)
+
+            self.initSupplyVars()
 
     """ creates window for single graph """
     def makeGraph(self):
@@ -170,7 +190,35 @@ class MainMenu(QtGui.QWidget):
     def newLineRead(self, newRow):
         #print 'I read a line: ', newRow
         self.updateGraphs(newRow)
+        self.checkValidity(newRow)
 
+    """ Shows an error message is the data is invalid"""
+    def checkValidity(self, row):
+        errors_list = []
+
+        if self.supply % 2 == 0:
+            
+            fwdValue = float(row[self.fwd])
+            dcBiasValue = float(row[self.dcbias])
+            rflValue = float(row[self.rfl])
+            
+            if fwdValue < 5: errors_list.append("FWD power is below 5.")
+            if dcBiasValue < 50: errors_list.append("DC bias is below 50.")
+            if .10*fwdValue < rflValue:
+                errors_list.append("RFL power is greater than 10% of FWD.")
+
+        if self.supply % 2 == 1:
+            opValue = float(row[self.output_power])
+            if opValue < 5: errors_list.append("Output power is below 5") 
+
+        newErrors = [ x for x in errors_list if x not in self.errors]
+        self.errors += newErrors
+        if newErrors:
+            message = "You have the following errors: " + " ".join(newErrors)
+            print message
+            validityError = QtGui.QMessageBox.information(None,"Unreliable Data Error", message)
+            pass
+        
 """ main event loop """
 def main():
     app = QtGui.QApplication(sys.argv)
