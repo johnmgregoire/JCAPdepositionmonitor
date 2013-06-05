@@ -25,40 +25,57 @@ class DataReader(QtCore.QThread):
         self.datafile = open(filename, 'rb')
         # read column headings and create lists to hold data
         headings = self.datafile.readline().split(',')
-        self.numColumns = len(headings)
         # strip off '/r/n' at end of line - only works on Windows
-        headings[self.numColumns-1] = headings[self.numColumns-1][:-2]
+        #headings[self.numColumns-1] = headings[self.numColumns-1][:-2]
         global DATA_DICT
         global DATA_HEADINGS
         # clear dictionary in case it has already been used for a different file
         DATA_DICT.clear()
         DATA_HEADINGS.clear()
+        DATA_HEADINGS[0] = 'Time'
+        DATA_DICT['Time'] = []
+        DATA_HEADINGS[1] = 'Date'
+        DATA_DICT['Date'] = []
         # initialize each heading with an array to store the column data
-        for col in range(len(headings)):
+        for col in range(3, len(headings)):
+            if headings[col] == '':
+                break
             DATA_HEADINGS[col] = headings[col]
             DATA_DICT[headings[col]] = []
+        self.numColumns = len(DATA_HEADINGS)
         self.lastEOFpos = self.datafile.tell()
+        print DATA_HEADINGS
+        print self.numColumns
 
     def run(self):
         global DATA_DICT
         global DATA_HEADINGS
-        numColumns = len(DATA_DICT)
+        dataColNums = DATA_HEADINGS.keys()
 
         while self.running:
             self.datafile.seek(self.lastEOFpos)
             data = self.datafile.readline()
             row = data.split(',')
-            if len(row) == numColumns and row[numColumns-1].endswith('\r\n'):
+            strippedRow = []
+            for col in (row[:2] + row[3:]):
+                if col != '':
+                    strippedRow += [col]
+                else:
+                    break
+            if len(strippedRow) == self.numColumns and row[len(row)-1].endswith('\r\n'):
+                print "full line read"
                 # add the new info to the respective column
-                for col in range(len(row)):
+                for col in dataColNums:
                     heading = DATA_HEADINGS.get(col)
                     DATA_DICT[heading].append(row[col])
                 # SEND SIGNAL
-                self.lineRead.emit(row)
+                print strippedRow
+                self.lineRead.emit(strippedRow)
                 # move the reader cursor only if we read in a full line
                 self.lastEOFpos = self.datafile.tell()
 
         # close file after end() has been called
+        print DATA_DICT
         self.datafile.close()
 
     def end(self):

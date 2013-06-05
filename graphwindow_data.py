@@ -57,7 +57,7 @@ class GraphWindow(QtGui.QMainWindow):
         # get variables from spreadsheet
         global DATA_HEADINGS
         self.vars = []
-        for index in range(2, len(DATA_HEADINGS)):
+        for index in range(3, len(DATA_HEADINGS)):
             self.vars += [DATA_HEADINGS.get(index)]
 
         # initialize default graph
