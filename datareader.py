@@ -32,12 +32,14 @@ class DataReader(QtCore.QThread):
         # clear dictionary in case it has already been used for a different file
         DATA_DICT.clear()
         DATA_HEADINGS.clear()
+        # manually add time and date headings because they aren't in file
         DATA_HEADINGS[0] = 'Time'
         DATA_DICT['Time'] = []
         DATA_HEADINGS[1] = 'Date'
         DATA_DICT['Date'] = []
         # initialize each heading with an array to store the column data
         for col in range(3, len(headings)):
+            # ignore empty columns at end of spreadsheet
             if headings[col] == '':
                 break
             DATA_HEADINGS[col] = headings[col]
@@ -48,6 +50,7 @@ class DataReader(QtCore.QThread):
     def run(self):
         global DATA_DICT
         global DATA_HEADINGS
+        # get column numbers that hold data in spreadsheet
         dataColNums = DATA_HEADINGS.keys()
 
         while self.running:
@@ -55,11 +58,15 @@ class DataReader(QtCore.QThread):
             data = self.datafile.readline()
             row = data.split(',')
             strippedRow = []
+            # ignore empty third column in spreadsheet
             for col in (row[:2] + row[3:]):
                 if col != '':
                     strippedRow += [col]
+                # ignore empty columns at end of spreadsheet
                 else:
                     break
+            # check if we have all data from row and have read
+            #   up to the end of line character
             if len(strippedRow) == self.numColumns and row[len(row)-1].endswith('\r\n'):
                 # add the new info to the respective column
                 for col in dataColNums:

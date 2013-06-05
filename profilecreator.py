@@ -56,7 +56,6 @@ class ProfileCreator(QtGui.QWidget):
         varNames = DATA_HEADINGS.values()
         varNames.remove('Time')
         varNames.remove('Date')
-        print varNames
         for index in range(len(varNames)):
             self.checkboxes += [QtGui.QCheckBox(varNames[index], self)]
             # first half of variables added to first column
