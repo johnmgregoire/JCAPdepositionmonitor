@@ -7,11 +7,9 @@ FILE_INFO = {}
 
 def parseFilename(filename):
     global FILE_INFO
-    print filename
     if filename.endswith('.csv'):
         filename = filename[:-4]
     rawFileInfo = filename.split('_')
-    print rawFileInfo
     tagsDict = {'Source': 'Source', 'Src': 'Source', 'SRC': 'Source',
             'src': 'Source', 't': 'TiltDeg', 'tilt': 'TiltDeg', 'z': 'Z_mm',
             'Z': 'Z_mm', 'Supply': 'Supply', 'Sup': 'Supply', 'sup': 'Supply'}
@@ -19,7 +17,16 @@ def parseFilename(filename):
         strippedTag = filter(str.isalpha, tag)
         tagVal = filter(lambda x: not x.isalpha(), tag)
         if strippedTag in tagsDict:
-            FILE_INFO[tagsDict.get(strippedTag)] = tagVal
+            stdName = tagsDict.get(strippedTag)
+            if (stdName == 'Z_mm' and stdName in FILE_INFO):
+                FILE_INFO[stdName] += [tagVal]
+            elif (stdName == 'Z_mm' or stdName == 'TiltDeg'):
+                FILE_INFO[stdName] = [tagVal]
+            else:
+                FILE_INFO[stdName] = tagVal
         elif (tag.istitle() and tag.isalpha()):
             FILE_INFO['Element'] = tag
+    if len(FILE_INFO) != 5:
+        print 'Filename in incorrect format'
+        # throw error
     print FILE_INFO
