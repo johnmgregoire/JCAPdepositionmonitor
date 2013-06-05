@@ -1,14 +1,27 @@
 Things to do:
 
+- Add error messages to graphing program:
+	-Even power supply:
+		- RFL >10% of FWD*
+		- FWD < 5*
+		- DC bias < 50*
+	-Odd power supply:
+		- output power < 5*
+	-Both:
+		- power supply (output, voltage, DC bias)
+			fluctuating w/ st. dev. >10% of mean
+	* = throw away data (don't add to database)
+
 - Load most recently modified file (use oswalk) [done for now]
-	* need to know where data files are going to be stored
+	- need to know where data files are going to be stored
+
 - Create menu for loading file [done for now]
 	- definitely in main menu - also in graph window? 
 
 - COLOR WHEELS?!?!?!
 	- normalize by center/don't normalize
 
-* In our testing, we've needed to start writing to the file
+- In our testing, we've needed to start writing to the file
 before we open the program in order to read that file.
 In practice, the file probably won't be created (and thus
 won't be available to load)

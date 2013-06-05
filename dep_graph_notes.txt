@@ -22,3 +22,22 @@ Things we need to keep track of:
 	is fixed
 - adding color values for different elements, computing
 	percentages based on sum
+
+
+
+Clarifications:
+
+- 'Src[src] tilt motor position' should match t-value
+	in filename
+	(probably throw away data set if no matches in file,
+	when the time comes to think about that)
+- it's alright to compute averages, plot point after gun
+	has moved to next position
+- as in Graph, give warning message if power is fluctuating
+	and error messages if power supply is failing
+	(maybe integrate this function into MainMenu, so
+	the entire program is put into the background when
+	there's a serious error?)
+- no need to put data in library file right now
+- take necessary t and z values from filename - need to ask
+	if we can hard-code radius values given in process3
