@@ -7,7 +7,7 @@ import csv
 import time
 
 filename = 'Ag_Src1_Supply1_11W_t20_z3.0_z3.6.csv'
-testfile = 'testcsv.csv'
+testfile = 'Hg_Src1_Supply1_11W_t20_z3.0_z3.6.csv'
 
 datafile = open(filename, 'rb')
 csvfile = open(testfile, 'wb')
@@ -16,8 +16,8 @@ csvfile = open(testfile, 'wb')
 csvwriter = csv.writer(csvfile)
 
 
-linesToWrite = 100
-sleepTime = 0.1
+linesToWrite = 300
+sleepTime = 0.25
 
 
 x = 0
