@@ -20,10 +20,15 @@ additionalCols = 20
 
 csvfile = open(testfile, 'wb')
 csvwriter = csv.writer(csvfile)
-headers =  [ "Date" , "Time" , "Value" ]
+headers =  [ "Date" , "Time" , "" , "Value" ]
 
 for j in range(additionalCols):
     headers += [ "Value"+str(j) ]
+
+# Empty columns to simulate real files
+    headers += [""]
+    headers += [""]
+    headers += [""]
 
 csvwriter.writerow(headers)
 
@@ -40,10 +45,10 @@ while num < 1000:
     #Getting the MS data
     ms = (str(x).split('.'))[1]
     
-    fulldate = strftime("%m/%d/%Y %H:%M:%S", time.localtime(x))
+    fulldate = strftime("%d/%m/%Y %H:%M:%S", time.localtime(x))
     currentDT = fulldate.split()
     
-    # The date in the form mm/dd/yyyy
+    # The date in the form dd/mm/yyyy
     date = str(currentDT[0])
 
     Ttime = currentDT[1]+':'+ms
@@ -52,10 +57,15 @@ while num < 1000:
     # Done in order to slow down the processing
     print Ttime
 
-    content = [ date , Ttime , str(num%50)]
+    content = [ date , Ttime , "", str(num%50)]
     
     for j in range(2,additionalCols+2):
         content += [ str(num % (j*50))]
+
+    content += [""]
+    content += [""]
+    content += [""]
+    
 
     # Modifiy to simulate writing speed
     time.sleep(0.1)
