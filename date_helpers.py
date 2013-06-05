@@ -13,9 +13,9 @@ import datetime
 
 # give a float of seconds - such as time.time() and it returns a datetime obj
 def dateObj(atime):
-    localCurrTime = strftime("%m/%d/%Y %H:%M:%S", time.localtime(atime))
-    return datetime.datetime.strptime(localCurrTime, "%m/%d/%Y %H:%M:%S")
+    localCurrTime = strftime("%d/%m/%Y %H:%M:%S", time.localtime(atime))
+    return datetime.datetime.strptime(localCurrTime, "%d/%m/%Y %H:%M:%S")
 
-# give it a string of the from m/d/Y H:M:S:f and it returns a date time object
+# give it a string of the from d/m/Y H:M:S:f and it returns a date time object
 def dateObjFloat(fullTime):
-    return datetime.datetime.strptime(fullTime,"%m/%d/%Y %H:%M:%S:%f")
+    return datetime.datetime.strptime(fullTime,"%d/%m/%Y %H:%M:%S:%f")

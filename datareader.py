@@ -63,13 +63,11 @@ class DataReader(QtCore.QThread):
                 else:
                     break
             if len(strippedRow) == self.numColumns and row[len(row)-1].endswith('\r\n'):
-                print "full line read"
                 # add the new info to the respective column
                 for col in dataColNums:
                     heading = DATA_HEADINGS.get(col)
                     DATA_DICT[heading].append(row[col])
                 # SEND SIGNAL
-                print strippedRow
                 self.lineRead.emit(strippedRow)
                 # move the reader cursor only if we read in a full line
                 self.lastEOFpos = self.datafile.tell()
