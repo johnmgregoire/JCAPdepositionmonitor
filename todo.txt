@@ -1,11 +1,11 @@
 Things to do:
 
 - Add error messages to graphing program:
-	-Even power supply:
+	-Even power supply: (presumed done)
 		- RFL >10% of FWD*
 		- FWD < 5*
 		- DC bias < 50*
-	-Odd power supply:
+	-Odd power supply: (presumed done)
 		- output power < 5*
 	-Both:
 		- power supply (output, voltage, DC bias)
