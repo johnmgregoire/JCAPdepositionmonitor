@@ -41,3 +41,22 @@ Clarifications:
 - no need to put data in library file right now
 - take necessary t and z values from filename - need to ask
 	if we can hard-code radius values given in process3
+
+use savgolsmooth(x, nptsoneside=1, order = 2, dx=1.0, deriv=0, binprior=0)
+to take derivative of angle over time
+
+
+HOW TO CALCULATE A DATA POINT:
+- get useful indices
+	- where z and t match values in FILE_INFO
+- get Xtal rates
+- calculate difference between Xtal rates at beginning and end
+	of time spent at this azimuth
+	- divide by time span (rate profile)
+- rate0 = mean Xtal3 rate
+- rate1 = rate0 * (rate profile R1)/(rate profile R0)
+- rate2 = rate0 * (rate profile R2)/(rate profile R0)
+- take sin and cos of angle; calculate x, y coordinates
+- r = [rate0, rate1, rate2]
+- plot x, y, color=r
+

@@ -16,6 +16,6 @@ def dateObj(atime):
     localCurrTime = strftime("%d/%m/%Y %H:%M:%S", time.localtime(atime))
     return datetime.datetime.strptime(localCurrTime, "%d/%m/%Y %H:%M:%S")
 
-# give it a string of the from d/m/Y H:M:S:f and it returns a date time object
+# give it a string of the form d/m/Y H:M:S:f and it returns a date time object
 def dateObjFloat(fullTime):
     return datetime.datetime.strptime(fullTime,"%d/%m/%Y %H:%M:%S:%f")

@@ -74,10 +74,10 @@ class DataReader(QtCore.QThread):
                 for col in dataColNums:
                     heading = DATA_HEADINGS.get(col)
                     DATA_DICT[heading].append(row[col])
-                # SEND SIGNAL
                 # re-insert empty third column to keep indices
                 #   in strippedRow consisten with DATA_HEADINGS
                 strippedRow.insert(2, '')
+                # SEND SIGNAL
                 self.lineRead.emit(strippedRow)
                 # move the reader cursor only if we read in a full line
                 self.lastEOFpos = self.datafile.tell()
