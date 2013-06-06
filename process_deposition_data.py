@@ -20,15 +20,15 @@ def getDataRow(row):
     if ROW_BUFFER == []:
         ROW_BUFFER += [row]
     else:
-        print row
+        print 'row', row
         anglecolnum = getCol('Platen Motor Position')
         print row[anglecolnum]
         angle = round(float(row[anglecolnum]), 0)
-        print angle
+        print 'angle', angle
         radcolnum = getCol('Platen Zshift Motor 1 Position')
         print row[radcolnum]
         radius = round(float(row[radcolnum]), 1)
-        print radius
+        print 'radius', radius
         if (angle == round(float(ROW_BUFFER[-1][anglecolnum]), 0) and radius ==
             round(float(ROW_BUFFER[-1][radcolnum]), 1)):
             ROW_BUFFER += [row]
@@ -66,10 +66,8 @@ def getRowRange():
 
 def getTimeSpan(dataArrayT):
     datecol = getCol('Date')
-    print datecol
     timecol = getCol('Time')
-    print timecol
-    print dataArrayT
+    print 'dataArrayT', dataArrayT
     # error: array index out of range
     datetimeTup = zip(dataArrayT[datecol], dataArrayT[timecol])
     startStr = datetimeTup[0][0] + ' ' + datetimeTup[0][1]
@@ -79,6 +77,7 @@ def getTimeSpan(dataArrayT):
 
 def getXtalRate(ratenum, dataArrayT):
     rcolnum = getCol('Xtal%d Rate' % ratenum)
+    print 'rcolnum', rcolnum
     return np.array(map(float, dataArrayT[rcolnum]))
 
 def getDepRates(timespan, dataArrayT):
@@ -91,18 +90,24 @@ def getDepRates(timespan, dataArrayT):
     
 def processData(angle, radius):
     rowRange = getRowRange()
-    datacols = np.array(ROW_BUFFER).T
-    dataArrayT = datacols[rowRange[0]:(rowRange[1]+1)]
-    timespan = getTimeSpan(dataArrayT)
-    depRates = getDepRates(timespan, dataArrayT)
-    rate0 = getXtalRate(3, dataArrayT).mean()
-    rate1 = rate0 * depRates[2]/depRates[1]
-    rate2 = rate0 * depRates[0]/depRates[1]
-    if radius == FILE_INFO['Z_mm'][0]:
-        x = radius * np.cos(angle * np.pi/180.)
-        y = radius * np.cos(angle * np.pi/180.)
+    print rowRange
+    if rowRange[0] == rowRange[1]:
+        pass
     else:
-        x = radius * np.cos(angle * np.pi/180. + np.pi)
-        y = radius * np.cos(angle * np.pi/180. + np.pi)
-    rate = np.concatenate([[rate0], [rate1], [rate2]])
+        print 'ROW_BUFFER', ROW_BUFFER
+        dataArray = ROW_BUFFER[rowRange[0]:(rowRange[1]+1)]
+        dataArrayT = np.array(dataArray).T
+        print 'dataArrayT', dataArrayT
+        timespan = getTimeSpan(dataArrayT)
+        depRates = getDepRates(timespan, dataArrayT)
+        rate0 = getXtalRate(3, dataArrayT).mean()
+        rate1 = rate0 * depRates[2]/depRates[1]
+        rate2 = rate0 * depRates[0]/depRates[1]
+        if radius == FILE_INFO['Z_mm'][0]:
+            x = radius * np.cos(angle * np.pi/180.)
+            y = radius * np.cos(angle * np.pi/180.)
+        else:
+            x = radius * np.cos(angle * np.pi/180. + np.pi)
+            y = radius * np.cos(angle * np.pi/180. + np.pi)
+        rate = np.concatenate([[rate0], [rate1], [rate2]])
 
