@@ -92,9 +92,5 @@ class LoadMenu(QtGui.QDialog):
         self.close()
 
     """ called by MainMenu every second; nothing for this widget to do """
-    def updateWindow(self, newRow):
-        pass
-
-    """ called by MainMenu every second; nothing for this widget to do """
     def redrawWindow(self):
         pass
