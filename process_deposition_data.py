@@ -99,6 +99,7 @@ def getDepRates(timespan, dataArrayT):
     return depRates
     
 def processData(angle, radius):
+    global DEP_DATA
     rowRange = getRowRange()
     #print 't:', FILE_INFO.get('TiltDeg')
     #print 'rowRange:', rowRange
@@ -118,6 +119,7 @@ def processData(angle, radius):
             if angle == 0:
                 #plot rate0 at (0, 0)
                 print 'plotting rate0 at (0,0)'
+                DEP_DATA.append((0.0, 0.0, rate))
             x = radius * np.cos(angle * np.pi/180.)
             y = radius * np.sin(angle * np.pi/180.)
             # rate1 corresponds to Xtal4 Rate
@@ -128,6 +130,7 @@ def processData(angle, radius):
             # rate2 corresponds to Xtal2 Rate
             rate = rate0 * depRates[0]/depRates[1]
         print (angle, radius, x, y, rate)
+        DEP_DATA.append((x, y, rate))
         # return the tuple above to depgraph
         return (x, y, rate)
 

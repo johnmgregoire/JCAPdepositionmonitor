@@ -199,12 +199,10 @@ class MainMenu(QtGui.QWidget):
 
     """ handles signal from reader that new line has been read """
     def newLineRead(self, newRow):
-        global DEP_DATA
         self.updateGraphs(newRow)
         self.checkValidity(newRow)
         newDepRates = processDataRow(newRow)
         if newDepRates != None:
-            DEP_DATA += newDepRates
             for window in self.depWindows:
                 window.updateWindow(newDepRates)
 

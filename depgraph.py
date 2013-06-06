@@ -21,7 +21,7 @@ class DepositionGraph(FigureCanvas):
                                    QtGui.QSizePolicy.Expanding,
                                    QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
-
+        
         self.initPlot()
 
     def initPlot(self):
@@ -32,11 +32,12 @@ class DepositionGraph(FigureCanvas):
             self.xdata.append(x)
             self.ydata.append(y)
             self.ratedata.append(rate)
-        self.plot = self.figure.add_subplot(111)
+        self.plot = self.figure.add_subplot(1, 1, 1, aspect=1)
         self.scalarMap = cm.ScalarMappable(norm=colors.Normalize(vmin=0, vmax=150))
         self.scalarMap._A = self.ratedata
         # comment this back in when data processor is connected
-        self.plot.scatter(self.xdata, self.ydata, c=self.ratedata, marker='o', edgecolor='none', s=60)
+        self.plot.scatter(self.xdata, self.ydata, c = self.ratedata,
+                          cmap=self.scalarMap.get_cmap(), marker='o', edgecolor='none', s=60)
         self.plot.set_aspect(1.)
         self.figure.colorbar(self.scalarMap)
 
@@ -45,6 +46,7 @@ class DepositionGraph(FigureCanvas):
             self.xdata.append(x)
             self.ydata.append(y)
             self.ratedata.append(rate)
-            self.plot.scatter(x, y, c=rate, marker='o', edgecolor='none', s=60)
         print "deposition graph updating"
+        self.plot.scatter(self.xdata[-2:], self.ydata[-2:], c = self.ratedata[-2:],
+                          cmap=self.scalarMap.get_cmap(), marker='o', edgecolor='none', s=60)
         self.draw()
