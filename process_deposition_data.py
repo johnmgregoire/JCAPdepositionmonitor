@@ -58,17 +58,19 @@ def getRowRange():
     tcolnum = getCol('Src%d Motor Tilt Position' % int(FILE_INFO['Source']))
     data = np.array(ROW_BUFFER)
     datacols = data.T
-    zcol = datacols[zcolnum]
-    print 'zcol', zcol
-    tcol = datacols[tcolnum]
-    print 'tcol', tcol
+    zcol = map(float, datacols[zcolnum])
+    tcol = map(float, datacols[tcolnum])
     inds_useful=np.where((roundZ(zcol)>=0)&
                             (roundt(tcol)>=0))[0]
     return (inds_useful[0], inds_useful[-1])
 
 def getTimeSpan(dataArrayT):
     datecol = getCol('Date')
+    print datecol
     timecol = getCol('Time')
+    print timecol
+    print dataArrayT
+    # error: array index out of range
     datetimeTup = zip(dataArrayT[datecol], dataArrayT[timecol])
     startStr = datetimeTup[0][0] + ' ' + datetimeTup[0][1]
     endStr = datetimeTup[-1][0] + ' ' + datetimeTup[-1][1]
@@ -77,7 +79,7 @@ def getTimeSpan(dataArrayT):
 
 def getXtalRate(ratenum, dataArrayT):
     rcolnum = getCol('Xtal%d Rate' % ratenum)
-    return np.array(dataArrayT[rcolnum])
+    return np.array(map(float, dataArrayT[rcolnum]))
 
 def getDepRates(timespan, dataArrayT):
     depRates = []
@@ -85,6 +87,7 @@ def getDepRates(timespan, dataArrayT):
         rateData = getXtalRate(x, dataArrayT)
         rateDiff = rateData[-1] - rateData[0]
         depRates += [rateDiff/timespan]
+    return depRates
     
 def processData(angle, radius):
     rowRange = getRowRange()
@@ -101,5 +104,5 @@ def processData(angle, radius):
     else:
         x = radius * np.cos(angle * np.pi/180. + np.pi)
         y = radius * np.cos(angle * np.pi/180. + np.pi)
-    rate = np.concatenate([[rate0], rate1, rate2])
+    rate = np.concatenate([[rate0], [rate1], [rate2]])
 
