@@ -3,7 +3,7 @@
 # Last Updated: 6/6/2013
 # For JCAP
 
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 from depgraph import *
 import process_deposition_data
 import re
@@ -25,7 +25,7 @@ class DepositionWindow(QtGui.QMainWindow):
         # main_widget holds all other widgets in window
         self.main_widget = QtGui.QWidget(self)
 
-                # initialize the graph
+        # initialize the graph
         self.depgraph = DepositionGraph(self.main_widget)
 
         self.setWindowTitle("Deposition Window - Work In Progress")
@@ -40,6 +40,10 @@ class DepositionWindow(QtGui.QMainWindow):
         # adding layouts to one another
         self.mainlayout.addWidget(self.depgraph,0,0)
         self.mainlayout.addLayout(self.sidelayout,0,1)
+
+        #set the streches
+        self.mainlayout.setColumnStretch(0,5)
+        self.mainlayout.setColumnStretch(1,0)
 
         #drop down widget, text widgets, ect
         self.selectUnits = QtGui.QComboBox()
@@ -58,11 +62,13 @@ class DepositionWindow(QtGui.QMainWindow):
 
         self.selectUnits.activated[str].connect(self.selectConversion)
 
+        self.sidelayout.setAlignment(QtCore.Qt.AlignTop)
+
         #adding to sidelayout
+        self.sidelayout.addWidget(self.selectUnits)
         self.sidelayout.addWidget(self.label_chemEQ)
         self.sidelayout.addWidget(self.chemEQ)
         self.sidelayout.addWidget(self.procChem)
-        self.sidelayout.addWidget(self.selectUnits)
 
 
         self.show()
@@ -74,7 +80,8 @@ class DepositionWindow(QtGui.QMainWindow):
     def handleEQ(self):
         formula = self.chemEQ.text()
         if not self.checkRegEx(formula):
-            message = "The equation you entered is of the wrong format."
+            message = """The equation you entered is of the wrong format.
+                        Some examples are: FeO and FeO1.5"""
             inputError = QtGui.QMessageBox.information(None,"Wrong Format", message)
         
 
