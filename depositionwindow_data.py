@@ -113,9 +113,9 @@ class DepositionWindow(QtGui.QMainWindow):
         
         return False
 
-    def updateWindow(self,newDepRate):
+    def updateWindow(self,newDepRates):
         # newDepRates = [(x, y, rate1), (x, y, rate2)]
-        self.depgraph.updatePlot(newDepRate)
+        self.depgraph.updatePlot(newDepRates)
         pass
 
     def redrawWindow(self):

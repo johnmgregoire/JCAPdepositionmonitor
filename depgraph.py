@@ -40,7 +40,11 @@ class DepositionGraph(FigureCanvas):
         self.plot.set_aspect(1.)
         self.figure.colorbar(self.scalarMap)
 
-    def updatePlot(self):
+    def updatePlot(self, newData):
+        for x, y, rate in newData:
+            self.xdata.append(x)
+            self.ydata.append(y)
+            self.ratedata.append(rate)
+            self.plot.scatter(x, y, c=rate, marker='o', edgecolor='none', s=60)
         print "deposition graph updating"
-        
-        pass
+        self.draw()
