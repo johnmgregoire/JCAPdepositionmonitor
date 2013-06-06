@@ -6,6 +6,7 @@
 from graph import *
 from depgraph import *
 from elements import ELEMENTS
+from fractions import Fraction
 import re
 import sys
 
@@ -78,21 +79,22 @@ class DepositionWindow(QtGui.QMainWindow):
 
 
     def selectConversion(self, unitName):
-        #TODO - Remove this variable eventually -- it's a dummy var
-        test_value = 1
 
         print unitName
 
-        if "g/(scm^3)":
-            pass
-        if "nm/s":
-            density = self.density
-            print self.density
-            pass
-        if "mol/(s*cm^2)":
-            molarMass = (self.Lmnts["Metal Name"].mass + self.Lmnts["Second Element"].mass \
-                        *self.Lmnts["Second Element Stoich"])
-            print molarMass
+        if self.Lmnts:
+            if "g/(scm^3)":
+                pass
+            if "nm/s":
+                density = self.density
+                print self.density
+                pass
+            if "mol/(s*cm^2)":
+                scaledMass = self.Lmnts["Metal Name"].mass + self.Lmnts["Second Element"].mass \
+                            *self.Lmnts["Second Element Stoich"]
+                factor = Fraction(self.Lmnts["Second Element Stoich"]).limit_denominator()
+                molarMass = scaledMass * factor._denominator
+                print molarMass
         
 
     def handleEQS(self):
