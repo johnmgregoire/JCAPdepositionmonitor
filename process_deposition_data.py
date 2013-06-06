@@ -14,27 +14,36 @@ from date_helpers import *
 ROW_BUFFER = []
 zndec = 2
 tndec = 1
+radius1 = 28.
+radius2 = 45.
+
+# make sure to make one last call to processData when file finishes
 
 def getDataRow(row):
     global ROW_BUFFER
     if ROW_BUFFER == []:
         ROW_BUFFER += [row]
     else:
-        print 'row', row
         anglecolnum = getCol('Platen Motor Position')
-        print row[anglecolnum]
-        angle = round(float(row[anglecolnum]), 0)
-        print 'angle', angle
-        radcolnum = getCol('Platen Zshift Motor 1 Position')
-        print row[radcolnum]
-        radius = round(float(row[radcolnum]), 1)
-        print 'radius', radius
-        if (angle == round(float(ROW_BUFFER[-1][anglecolnum]), 0) and radius ==
-            round(float(ROW_BUFFER[-1][radcolnum]), 1)):
+        angle = round(float(row[anglecolnum]))
+        # print 'angle:', angle
+        zcolnum = getCol('Platen Zshift Motor 1 Position')
+        zval = round(float(row[zcolnum]), 1)
+        #print 'radius:', radius
+        prevangle = round(float(ROW_BUFFER[-1][anglecolnum]), 0)
+        prevz = round(float(ROW_BUFFER[-1][zcolnum]), 1)
+        if (angle == prevangle and zval == prevz):
             ROW_BUFFER += [row]
+        elif (angle == prevangle):
+            # make new graph
+            print 'drawing new graph for z =', zval
+            processData(prevangle, radius1)
+            processData(prevangle, radius2)
+            ROW_BUFFER = [row]
         else:
-            processData(angle, radius)
-            ROW_BUFFER = []
+            processData(prevangle, radius1)
+            processData(prevangle, radius2)
+            ROW_BUFFER = [row]
     # send to ROW_BUFFER if same azimuth
     # otherwise empty buffer (?) and then add row
     #   call processData() as well
@@ -67,7 +76,6 @@ def getRowRange():
 def getTimeSpan(dataArrayT):
     datecol = getCol('Date')
     timecol = getCol('Time')
-    print 'dataArrayT', dataArrayT
     # error: array index out of range
     datetimeTup = zip(dataArrayT[datecol], dataArrayT[timecol])
     startStr = datetimeTup[0][0] + ' ' + datetimeTup[0][1]
@@ -77,7 +85,6 @@ def getTimeSpan(dataArrayT):
 
 def getXtalRate(ratenum, dataArrayT):
     rcolnum = getCol('Xtal%d Rate' % ratenum)
-    print 'rcolnum', rcolnum
     return np.array(map(float, dataArrayT[rcolnum]))
 
 def getDepRates(timespan, dataArrayT):
@@ -90,24 +97,33 @@ def getDepRates(timespan, dataArrayT):
     
 def processData(angle, radius):
     rowRange = getRowRange()
-    print rowRange
+    #print 't:', FILE_INFO.get('TiltDeg')
+    #print 'rowRange:', rowRange
     if rowRange[0] == rowRange[1]:
         pass
     else:
-        print 'ROW_BUFFER', ROW_BUFFER
+        #print 'ROW_BUFFER', ROW_BUFFER
         dataArray = ROW_BUFFER[rowRange[0]:(rowRange[1]+1)]
         dataArrayT = np.array(dataArray).T
-        print 'dataArrayT', dataArrayT
+        #print 'dataArrayT', dataArrayT
         timespan = getTimeSpan(dataArrayT)
         depRates = getDepRates(timespan, dataArrayT)
         rate0 = getXtalRate(3, dataArrayT).mean()
-        rate1 = rate0 * depRates[2]/depRates[1]
-        rate2 = rate0 * depRates[0]/depRates[1]
-        if radius == FILE_INFO['Z_mm'][0]:
+        #Xtal3Rate = map(float, DATA_DICT.get('Xtal3 Rate'))
+        #rate0 = np.array(Xtal3Rate).mean()
+        rate = rate0
+        if radius == radius1:
+            if angle == 0:
+                #plot rate0 at (0, 0)
+                print 'plotting rate0 at (0,0)'
             x = radius * np.cos(angle * np.pi/180.)
-            y = radius * np.cos(angle * np.pi/180.)
+            y = radius * np.sin(angle * np.pi/180.)
+            # rate1 corresponds to Xtal4 Rate
+            rate = rate0 * depRates[2]/depRates[1]
         else:
             x = radius * np.cos(angle * np.pi/180. + np.pi)
-            y = radius * np.cos(angle * np.pi/180. + np.pi)
-        rate = np.concatenate([[rate0], [rate1], [rate2]])
+            y = radius * np.sin(angle * np.pi/180. + np.pi)
+            # rate2 corresponds to Xtal2 Rate
+            rate = rate0 * depRates[0]/depRates[1]
+        print (angle, radius, x, y, rate)
 
