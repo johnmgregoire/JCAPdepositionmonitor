@@ -5,6 +5,7 @@
 
 from PyQt4 import QtGui
 from depgraph import *
+import process_deposition_data
 import re
 import sys
 
@@ -107,6 +108,7 @@ class DepositionWindow(QtGui.QMainWindow):
         return False
 
     def updateWindow(self,newRow):
+        process_deposition_data.getDataRow(newRow)
         pass
 
     def redrawWindow(self):

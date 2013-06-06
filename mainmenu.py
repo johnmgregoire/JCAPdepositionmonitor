@@ -8,7 +8,6 @@ from depositionwindow_data import *
 from graphwindow_data import *
 from profilewindow import *
 import os
-import process_deposition_data
 
 """ window that pops up when application launches """
 class MainMenu(QtGui.QWidget):
@@ -199,7 +198,6 @@ class MainMenu(QtGui.QWidget):
         #print 'I read a line: ', newRow
         self.updateGraphs(newRow)
         self.checkValidity(newRow)
-        process_deposition_data.getDataRow(newRow)
 
     """ Shows an error message is the data is invalid"""
     def checkValidity(self, row):
