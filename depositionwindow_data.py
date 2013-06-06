@@ -5,6 +5,7 @@
 
 from graph import *
 from depgraph import *
+from elements import ELEMENTS
 import re
 import sys
 
@@ -14,6 +15,7 @@ class DepositionWindow(QtGui.QMainWindow):
         super(DepositionWindow, self).__init__()
 
         self.Lmnts = {}
+        self.density = None
         self.initUI()
 
     """ draws the user interface of the window """
@@ -47,14 +49,15 @@ class DepositionWindow(QtGui.QMainWindow):
         #drop down widget, text widgets, ect
         self.selectUnits = QtGui.QComboBox()
         self.chemEQ = QtGui.QLineEdit(self)
+        self.densityLine = QtGui.QLineEdit(self)
         self.procChem = QtGui.QPushButton('Enter')
 
         # set connections up
-        self.procChem.clicked.connect(self.handleEQ)
+        self.procChem.clicked.connect(self.handleEQS)
 
         # labels
         self.label_chemEQ = QtGui.QLabel('Chemical equation:')
-        self.unitOptions = ["A/s"]
+        self.unitOptions = ["g/(scm^3)", "nm/s", "mol/(s*cm^2)"]
 
         for unit in self.unitOptions:
             self.selectUnits.addItem(unit)
@@ -67,6 +70,7 @@ class DepositionWindow(QtGui.QMainWindow):
         self.sidelayout.addWidget(self.selectUnits)
         self.sidelayout.addWidget(self.label_chemEQ)
         self.sidelayout.addWidget(self.chemEQ)
+        self.sidelayout.addWidget(self.densityLine)
         self.sidelayout.addWidget(self.procChem)
 
 
@@ -74,25 +78,49 @@ class DepositionWindow(QtGui.QMainWindow):
 
 
     def selectConversion(self, unitName):
+        #TODO - Remove this variable eventually -- it's a dummy var
+        test_value = 1
+
         print unitName
 
-    def handleEQ(self):
+        if "g/(scm^3)":
+            pass
+        if "nm/s":
+            density = self.density
+            print self.density
+            pass
+        if "mol/(s*cm^2)":
+            molarMass = (self.Lmnts["Metal Name"].mass + self.Lmnts["Second Element"].mass \
+                        *self.Lmnts["Second Element Stoich"])
+            print molarMass
+        
+
+    def handleEQS(self):
         formula = self.chemEQ.text()
+
+        if not formula:
+            return
+
+        if not self.densityLine.text():
+            self.density = self.densityLine.text()
+            
         if not self.checkRegEx(formula):
-            message = """The equation you entered is of the wrong format.
-                        Some examples are: FeO and FeO1.5"""
+            message = "The equation you entered is of the wrong format or is missing an element."
+            message += "Some examples are: FeO and FeO1.5"
             inputError = QtGui.QMessageBox.information(None,"Wrong Format", message)
         
 
     def checkRegEx(self,text):
-        
+
+        reg0 = '^'
         reg1 = '[A-Z]'
         reg2 = '[a-z]?'
         reg3 = '([ONBC])'
         reg4 = '[\d]*'
         reg5 = '(\.\d+)?'
+        reg6 = '$'
         
-        totalReg = '(' + reg1+reg2 + ')' + reg3 + '(' + reg4 + reg5 + ')'
+        totalReg = reg0 + '(' + reg1+reg2 + ')' + reg3 + '(' + reg4 + reg5 + ')' + reg6
 
         regEX = re.compile(totalReg)
         x = re.match(regEX,str(text))
@@ -105,12 +133,17 @@ class DepositionWindow(QtGui.QMainWindow):
             if otherElmntStoich == "":
                 otherElmntStoich = 1.
 
-            self.Lmnts["Metal Name"] = metalName
-            self.Lmnts["Second Element"] = otherElmntName
-            self.Lmnts["Second Element Stoich"] = otherElmntStoich
-            
-            return True
-        
+            try:
+                metalElmntObject = ELEMENTS[metalName]
+                secondElmntObject = ELEMENTS[otherElmntName]
+                self.Lmnts["Metal Name"] = metalElmntObject
+                self.Lmnts["Second Element"] = secondElmntObject
+                self.Lmnts["Second Element Stoich"] = float(otherElmntStoich)
+                return True
+
+            except KeyError:
+                pass 
+    
         return False
 
     def updateWindow(self,newDepRates):
