@@ -1,9 +1,10 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 6/5/2013
-# Last Updated: 6/5/2013
+# Last Updated: 6/6/2013
 # For JCAP
 
 from PyQt4 import QtGui
+from depgraph import *
 import re
 import sys
 
@@ -23,6 +24,9 @@ class DepositionWindow(QtGui.QMainWindow):
         # main_widget holds all other widgets in window
         self.main_widget = QtGui.QWidget(self)
 
+                # initialize the graph
+        self.depgraph = DepositionGraph(self.main_widget)
+
         self.setWindowTitle("Deposition Window - Work In Progress")
 
         # set main_widget as center of window
@@ -33,6 +37,7 @@ class DepositionWindow(QtGui.QMainWindow):
         self.sidelayout = QtGui.QGridLayout(self.main_widget)
 
         # adding layouts to one another
+        self.mainlayout.addWidget(self.depgraph,0,0)
         self.mainlayout.addLayout(self.sidelayout,0,1)
 
         #drop down widget, text widgets, ect
@@ -68,7 +73,7 @@ class DepositionWindow(QtGui.QMainWindow):
     def handleEQ(self):
         formula = self.chemEQ.text()
         if not self.checkRegEx(formula):
-            message = ""
+            message = "The equation you entered is of the wrong format."
             inputError = QtGui.QMessageBox.information(None,"Wrong Format", message)
         
 
@@ -101,11 +106,8 @@ class DepositionWindow(QtGui.QMainWindow):
         
         return False
 
+    def updateWindow(self,newRow):
+        pass
 
-def main():
-    app = QtGui.QApplication(sys.argv)
-    window = DepositionWindow()
-    sys.exit(app.exec_())
-
-if __name__ == '__main__':
-    main()
+    def redrawWindow(self):
+        pass

@@ -4,6 +4,7 @@
 # For JCAP
 
 from dictionary_helpers import *
+from depositionwindow_data import *
 from graphwindow_data import *
 from profilewindow import *
 import os
@@ -94,6 +95,7 @@ class MainMenu(QtGui.QWidget):
         # show a deposition graph
         makeDepositionButton = QtGui.QPushButton('Create Deposition Graph')
         self.layout.addWidget(makeDepositionButton)
+        makeDepositionButton.clicked.connect(self.makeDeposition)
 
         # initialize the timer that updates all graphs in application
         timer = QtCore.QTimer(self)
@@ -160,6 +162,11 @@ class MainMenu(QtGui.QWidget):
         self.windows.append(loadMenu)
         loadMenu.show()
         loadMenu.profileChosen.connect(self.loadProfile)
+
+    """shows the deposition window"""
+    def makeDeposition(self):
+        depWindow = DepositionWindow()
+        self.windows.append(depWindow)
 
     """ once profile is chosen, loads profile in new window """
     def loadProfile(self, name):
