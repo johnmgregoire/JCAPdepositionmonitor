@@ -3,9 +3,8 @@
 # Last Updated: 6/6/2013
 # For JCAP
 
-from PyQt4 import QtGui, QtCore
+from graph import *
 from depgraph import *
-import process_deposition_data
 import re
 import sys
 
@@ -114,8 +113,9 @@ class DepositionWindow(QtGui.QMainWindow):
         
         return False
 
-    def updateWindow(self,newRow):
-        process_deposition_data.getDataRow(newRow)
+    def updateWindow(self,newDepRate):
+        # newDepRates = [(x, y, rate1), (x, y, rate2)]
+        self.depgraph.updatePlot(newDepRate)
         pass
 
     def redrawWindow(self):

@@ -3,10 +3,10 @@
 # Last Updated: 5/31/2013
 # For JCAP
 
-from dictionary_helpers import *
 from depositionwindow_data import *
 from graphwindow_data import *
 from profilewindow import *
+from process_deposition_data import *
 import os
 
 """ window that pops up when application launches """
@@ -15,7 +15,9 @@ class MainMenu(QtGui.QWidget):
     def __init__(self):
         super(MainMenu, self).__init__()
         # holds all active windows
-        self.windows = []
+        self.graphWindows = []
+        self.depWindows = []
+        self.miscWindows = []
         # holds all profiles associated with current file
         self.profiles = {}
         # save name of file from which application will read
@@ -118,7 +120,8 @@ class MainMenu(QtGui.QWidget):
             self.file = dirList[len(dirList)-1]
             self.reader.end()
             # hides all windows so they can be removed later
-            for window in self.windows:
+            for window in zip(self.graphWindows, self.depWindows,
+                              self.miscWindows):
                 window.hide()
             self.reader = DataReader(parent=self, filename=self.file)
             self.reader.start()
@@ -129,13 +132,13 @@ class MainMenu(QtGui.QWidget):
     """ creates window for single graph """
     def makeGraph(self):
         graph = GraphWindow(datafile=self.file)
-        self.windows.append(graph)
+        self.graphWindows.append(graph)
         graph.show()
 
     """ shows profile creator window """
     def makeProfile(self):
         profileCreator = ProfileCreator(datafile=self.file)
-        self.windows.append(profileCreator)
+        self.miscWindows.append(profileCreator)
         profileCreator.show()
 
     """ shows load profile window """
@@ -158,30 +161,31 @@ class MainMenu(QtGui.QWidget):
             except EOFError:
                 break
         loadMenu = LoadMenu(menuList)
-        self.windows.append(loadMenu)
+        self.miscWindows.append(loadMenu)
         loadMenu.show()
         loadMenu.profileChosen.connect(self.loadProfile)
 
     """shows the deposition window"""
     def makeDeposition(self):
         depWindow = DepositionWindow()
-        self.windows.append(depWindow)
+        self.depWindows.append(depWindow)
 
     """ once profile is chosen, loads profile in new window """
     def loadProfile(self, name):
         varsList = self.profiles.get(str(name))
         profileWindow = ProfileWindow(name, varsList)
-        self.windows.append(profileWindow)
+        self.graphWindows.append(profileWindow)
         profileWindow.show()
 
     """ sends new data received by reader to active graph windows """
     def updateGraphs(self, newRow):
-        for window in self.windows:
+        for window in self.graphWindows:
             window.updateWindow(newRow)
 
     """ updates all active graph windows every second """
     def redrawAll(self):
-        for window in self.windows:
+        for window in zip(self.graphWindows, self.depWindows,
+                          self.miscWindows):
             if window.isHidden():
                 self.windows.remove(window)
             else:
@@ -193,11 +197,16 @@ class MainMenu(QtGui.QWidget):
         self.reader.end()
         event.accept()
 
-### this is currently redundant - can connect signal directly to updateGraphs ###
+    """ handles signal from reader that new line has been read """
     def newLineRead(self, newRow):
-        #print 'I read a line: ', newRow
+        global DEP_DATA
         self.updateGraphs(newRow)
         self.checkValidity(newRow)
+        newDepRates = processDataRow(newRow)
+        if newDepRates != None:
+            DEP_DATA += newDepRates
+            for window in self.depWindows:
+                window.updateWindow(newDepRates)
 
     """ Shows an error message is the data is invalid"""
     def checkValidity(self, row):

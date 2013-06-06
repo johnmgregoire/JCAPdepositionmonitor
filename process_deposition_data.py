@@ -4,9 +4,11 @@
 # For JCAP
 
 import numpy as np
-from datareader import *
 from dictionary_helpers import *
 from date_helpers import *
+from datareader import *
+
+DEP_DATA = []
 
 """ does all of the data processing necessary for
     deposition plots """
@@ -18,8 +20,8 @@ radius1 = 28.
 radius2 = 45.
 
 # make sure to make one last call to processData when file finishes
-
-def getDataRow(row):
+ 
+def processDataRow(row):
     global ROW_BUFFER
     if ROW_BUFFER == []:
         ROW_BUFFER += [row]
@@ -37,13 +39,17 @@ def getDataRow(row):
         elif (angle == prevangle):
             # make new graph
             print 'drawing new graph for z =', zval
-            processData(prevangle, radius1)
-            processData(prevangle, radius2)
+            newpt1 = processData(prevangle, radius1)
+            newpt2 = processData(prevangle, radius2)
             ROW_BUFFER = [row]
+            if (newpt1 != None and newpt2 != None):
+                return (newpt1, newpt2)
         else:
-            processData(prevangle, radius1)
-            processData(prevangle, radius2)
+            newpt1 = processData(prevangle, radius1)
+            newpt2 = processData(prevangle, radius2)
             ROW_BUFFER = [row]
+            if (newpt1 != None and newpt2 != None):
+                return [newpt1, newpt2]
 
 def roundZ(zcol):
     zrnd=np.round(zcol, decimals=zndec)
@@ -106,7 +112,6 @@ def processData(angle, radius):
         timespan = getTimeSpan(dataArrayT)
         depRates = getDepRates(timespan, dataArrayT)
         rate0 = getXtalRate(3, dataArrayT).mean()
-        #Xtal3Rate = map(float, DATA_DICT.get('Xtal3 Rate'))
         #rate0 = np.array(Xtal3Rate).mean()
         rate = rate0
         if radius == radius1:
@@ -124,4 +129,5 @@ def processData(angle, radius):
             rate = rate0 * depRates[0]/depRates[1]
         print (angle, radius, x, y, rate)
         # return the tuple above to depgraph
+        return (x, y, rate)
 
