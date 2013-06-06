@@ -4,6 +4,7 @@
 # For JCAP
 
 from PyQt4 import QtGui
+import re
 import sys
 
 class DepositionWindow(QtGui.QMainWindow):
@@ -11,6 +12,7 @@ class DepositionWindow(QtGui.QMainWindow):
     def __init__(self):
         super(DepositionWindow, self).__init__()
 
+        self.Lmnts = {}
         self.initUI()
 
     """ draws the user interface of the window """
@@ -35,10 +37,14 @@ class DepositionWindow(QtGui.QMainWindow):
 
         #drop down widget, text widgets, ect
         self.selectUnits = QtGui.QComboBox()
-        self.chemEq = QtGui.QLineEdit(self)
+        self.chemEQ = QtGui.QLineEdit(self)
+        self.procChem = QtGui.QPushButton('Enter')
+
+        # set connections up
+        self.procChem.clicked.connect(self.handleEQ)
 
         # labels
-        self.label_chemEq = QtGui.QLabel('Chemical equation')
+        self.label_chemEQ = QtGui.QLabel('Chemical equation:')
         self.unitOptions = ["A/s"]
 
         for unit in self.unitOptions:
@@ -47,15 +53,54 @@ class DepositionWindow(QtGui.QMainWindow):
         self.selectUnits.activated[str].connect(self.selectConversion)
 
         #adding to sidelayout
-        self.sidelayout.addWidget(self.label_chemEq)
-        self.sidelayout.addWidget(self.chemEq)
+        self.sidelayout.addWidget(self.label_chemEQ)
+        self.sidelayout.addWidget(self.chemEQ)
+        self.sidelayout.addWidget(self.procChem)
         self.sidelayout.addWidget(self.selectUnits)
+
 
         self.show()
 
 
     def selectConversion(self, unitName):
         print unitName
+
+    def handleEQ(self):
+        formula = self.chemEQ.text()
+        if not self.checkRegEx(formula):
+            message = ""
+            inputError = QtGui.QMessageBox.information(None,"Wrong Format", message)
+        
+
+    def checkRegEx(self,text):
+        
+        reg1 = '[A-Z]'
+        reg2 = '[a-z]?'
+        reg3 = '([ONBC])'
+        reg4 = '[\d]*'
+        reg5 = '(\.\d+)?'
+        
+        totalReg = '(' + reg1+reg2 + ')' + reg3 + '(' + reg4 + reg5 + ')'
+
+        regEX = re.compile(totalReg)
+        x = re.match(regEX,str(text))
+
+        if x:
+            metalName = x.group(1)
+            otherElmntName = x.group(2)
+            otherElmntStoich  = x.group(3)
+            
+            if otherElmntStoich == "":
+                otherElmntStoich = 1.
+
+            self.Lmnts["Metal Name"] = metalName
+            self.Lmnts["Second Element"] = otherElmntName
+            self.Lmnts["Second Element Stoich"] = otherElmntStoich
+            
+            return True
+        
+        return False
+
 
 def main():
     app = QtGui.QApplication(sys.argv)
