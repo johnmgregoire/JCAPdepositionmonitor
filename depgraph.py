@@ -6,7 +6,6 @@
 from PyQt4 import QtGui
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-import pylab
 
 class DepositionGraph(FigureCanvas):
 
@@ -27,4 +26,4 @@ class DepositionGraph(FigureCanvas):
         # comment this back in when data processor is connected
         #self.plot.scatter(x, y, c=cs, marker='o', edgecolor='none', s=60)
         self.plot.set_aspect(1.)
-        self.figure.colorbar()
+        #self.figure.colorbar(#plot name?)
