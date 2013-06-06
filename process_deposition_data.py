@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 6/05/2013
-# Last Updated: 6/05/2013
+# Last Updated: 6/06/2013
 # For JCAP
 
 import numpy as np
@@ -44,9 +44,6 @@ def getDataRow(row):
             processData(prevangle, radius1)
             processData(prevangle, radius2)
             ROW_BUFFER = [row]
-    # send to ROW_BUFFER if same azimuth
-    # otherwise empty buffer (?) and then add row
-    #   call processData() as well
 
 def roundZ(zcol):
     zrnd=np.round(zcol, decimals=zndec)
@@ -126,4 +123,5 @@ def processData(angle, radius):
             # rate2 corresponds to Xtal2 Rate
             rate = rate0 * depRates[0]/depRates[1]
         print (angle, radius, x, y, rate)
+        # return the tuple above to depgraph
 

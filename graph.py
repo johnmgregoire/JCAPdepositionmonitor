@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/23/2013
-# Last Updated: 6/3/2013
+# Last Updated: 6/03/2013
 # For JCAP
 
 import datetime
@@ -20,7 +20,7 @@ from dictionary_helpers import *
 """ widget to represent an auto-updating graph """
 class Graph(FigureCanvas):
 
-    """ sets up Figure object, plot, and auto-updating timer """
+    """ sets up Figure object and plot """
     def __init__(self, parent="None", width=3, height=2, dpi=80,
                  xvarname="None", yvarname="None"):
         self.auto = True
