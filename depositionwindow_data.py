@@ -64,7 +64,7 @@ class DepositionWindow(QtGui.QMainWindow):
         # labels
         self.label_chemEQ = QtGui.QLabel('Chemical equation:')
         self.label_density = QtGui.QLabel('Density:')
-        self.unitOptions = ["g/(scm^3)", "nm/s", "mol/(s*cm^2)"]
+        self.unitOptions = ["ng/(scm^2)", "nm/s", "nmol/(s*cm^2)"]
 
         for unit in self.unitOptions:
             self.selectUnits.addItem(unit)
@@ -90,14 +90,14 @@ class DepositionWindow(QtGui.QMainWindow):
         unitNameStr = str(unitName)
         
         if self.Lmnts:
-            if "ng/(scm^3)" == unitNameStr:
+            if "ng/(scm^2)" == unitNameStr:
                 self.depgraph.convFactor = 10
                 self.depgraph.units = 'ng/s cm'+r'$^2$'
             elif "nm/s" == unitNameStr:
                 #divide using the density - consider A/s
                 self.depgraph.convFactor = 0.1/self.density
                 self.depgraph.units = 'nm/s'
-            elif "mol/(s*cm^2)" == unitNameStr:
+            elif "nmol/(s*cm^2)" == unitNameStr:
                 # divide using the molar mass to get this
                 scaledMass = self.Lmnts["Metal Name"].mass + self.Lmnts["Second Element"].mass \
                             *self.Lmnts["Second Element Stoich"]
@@ -105,6 +105,8 @@ class DepositionWindow(QtGui.QMainWindow):
                 molarMass = scaledMass * factor._denominator
                 self.depgraph.convFactor = 10./molarMass
                 self.depgraph.units = 'nmoles/s cm'+r'$^2$'
+
+            self.depgraph.colorbar.set_label(self.depgraph.units)
 
             print self.depgraph.convFactor
             
