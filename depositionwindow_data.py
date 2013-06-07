@@ -87,23 +87,30 @@ class DepositionWindow(QtGui.QMainWindow):
 
     def selectConversion(self, unitName):
 
-        print unitName
-
+        unitNameStr = str(unitName)
+        
         if self.Lmnts:
-            if "g/(scm^3)":
+            if "g/(scm^3)" == unitNameStr:
                 # just divide once to get the order of 10^-9 which has more passable units
-                pass
-            elif "nm/s":
+                #TEST VALUE
+                self.depgraph.convFactor = 5.
+            elif "nm/s" == unitNameStr:
                 #divide using the density - consider A/s
                 density = self.density
                 print "The density is", density
-            elif "mol/(s*cm^2)":
+                self.depgraph.convFactor = 1./density
+                print 1./density
+            elif "mol/(s*cm^2)" == unitNameStr:
                 # divide using the molar mass to get this
                 scaledMass = self.Lmnts["Metal Name"].mass + self.Lmnts["Second Element"].mass \
                             *self.Lmnts["Second Element Stoich"]
                 factor = Fraction(self.Lmnts["Second Element Stoich"]).limit_denominator(100)
                 molarMass = scaledMass * factor._denominator
                 print "The molar mass is:", molarMass
+                self.depgraph.convFactor = 1./molarMass
+
+            print self.depgraph.convFactor
+            self.depgraph.convertPlot()
         
 
     def handleEQS(self):
@@ -118,7 +125,6 @@ class DepositionWindow(QtGui.QMainWindow):
             except ValueError:
                 valEror = QtGui.QMessageBox.information(None,
                                                         "Invalid Density","Unxpected density value")
-            print "Printing the density " + str(self.density)
             
         if not self.checkRegEx(formula):
             message = "The equation you entered is of the wrong format or is missing an element."

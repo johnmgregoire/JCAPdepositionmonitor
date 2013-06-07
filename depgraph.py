@@ -22,6 +22,7 @@ class DepositionGraph(FigureCanvas):
                                    QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
         self.initPlotArea()
+        self.convFactor = 1
 
     def initPlotArea(self):
         self.xdata = []
@@ -37,7 +38,8 @@ class DepositionGraph(FigureCanvas):
         for x, y, rate in DEP_DATA:
             self.xdata.append(x)
             self.ydata.append(y)
-            self.ratedata.append(rate)
+            modified_rate = rate*self.convFactor
+            self.ratedata.append(modified_rate)
         self.scalarMap = cm.ScalarMappable(norm=colors.Normalize(vmin=0, vmax=max(self.ratedata)))
         self.scalarMap.set_array(np.array(self.ratedata))
         self.datavis = self.plot.scatter(self.xdata, self.ydata, c = self.ratedata,
@@ -52,11 +54,24 @@ class DepositionGraph(FigureCanvas):
         for x, y, rate in newData:
             self.xdata.append(x)
             self.ydata.append(y)
-            self.ratedata.append(rate)
+            modified_rate = rate*self.convFactor
+            self.ratedata.append(modified_rate)
         print "deposition graph updating"
         self.datavis.remove()
         self.datavis = self.plot.scatter(self.xdata, self.ydata, c = self.ratedata,
                           cmap=self.scalarMap.get_cmap(), marker='o', edgecolor='none', s=60)
+        self.scalarMap.set_clim(0, max(self.ratedata))
+        self.colorbar.draw_all()
+        self.draw()
+
+    def convertPlot(self):
+        print "converting plot", self.convFactor
+        lenOfRateData = len(self.ratedata)
+        print "Before conversion", self.ratedata
+        for rateLoc, (x, y, rate) in enumerate(DEP_DATA[:lenOfRateData]):
+            modified_rate = rate*self.convFactor
+            self.ratedata[rateLoc] = modified_rate
+        print "After conversion", self.ratedata
         self.scalarMap.set_clim(0, max(self.ratedata))
         self.colorbar.draw_all()
         self.draw()
