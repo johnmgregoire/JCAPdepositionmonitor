@@ -79,7 +79,7 @@ class DepositionGraph(FigureCanvas):
         print "converting plot", self.convFactor
         lenOfRateData = len(self.ratedata)
         print "Before conversion", self.ratedata
-        for rateLoc, (x, y, rate) in enumerate(DEP_DATA[:lenOfRateData]):
+        for rateLoc, (z, x, y, rate) in enumerate(DEP_DATA[:lenOfRateData]):
             modified_rate = rate*self.convFactor
             self.ratedata[rateLoc] = modified_rate
         print "After conversion", self.ratedata
