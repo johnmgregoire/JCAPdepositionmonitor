@@ -60,13 +60,14 @@ class DepositionGraph(FigureCanvas):
 
     def updatePlot(self, newData):
         for z, x, y, rate in newData:
+            self.zdata.append(z)
             self.xdata.append(x)
             self.ydata.append(y)
             modified_rate = rate*self.convFactor
             self.ratedata.append(modified_rate)
         print "deposition graph updating"
         self.datavis.remove()
-        self.datavis = self.plot.scatter(self.xdata, self.ydata, zs=3.0,
+        self.datavis = self.plot.scatter(self.xdata, self.ydata, zs=self.zdata,
                                          c = self.ratedata,
                                          cmap=self.scalarMap.get_cmap(),
                                          marker='o', edgecolor='none', s=60)
