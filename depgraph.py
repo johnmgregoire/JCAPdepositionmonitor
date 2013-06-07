@@ -32,14 +32,18 @@ class DepositionGraph(FigureCanvas):
             self.xdata.append(x)
             self.ydata.append(y)
             self.ratedata.append(rate)
-        self.plot = self.figure.add_subplot(1, 1, 1, aspect=1)
-        self.scalarMap = cm.ScalarMappable(norm=colors.Normalize(vmin=0, vmax=150))
-        self.scalarMap._A = self.ratedata
-        # comment this back in when data processor is connected
-        self.plot.scatter(self.xdata, self.ydata, c = self.ratedata,
+        self.plot = self.figure.add_subplot(1, 1, 1, adjustable='box', aspect=1)
+        self.plot.set_xlim(-60, 60)
+        self.plot.set_ylim(-60, 60)
+        self.plot.autoscale(enable=False, tight=False)
+        self.scalarMap = cm.ScalarMappable(norm=colors.Normalize(vmin=0, vmax=max(self.ratedata)))
+        self.scalarMap.set_array(np.array(self.ratedata))
+        self.datavis = self.plot.scatter(self.xdata, self.ydata, c = self.ratedata,
                           cmap=self.scalarMap.get_cmap(), marker='o', edgecolor='none', s=60)
-        self.plot.set_aspect(1.)
-        self.figure.colorbar(self.scalarMap)
+        self.colorbar = self.figure.colorbar(self.scalarMap, ax = self.plot)
+        self.colorbar.set_array(np.array(self.ratedata))
+        self.colorbar.autoscale()
+        self.scalarMap.set_colorbar(self.colorbar, self.plot)
 
     def updatePlot(self, newData):
         for x, y, rate in newData:
@@ -47,6 +51,9 @@ class DepositionGraph(FigureCanvas):
             self.ydata.append(y)
             self.ratedata.append(rate)
         print "deposition graph updating"
-        self.plot.scatter(self.xdata[-2:], self.ydata[-2:], c = self.ratedata[-2:],
+        self.datavis.remove()
+        self.datavis = self.plot.scatter(self.xdata, self.ydata, c = self.ratedata,
                           cmap=self.scalarMap.get_cmap(), marker='o', edgecolor='none', s=60)
+        self.scalarMap.set_clim(0, max(self.ratedata))
+        self.colorbar.draw_all()
         self.draw()
