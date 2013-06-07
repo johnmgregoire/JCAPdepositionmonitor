@@ -14,6 +14,7 @@ DEP_DATA = []
     deposition plots """
 
 ROW_BUFFER = []
+changeZ = False
 zndec = 2
 tndec = 1
 radius1 = 28.
@@ -23,6 +24,7 @@ radius2 = 45.
  
 def processDataRow(row):
     global ROW_BUFFER
+    global changeZ
     if ROW_BUFFER == []:
         ROW_BUFFER += [row]
     else:
@@ -39,6 +41,7 @@ def processDataRow(row):
             print 'drawing new graph for z =', zval
             newpt1 = processData(prevz, prevangle, radius1)
             newpt2 = processData(prevz, prevangle, radius2)
+            changeZ = True
             ROW_BUFFER = [row]
             if (newpt1 != None and newpt2 != None):
                 return [newpt1, newpt2]
@@ -94,9 +97,20 @@ def getDepRates(timespan, dataArrayT):
         rateDiff = rateData[-1] - rateData[0]
         depRates += [rateDiff/timespan]
     return depRates
+
+def addCenter(z):
+    global DEP_DATA
+    rowRange = getRowRange()
+    dataArray = ROW_BUFFER[rowRange[0]:(rowRange[1]+1)]
+    dataArrayT = np.array(dataArray).T
+    timespan = getTimeSpan(dataArrayT)
+    depRates = getDepRates(timespan, dataArrayT)
+    rate = getXtalRate(3, dataArrayT).mean()
+    DEP_DATA.append((z, 0.0, 0.0, rate))
     
 def processData(z, angle, radius):
     global DEP_DATA
+    global changeZ
     rowRange = getRowRange()
     #print 't:', FILE_INFO.get('TiltDeg')
     #print 'rowRange:', rowRange
@@ -113,10 +127,11 @@ def processData(z, angle, radius):
         #rate0 = np.array(Xtal3Rate).mean()
         rate = rate0
         if radius == radius1:
-            if angle == 0:
+            if angle == 0 or changeZ:
                 #plot rate0 at (0, 0)
                 print 'plotting rate0 at (0,0)'
-                DEP_DATA.append((z, 0.0, 0.0, rate))
+                addCenter(z)
+                changeZ = False
             x = radius * np.cos(angle * np.pi/180.)
             y = radius * np.sin(angle * np.pi/180.)
             # rate1 corresponds to Xtal4 Rate
