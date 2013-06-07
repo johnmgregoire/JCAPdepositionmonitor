@@ -3,6 +3,7 @@
 # Last Updated: 6/6/2013
 # For JCAP
 
+import numpy as np
 from graph import *
 from depgraph import *
 from elements import ELEMENTS
@@ -58,6 +59,7 @@ class DepositionWindow(QtGui.QMainWindow):
 
         # labels
         self.label_chemEQ = QtGui.QLabel('Chemical equation:')
+        self.label_density = QtGui.QLabel('Density:')
         self.unitOptions = ["g/(scm^3)", "nm/s", "mol/(s*cm^2)"]
 
         for unit in self.unitOptions:
@@ -71,6 +73,7 @@ class DepositionWindow(QtGui.QMainWindow):
         self.sidelayout.addWidget(self.selectUnits)
         self.sidelayout.addWidget(self.label_chemEQ)
         self.sidelayout.addWidget(self.chemEQ)
+        self.sidelayout.addWidget(self.label_density)
         self.sidelayout.addWidget(self.densityLine)
         self.sidelayout.addWidget(self.procChem)
 
@@ -84,17 +87,19 @@ class DepositionWindow(QtGui.QMainWindow):
 
         if self.Lmnts:
             if "g/(scm^3)":
+                # just divide once to get the order of 10^-9 which has more passable units
                 pass
-            if "nm/s":
+            elif "nm/s":
+                #divide using the density - consider A/s
                 density = self.density
-                print self.density
-                pass
-            if "mol/(s*cm^2)":
+                print "The density is", density
+            elif "mol/(s*cm^2)":
+                # divide using the molar mass to get this
                 scaledMass = self.Lmnts["Metal Name"].mass + self.Lmnts["Second Element"].mass \
                             *self.Lmnts["Second Element Stoich"]
-                factor = Fraction(self.Lmnts["Second Element Stoich"]).limit_denominator()
+                factor = Fraction(self.Lmnts["Second Element Stoich"]).limit_denominator(100)
                 molarMass = scaledMass * factor._denominator
-                print molarMass
+                print "The molar mass is:", molarMass
         
 
     def handleEQS(self):
@@ -103,8 +108,13 @@ class DepositionWindow(QtGui.QMainWindow):
         if not formula:
             return
 
-        if not self.densityLine.text():
-            self.density = self.densityLine.text()
+        if self.densityLine.text():
+            try:
+                self.density = float(self.densityLine.text())
+            except ValueError:
+                valEror = QtGui.QMessageBox.information(None,
+                                                        "Invalid Density","Unxpected density value")
+            print "Printing the density " + str(self.density)
             
         if not self.checkRegEx(formula):
             message = "The equation you entered is of the wrong format or is missing an element."
@@ -154,4 +164,5 @@ class DepositionWindow(QtGui.QMainWindow):
         pass
 
     def redrawWindow(self):
+
         pass
