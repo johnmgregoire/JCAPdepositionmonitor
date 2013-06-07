@@ -24,10 +24,12 @@ class DepositionGraph(FigureCanvas):
         FigureCanvas.updateGeometry(self)
         self.initPlotArea()
         self.convFactor = 1
-        self.z1 = 0
+        self.z1 = None
         self.z2 = None
         self.z2index = None
-        self.zvar = z1
+        self.zvar = None
+        self.maxRate = 0
+        self.changeScale = False
         # formatted string that represents the units of the data
         self.units = r'$10^{-8}$'+'g/s cm'+r'$^2$'
 
@@ -40,28 +42,32 @@ class DepositionGraph(FigureCanvas):
                                             projection = '3d')
         self.plot.set_xlim(-50, 50)
         self.plot.set_ylim(-50, 50)
-        self.plot.set_zlim(2.8, 3.8)
-        self.plot.autoscale(enable=False, tight=False)
-        #self.plot.autoscale_view(tight=False, scalex=False, scaley=False,
-                                 #scalez=True)
+        #self.plot.set_zlim(2.8, 3.8)
+        #self.plot.autoscale(enable=False, tight=False)
+        self.plot.autoscale_view(tight=False, scalex=False, scaley=False,
+                                 scalez=True)
 
     def firstPlot(self):
         self.z1 = DEP_DATA[0][0]
+        self.zvar = self.z1
         for i, (z, x, y, rate) in enumerate(DEP_DATA):
-            if z != self.z1:
+            if  not self.z2 and z != self.z1:
                 self.z2 = z
-                self.zvar = z2
+                self.zvar = self.z2
                 self.z2index = i
             self.xdata.append(x)
             self.ydata.append(y)
             modified_rate = rate*self.convFactor
             self.ratedata.append(modified_rate)
-        self.scalarMap = cm.ScalarMappable(norm=colors.Normalize(vmin=0, vmax=max(self.ratedata)))
+            if modified_rate > self.maxRate:
+                self.maxRate = modified_rate
+        self.scalarMap = cm.ScalarMappable(norm=colors.Normalize(vmin=0, vmax=self.maxRate))
         self.scalarMap.set_array(np.array(self.ratedata))
-        zarr = np.ones(len(self.xdata))*z1
+        zarr = np.ones(len(self.xdata))*self.z1
         if self.z2:
-            
-        self.datavis = self.plot.scatter(self.xdata, self.ydata, zs=self.z1,
+            for i in range(self.z2index, len(zarr)):
+                zarr[i] = self.z2
+        self.datavis = self.plot.scatter(self.xdata, self.ydata, zs=zarr,
                                          c = self.ratedata, cmap=self.scalarMap.get_cmap(),
                                          marker='o', edgecolor='none', s=60)
         self.colorbar = self.figure.colorbar(self.scalarMap, ax = self.plot)
@@ -72,21 +78,39 @@ class DepositionGraph(FigureCanvas):
 
     def updatePlot(self, newData):
         for z, x, y, rate in newData:
-            if z != self.z1:
+            if not self.z1:
+                self.z1 = z
+                self.zvar = self.z1
+            elif z != self.zvar:
                 self.z2 = z
+                self.z2index = len(self.xdata)
+                print self.z2index
                 self.zvar = self.z2
             self.xdata.append(x)
             self.ydata.append(y)
             modified_rate = rate*self.convFactor
             self.ratedata.append(modified_rate)
+            if modified_rate > self.maxRate:
+                self.maxRate = modified_rate
+                self.changeScale = True
         print "deposition graph updating"
         self.datavis.remove()
-        self.datavis = self.plot.scatter(self.xdata, self.ydata, zs=self.zvar,
-                                         c = self.ratedata,
-                                         cmap=self.scalarMap.get_cmap(),
-                                         marker='o', edgecolor='none', s=60)
-        self.scalarMap.set_clim(0, max(self.ratedata))
-        self.colorbar.draw_all()
+        if not self.changeScale:
+            self.datavis = self.plot.scatter(self.xdata[-2:], self.ydata[-2:], zs=self.zvar,
+                                             c = self.ratedata[-2:],
+                                             cmap=self.scalarMap.get_cmap(),
+                                             marker='o', edgecolor='none', s=60)
+        else:
+            self.scalarMap.set_clim(0, self.maxRate)
+            zarr = np.ones(len(self.xdata))*self.z1
+            if self.z2:
+                for i in range(self.z2index, len(zarr)):
+                    zarr[i] = self.z2
+            self.datavis = self.plot.scatter(self.xdata, self.ydata, zs=zarr,
+                                             c = self.ratedata,
+                                             cmap=self.scalarMap.get_cmap(),
+                                             marker='o', edgecolor='none', s=60)
+            self.colorbar.draw_all()
         self.draw()
 
     def convertPlot(self):
