@@ -90,26 +90,24 @@ class DepositionWindow(QtGui.QMainWindow):
         unitNameStr = str(unitName)
         
         if self.Lmnts:
-            if "g/(scm^3)" == unitNameStr:
-                # just divide once to get the order of 10^-9 which has more passable units
-                #TEST VALUE
-                self.depgraph.convFactor = 5.
+            if "ng/(scm^3)" == unitNameStr:
+                self.depgraph.convFactor = 10
+                self.depgraph.units = 'ng/s cm'+r'$^2$'
             elif "nm/s" == unitNameStr:
                 #divide using the density - consider A/s
-                density = self.density
-                print "The density is", density
-                self.depgraph.convFactor = 1./density
-                print 1./density
+                self.depgraph.convFactor = 0.1/self.density
+                self.depgraph.units = 'nm/s'
             elif "mol/(s*cm^2)" == unitNameStr:
                 # divide using the molar mass to get this
                 scaledMass = self.Lmnts["Metal Name"].mass + self.Lmnts["Second Element"].mass \
                             *self.Lmnts["Second Element Stoich"]
                 factor = Fraction(self.Lmnts["Second Element Stoich"]).limit_denominator(100)
                 molarMass = scaledMass * factor._denominator
-                print "The molar mass is:", molarMass
-                self.depgraph.convFactor = 1./molarMass
+                self.depgraph.convFactor = 10./molarMass
+                self.depgraph.units = 'nmoles/s cm'+r'$^2$'
 
             print self.depgraph.convFactor
+            
             self.depgraph.convertPlot()
         
 
