@@ -24,9 +24,12 @@ class MainMenu(QtGui.QWidget):
         self.file = self.initReader()
         # initializes reader on data file
         self.reader = DataReader(parent=self, filename=self.file)
-        self.reader.start()
         self.reader.lineRead.connect(self.newLineRead)
-        
+        print 'reader initialized'
+        self.processPool = QtCore.QThreadPool()
+        self.processPool.setMaxThreadCount(1)
+        print 'thread pool initialized'
+                
         self.initUI()
 
         self.initSupplyVars()
@@ -182,6 +185,10 @@ class MainMenu(QtGui.QWidget):
         for window in self.graphWindows:
             window.updateWindow(newRow)
 
+    def depUpdate(self, newDepRates):
+        for window in self.depWindows:
+            window.updateWindow(newDepRates)
+
     """ updates all active graph windows every second """
     def redrawAll(self):
         for window in zip(self.graphWindows, self.depWindows,
@@ -199,12 +206,18 @@ class MainMenu(QtGui.QWidget):
 
     """ handles signal from reader that new line has been read """
     def newLineRead(self, newRow):
+        print 'line read'
         self.updateGraphs(newRow)
         self.checkValidity(newRow)
-        newDepRates = processDataRow(newRow)
-        if newDepRates != None:
+        self.processor = DataProcessor(parent=self, row=newRow)
+        self.processor.newData.connect(self.depUpdate)
+        self.processPool.start(self.processor)
+        
+        # send new row to processor thread
+        #newDepRates = processDataRow(newRow)
+        """if newDepRates != None:
             for window in self.depWindows:
-                window.updateWindow(newDepRates)
+                window.updateWindow(newDepRates)"""
 
     """ Shows an error message is the data is invalid"""
     def checkValidity(self, row):
