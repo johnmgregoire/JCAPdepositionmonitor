@@ -37,14 +37,14 @@ def processDataRow(row):
         elif (angle == prevangle):
             # make new graph
             print 'drawing new graph for z =', zval
-            newpt1 = processData(prevangle, radius1)
-            newpt2 = processData(prevangle, radius2)
+            newpt1 = processData(prevz, prevangle, radius1)
+            newpt2 = processData(prevz, prevangle, radius2)
             ROW_BUFFER = [row]
             if (newpt1 != None and newpt2 != None):
                 return [newpt1, newpt2]
         else:
-            newpt1 = processData(prevangle, radius1)
-            newpt2 = processData(prevangle, radius2)
+            newpt1 = processData(zval, prevangle, radius1)
+            newpt2 = processData(zval, prevangle, radius2)
             ROW_BUFFER = [row]
             if (newpt1 != None and newpt2 != None):
                 return [newpt1, newpt2]
@@ -95,7 +95,7 @@ def getDepRates(timespan, dataArrayT):
         depRates += [rateDiff/timespan]
     return depRates
     
-def processData(angle, radius):
+def processData(z, angle, radius):
     global DEP_DATA
     rowRange = getRowRange()
     #print 't:', FILE_INFO.get('TiltDeg')
@@ -116,7 +116,7 @@ def processData(angle, radius):
             if angle == 0:
                 #plot rate0 at (0, 0)
                 print 'plotting rate0 at (0,0)'
-                DEP_DATA.append((0.0, 0.0, rate))
+                DEP_DATA.append((z, 0.0, 0.0, rate))
             x = radius * np.cos(angle * np.pi/180.)
             y = radius * np.sin(angle * np.pi/180.)
             # rate1 corresponds to Xtal4 Rate
@@ -127,9 +127,9 @@ def processData(angle, radius):
             # rate2 corresponds to Xtal2 Rate
             rate = rate0 * depRates[0]/depRates[1]
         print (angle, radius, x, y, rate)
-        DEP_DATA.append((x, y, rate))
+        DEP_DATA.append((z, x, y, rate))
         # return the tuple above to depgraph
-        return (x, y, rate)
+        return (z, x, y, rate)
 
 def onExit(self):
     global ROW_BUFFER
