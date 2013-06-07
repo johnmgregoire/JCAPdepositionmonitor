@@ -31,6 +31,9 @@ class DepositionWindow(QtGui.QMainWindow):
 
         # initialize the graph
         self.depgraph = DepositionGraph(self.main_widget)
+        if DEP_DATA:
+            self.depgraph.firstPlot()
+            self.hasPlot = True
 
         self.setWindowTitle("Deposition Window - Work In Progress")
 

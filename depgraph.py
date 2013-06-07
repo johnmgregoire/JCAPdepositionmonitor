@@ -21,10 +21,7 @@ class DepositionGraph(FigureCanvas):
                                    QtGui.QSizePolicy.Expanding,
                                    QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
-
-        print 'canvas drawn'
         self.initPlotArea()
-        print 'plot initialized'
 
     def initPlotArea(self):
         self.xdata = []
