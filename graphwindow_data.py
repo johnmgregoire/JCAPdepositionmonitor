@@ -412,5 +412,5 @@ class GraphWindow(QtGui.QMainWindow):
     """ called when 'Screen Shot' button is clicked """
     def takeScreenShot(self):
         print "Taking screen shot"
-        self.graph.figure.savefig("test.png")
+        self.graph.figure.savefig(dateStringFile() + ".png")
         print "Screen shot saved"
