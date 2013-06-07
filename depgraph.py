@@ -24,7 +24,12 @@ class DepositionGraph(FigureCanvas):
         FigureCanvas.updateGeometry(self)
         self.initPlotArea()
         self.convFactor = 1
-        self.zdata = []
+        self.z1 = 0
+        self.z2 = None
+        self.z2index = None
+        self.zvar = z1
+        # formatted string that represents the units of the data
+        self.units = r'$10^{-8}$'+'g/s cm'+r'$^2$'
 
     def initPlotArea(self):
         self.xdata = []
@@ -41,33 +46,42 @@ class DepositionGraph(FigureCanvas):
                                  #scalez=True)
 
     def firstPlot(self):
-        for z, x, y, rate in DEP_DATA:
-            self.zdata.append(z)
+        self.z1 = DEP_DATA[0][0]
+        for i, (z, x, y, rate) in enumerate(DEP_DATA):
+            if z != self.z1:
+                self.z2 = z
+                self.zvar = z2
+                self.z2index = i
             self.xdata.append(x)
             self.ydata.append(y)
             modified_rate = rate*self.convFactor
             self.ratedata.append(modified_rate)
         self.scalarMap = cm.ScalarMappable(norm=colors.Normalize(vmin=0, vmax=max(self.ratedata)))
         self.scalarMap.set_array(np.array(self.ratedata))
-        self.datavis = self.plot.scatter(self.xdata, self.ydata, zs=self.zdata, zdir='z',
+        zarr = np.ones(len(self.xdata))*z1
+        if self.z2:
+            
+        self.datavis = self.plot.scatter(self.xdata, self.ydata, zs=self.z1,
                                          c = self.ratedata, cmap=self.scalarMap.get_cmap(),
                                          marker='o', edgecolor='none', s=60)
         self.colorbar = self.figure.colorbar(self.scalarMap, ax = self.plot)
         self.colorbar.set_array(np.array(self.ratedata))
         self.colorbar.autoscale()
         self.scalarMap.set_colorbar(self.colorbar, self.plot)
-        self.colorbar.set_label(r'$10^{-8}$'+'g/s cm'+r'$^2$')
+        self.colorbar.set_label(self.units)
 
     def updatePlot(self, newData):
         for z, x, y, rate in newData:
-            self.zdata.append(z)
+            if z != self.z1:
+                self.z2 = z
+                self.zvar = self.z2
             self.xdata.append(x)
             self.ydata.append(y)
             modified_rate = rate*self.convFactor
             self.ratedata.append(modified_rate)
         print "deposition graph updating"
         self.datavis.remove()
-        self.datavis = self.plot.scatter(self.xdata, self.ydata, zs=self.zdata,
+        self.datavis = self.plot.scatter(self.xdata, self.ydata, zs=self.zvar,
                                          c = self.ratedata,
                                          cmap=self.scalarMap.get_cmap(),
                                          marker='o', edgecolor='none', s=60)
