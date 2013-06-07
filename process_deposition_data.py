@@ -28,10 +28,8 @@ def processDataRow(row):
     else:
         anglecolnum = getCol('Platen Motor Position')
         angle = round(float(row[anglecolnum]))
-        # print 'angle:', angle
         zcolnum = getCol('Platen Zshift Motor 1 Position')
         zval = round(float(row[zcolnum]), 1)
-        #print 'radius:', radius
         prevangle = round(float(ROW_BUFFER[-1][anglecolnum]), 0)
         prevz = round(float(ROW_BUFFER[-1][zcolnum]), 1)
         if (angle == prevangle and zval == prevz):
@@ -43,7 +41,7 @@ def processDataRow(row):
             newpt2 = processData(prevangle, radius2)
             ROW_BUFFER = [row]
             if (newpt1 != None and newpt2 != None):
-                return (newpt1, newpt2)
+                return [newpt1, newpt2]
         else:
             newpt1 = processData(prevangle, radius1)
             newpt2 = processData(prevangle, radius2)
@@ -79,7 +77,6 @@ def getRowRange():
 def getTimeSpan(dataArrayT):
     datecol = getCol('Date')
     timecol = getCol('Time')
-    # error: array index out of range
     datetimeTup = zip(dataArrayT[datecol], dataArrayT[timecol])
     startStr = datetimeTup[0][0] + ' ' + datetimeTup[0][1]
     endStr = datetimeTup[-1][0] + ' ' + datetimeTup[-1][1]
@@ -103,7 +100,7 @@ def processData(angle, radius):
     rowRange = getRowRange()
     #print 't:', FILE_INFO.get('TiltDeg')
     #print 'rowRange:', rowRange
-    if rowRange[0] == rowRange[1]:
+    if rowRange[1] - rowRange[0] < 2:
         pass
     else:
         #print 'ROW_BUFFER', ROW_BUFFER
@@ -134,3 +131,13 @@ def processData(angle, radius):
         # return the tuple above to depgraph
         return (x, y, rate)
 
+def onExit(self):
+    global ROW_BUFFER
+    if ROW_BUFFER:
+        anglecolnum = getCol('Platen Motor Position')
+        angle = round(float(ROW_BUFFER[0][anglecolnum]))
+        newpt1 = processData(prevangle, radius1)
+        newpt2 = processData(prevangle, radius2)
+        ROW_BUFFER = []
+        if (newpt1 != None and newpt2 != None):
+            return [newpt1, newpt2]

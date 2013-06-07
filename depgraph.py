@@ -46,6 +46,7 @@ class DepositionGraph(FigureCanvas):
         self.colorbar.set_array(np.array(self.ratedata))
         self.colorbar.autoscale()
         self.scalarMap.set_colorbar(self.colorbar, self.plot)
+        self.colorbar.set_label(r'$10^{-8}$'+'g/s cm'+r'$^2$')
 
     def updatePlot(self, newData):
         for x, y, rate in newData:
