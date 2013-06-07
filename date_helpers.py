@@ -24,4 +24,8 @@ def dateObjFloat(fullTime):
 def dateString():
     localCurrTime = strftime("%d/%m/%Y %H:%M:%S", time.localtime(time.time()))
     return localCurrTime
-    
+
+# gives the current local time in the form of a string
+def dateStringFile():
+    localCurrTime = strftime("%d_%m_%Y-%H_%M_%S", time.localtime(time.time()))
+    return localCurrTime
