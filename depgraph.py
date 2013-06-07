@@ -69,7 +69,8 @@ class DepositionGraph(FigureCanvas):
                 zarr[i] = self.z2
         self.datavis = self.plot.scatter(self.xdata, self.ydata, zs=zarr,
                                          c = self.ratedata, cmap=self.scalarMap.get_cmap(),
-                                         marker='o', edgecolor='none', s=60)
+                                         marker='o', edgecolor='none', s=60,
+                                         alpha=1)
         self.colorbar = self.figure.colorbar(self.scalarMap, ax = self.plot)
         self.colorbar.set_array(np.array(self.ratedata))
         self.colorbar.autoscale()
@@ -79,13 +80,18 @@ class DepositionGraph(FigureCanvas):
     def updatePlot(self, newData):
         for z, x, y, rate in newData:
             if not self.z1:
-                self.z1 = z
-                self.zvar = self.z1
+                self.firstPlot()
             elif z != self.zvar:
                 self.z2 = z
                 self.z2index = len(self.xdata)
-                print self.z2index
                 self.zvar = self.z2
+                # get center point from dictionary
+                center = DEP_DATA[-3]
+                print 'center:', center
+                self.xdata.append(center[1])
+                self.ydata.append(center[2])
+                modified_rate = center[3]*self.convFactor
+                self.ratedata.append(modified_rate)
             self.xdata.append(x)
             self.ydata.append(y)
             modified_rate = rate*self.convFactor
