@@ -21,21 +21,26 @@ class DepositionGraph(FigureCanvas):
                                    QtGui.QSizePolicy.Expanding,
                                    QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
-        
-        self.initPlot()
 
-    def initPlot(self):
+        print 'canvas drawn'
+        self.initPlotArea()
+        print 'plot initialized'
+
+    def initPlotArea(self):
         self.xdata = []
         self.ydata = []
         self.ratedata = []
-        for x, y, rate in DEP_DATA:
-            self.xdata.append(x)
-            self.ydata.append(y)
-            self.ratedata.append(rate)
+        
         self.plot = self.figure.add_subplot(1, 1, 1, adjustable='box', aspect=1)
         self.plot.set_xlim(-60, 60)
         self.plot.set_ylim(-60, 60)
         self.plot.autoscale(enable=False, tight=False)
+
+    def firstPlot(self):
+        for x, y, rate in DEP_DATA:
+            self.xdata.append(x)
+            self.ydata.append(y)
+            self.ratedata.append(rate)
         self.scalarMap = cm.ScalarMappable(norm=colors.Normalize(vmin=0, vmax=max(self.ratedata)))
         self.scalarMap.set_array(np.array(self.ratedata))
         self.datavis = self.plot.scatter(self.xdata, self.ydata, c = self.ratedata,
