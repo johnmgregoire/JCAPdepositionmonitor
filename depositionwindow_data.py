@@ -62,7 +62,7 @@ class DepositionWindow(QtGui.QMainWindow):
         # labels
         self.label_chemEQ = QtGui.QLabel('Chemical equation:')
         self.label_density = QtGui.QLabel('Density:')
-        self.unitOptions = ["g/(scm^3)", "nm/s", "mol/(s*cm^2)"]
+        self.unitOptions = ["ng/(scm^2)", "nm/s", "nmol/(s*cm^2)"]
 
         for unit in self.unitOptions:
             self.selectUnits.addItem(unit)
@@ -88,6 +88,7 @@ class DepositionWindow(QtGui.QMainWindow):
         unitNameStr = str(unitName)
         
         if self.Lmnts:
+<<<<<<< HEAD
             if "g/(scm^3)" == unitNameStr:
                 # just divide once to get the order of 10^-9 which has more passable units
                 #TEST VALUE
@@ -99,6 +100,16 @@ class DepositionWindow(QtGui.QMainWindow):
                 self.depgraph.convFactor = 1./density
                 print 1./density
             elif "mol/(s*cm^2)" == unitNameStr:
+=======
+            if "ng/(scm^2)" == unitNameStr:
+                self.depgraph.convFactor = 10
+                self.depgraph.units = 'ng/s cm'+r'$^2$'
+            elif "nm/s" == unitNameStr:
+                #divide using the density - consider A/s
+                self.depgraph.convFactor = 0.1/self.density
+                self.depgraph.units = 'nm/s'
+            elif "nmol/(s*cm^2)" == unitNameStr:
+>>>>>>> 003730f7a9cd31d35977b2d8e364642268408ef2
                 # divide using the molar mass to get this
                 scaledMass = self.Lmnts["Metal Name"].mass + self.Lmnts["Second Element"].mass \
                             *self.Lmnts["Second Element Stoich"]
@@ -106,6 +117,8 @@ class DepositionWindow(QtGui.QMainWindow):
                 molarMass = scaledMass * factor._denominator
                 print "The molar mass is:", molarMass
                 self.depgraph.convFactor = 1./molarMass
+
+            self.depgraph.colorbar.set_label(self.depgraph.units)
 
             print self.depgraph.convFactor
             self.depgraph.convertPlot()
