@@ -17,7 +17,7 @@ csvwriter = csv.writer(csvfile)
 
 
 linesToWrite = 820
-sleepTime = 0.10
+sleepTime = 0.25
 
 
 x = 0
