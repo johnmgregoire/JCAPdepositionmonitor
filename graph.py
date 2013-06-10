@@ -99,10 +99,8 @@ class Graph(FigureCanvas):
 
     """ adds new data to graph whenever reader sends new row """
     def updatePlot(self, row):
-        print "updatingPlots :) :)"
         time_value = dateObjFloat(row[self.colNums[0]] + " " + row[self.colNums[1]])
         for i in range(len(self.yvarsL)):
-            print "updatingPlots2 :) :)"
             self.axes.plot_date(time_value, row[self.yvarsL[i].columnNumber],
                                 markerfacecolor=self.yvarsL[i].color,
                                 markeredgecolor=self.yvarsL[i].color)
