@@ -289,6 +289,8 @@ class GraphWindow(QtGui.QMainWindow):
             
     """ called by MainMenu every second """  
     def redrawWindow(self):
+        self.graph.draw()
+        print "o.O"
         if self.updating:
             self.graph.timeFrame()
             self.graph.draw()
