@@ -190,10 +190,21 @@ class MainMenu(QtGui.QWidget):
 
     """ updates all active graph windows every second """
     def redrawAll(self):
-        windows = self.graphWindows + self.depWindows + self.miscWindows
-        for window in windows:
+        for window in self.graphWindows:
             if window.isHidden():
-                windows.remove(window)
+                self.graphWindows.remove(window)
+            else:
+                window.redrawWindow()
+
+        for window in self.depWindows:
+            if window.isHidden():
+                self.depWindows.remove(window)
+            else:
+                window.redrawWindow()
+
+        for window in self.miscWindows:
+            if window.isHidden():
+                self.miscWindows.remove(window)
             else:
                 window.redrawWindow()
 

@@ -75,7 +75,7 @@ class ProcessorThread(QtCore.QThread):
         rowRange = getRowRange()
         #print 't:', FILE_INFO.get('TiltDeg')
         #print 'rowRange:', rowRange
-        if rowRange[1] - rowRange[0] < 2:
+        if rowRange[1] - rowRange[0] <= 2:
             pass
         else:
             #print 'ROW_BUFFER', ROW_BUFFER
@@ -113,8 +113,8 @@ class ProcessorThread(QtCore.QThread):
         ROW_BUFFER = []
         self.reader.end()
         self.reader = DataReader(parent=self, filename=newfile)
-        self.reader.start()
         self.reader.lineRead.connect(self.newLineRead)
+        self.reader.start()     
 
     def onExit(self):
         global ROW_BUFFER
