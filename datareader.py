@@ -13,7 +13,7 @@ DATA_HEADINGS = {}
 """ thread that reads data from file """
 class DataReader(QtCore.QThread):
 
-    # initialize signal to graph when a full line has been read
+    # initialize signal to processor when a full line has been read
     lineRead = QtCore.pyqtSignal(list)
     
     def __init__(self, parent=None, filename='default.csv'):

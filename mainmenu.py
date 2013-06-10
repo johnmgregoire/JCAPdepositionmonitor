@@ -201,12 +201,11 @@ class MainMenu(QtGui.QWidget):
     """ terminates reader when window is closed """
     def closeEvent(self, event):
         print "signal transmitted"
-        self.reader.end()
+        self.processor.reader.end()
         event.accept()
 
     """ handles signal from reader that new line has been read """
     def newLineRead(self, newRow):
-        print 'line read'
         self.updateGraphs(newRow)
         self.checkValidity(newRow)
         

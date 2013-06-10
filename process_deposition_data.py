@@ -14,7 +14,6 @@ DEP_DATA = []
     deposition plots """
 
 ROW_BUFFER = []
-changeZ = False
 zndec = 2
 tndec = 1
 radius1 = 28.
@@ -28,6 +27,7 @@ class ProcessorThread(QtCore.QThread):
     def __init__(self, parent=None, filename='default.csv'):
         super(ProcessorThread, self).__init__()
         self.file = filename
+        self.changeZ = False
         self.reader = DataReader(parent=self, filename=self.file)
         self.reader.lineRead.connect(self.newLineRead)
 
@@ -40,10 +40,8 @@ class ProcessorThread(QtCore.QThread):
 
     def processRow(self, row):
         global ROW_BUFFER
-        global changeZ
         if ROW_BUFFER == []:
             ROW_BUFFER += [row]
-            print 'first thing in row buffer'
         else:
             anglecolnum = getCol('Platen Motor Position')
             angle = round(float(row[anglecolnum]))
@@ -53,18 +51,16 @@ class ProcessorThread(QtCore.QThread):
             prevz = round(float(ROW_BUFFER[-1][zcolnum]), 1)
             if (angle == prevangle and zval == prevz):
                 ROW_BUFFER += [row]
-                print 'adding to row buffer'
             elif (angle == prevangle):
                 # make new graph
                 print 'drawing new graph for z =', zval
                 newpt1 = self.processData(prevz, prevangle, radius1)
                 newpt2 = self.processData(prevz, prevangle, radius2)
-                changeZ = True
+                self.changeZ = True
                 ROW_BUFFER = [row]
                 if (newpt1 != None and newpt2 != None):
                     self.newData.emit([newpt1, newpt2])
             else:
-                print 'processing a set of points'
                 newpt1 = self.processData(zval, prevangle, radius1)
                 newpt2 = self.processData(zval, prevangle, radius2)
                 ROW_BUFFER = [row]
@@ -73,7 +69,6 @@ class ProcessorThread(QtCore.QThread):
 
     def processData(self, z, angle, radius):
         global DEP_DATA
-        global changeZ
         rowRange = getRowRange()
         #print 't:', FILE_INFO.get('TiltDeg')
         #print 'rowRange:', rowRange
@@ -90,11 +85,12 @@ class ProcessorThread(QtCore.QThread):
             #rate0 = np.array(Xtal3Rate).mean()
             rate = rate0
             if radius == radius1:
-                if angle == 0 or changeZ:
+                if angle == 0 or self.changeZ:
                     #plot rate0 at (0, 0)
                     print 'plotting rate0 at (0,0)'
+                    DEP_DATA.append((z, 0.0, 0.0, rate))
                     self.newData.emit([(z, 0.0, 0.0, rate)])
-                    changeZ = False
+                    self.changeZ = False
                 x = radius * np.cos(angle * np.pi/180.)
                 y = radius * np.sin(angle * np.pi/180.)
                 # rate1 corresponds to Xtal4 Rate
