@@ -34,7 +34,7 @@ class GraphWindow(QtGui.QMainWindow):
         super(GraphWindow, self).__init__()
         # save spreadsheet filename
         self.source = datafile
-        self.updating = True
+        self.updating = False
 
         self.initUI()
 
@@ -289,7 +289,6 @@ class GraphWindow(QtGui.QMainWindow):
             
     """ called by MainMenu every second """  
     def redrawWindow(self):
-        self.graph.draw()
         if self.updating:
             self.graph.timeFrame()
             self.graph.draw()
