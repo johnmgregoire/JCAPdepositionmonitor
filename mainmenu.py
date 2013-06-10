@@ -29,11 +29,14 @@ class MainMenu(QtGui.QWidget):
         self.processor.lineRead.connect(self.newLineRead)
         self.processor.newData.connect(self.depUpdate)
         self.processor.start()
+        self.processor.terminated.connect(self.debug)
                 
         self.initUI()
 
         self.initSupplyVars()
 
+    def debug(self):
+        print 'DATA PROCESSOR DIED'
 
     """Initializes any variables that are useful for error checking"""
     def initSupplyVars(self):
@@ -121,14 +124,10 @@ class MainMenu(QtGui.QWidget):
             # gets filename from current directory (will be changed eventually)
             dirList = dirString.split('/')
             self.file = dirList[len(dirList)-1]
-            self.reader.end()
             # hides all windows so they can be removed later
-            for window in zip(self.graphWindows, self.depWindows,
-                              self.miscWindows):
+            for window in (self.graphWindows + self.depWindows + self.miscWindows):
                 window.hide()
-            self.reader = DataReader(parent=self, filename=self.file)
-            self.reader.start()
-            self.reader.lineRead.connect(self.newLineRead)
+            self.processor.newFile(self.file)
 
             self.initSupplyVars()
 
@@ -182,32 +181,30 @@ class MainMenu(QtGui.QWidget):
 
     """ sends new data received by reader to active graph windows """
     def updateGraphs(self, newRow):
-        print 'updating graphs'
         for window in self.graphWindows:
             window.updateWindow(newRow)
 
     def depUpdate(self, newDepRates):
-        print 'updating deposition graphs'
         for window in self.depWindows:
             window.updateWindow(newDepRates)
 
     """ updates all active graph windows every second """
     def redrawAll(self):
-        for window in (self.graphWindows + self.depWindows + self.miscWindows):
+        windows = self.graphWindows + self.depWindows + self.miscWindows
+        for window in windows:
             if window.isHidden():
-                self.windows.remove(window)
+                windows.remove(window)
             else:
                 window.redrawWindow()
 
     """ terminates reader when window is closed """
     def closeEvent(self, event):
         print "signal transmitted"
-        self.processor.reader.end()
+        self.processor.end()
         event.accept()
 
     """ handles signal from reader that new line has been read """
     def newLineRead(self, newRow):
-        print 'MainMenu got new line'
         self.updateGraphs(newRow)
         self.checkValidity(newRow)
         

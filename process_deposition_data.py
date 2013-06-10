@@ -28,11 +28,14 @@ class ProcessorThread(QtCore.QThread):
         super(ProcessorThread, self).__init__()
         self.file = filename
         self.changeZ = False
+        self.running = True
         self.reader = DataReader(parent=self, filename=self.file)
         self.reader.lineRead.connect(self.newLineRead)
 
     def run(self):
         self.reader.start()
+        while self.running:
+            pass
 
     def newLineRead(self, newRow):
         self.lineRead.emit(newRow)
@@ -105,6 +108,14 @@ class ProcessorThread(QtCore.QThread):
             # return the tuple above to depgraph
             return (z, x, y, rate)
 
+    def newFile(self, newfile):
+        global ROW_BUFFER
+        ROW_BUFFER = []
+        self.reader.end()
+        self.reader = DataReader(parent=self, filename=newfile)
+        self.reader.start()
+        self.reader.lineRead.connect(self.newLineRead)
+
     def onExit(self):
         global ROW_BUFFER
         if ROW_BUFFER:
@@ -115,6 +126,10 @@ class ProcessorThread(QtCore.QThread):
             ROW_BUFFER = []
             if (newpt1 != None and newpt2 != None):
                 return [newpt1, newpt2]
+            
+    def end(self):
+        self.reader.end()
+        self.running = False
 
 """
 class DataProcessor(QtCore.QObject):
