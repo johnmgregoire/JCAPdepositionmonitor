@@ -182,17 +182,18 @@ class MainMenu(QtGui.QWidget):
 
     """ sends new data received by reader to active graph windows """
     def updateGraphs(self, newRow):
+        print 'updating graphs'
         for window in self.graphWindows:
             window.updateWindow(newRow)
 
     def depUpdate(self, newDepRates):
+        print 'updating deposition graphs'
         for window in self.depWindows:
             window.updateWindow(newDepRates)
 
     """ updates all active graph windows every second """
     def redrawAll(self):
-        for window in zip(self.graphWindows, self.depWindows,
-                          self.miscWindows):
+        for window in (self.graphWindows + self.depWindows + self.miscWindows):
             if window.isHidden():
                 self.windows.remove(window)
             else:
@@ -206,6 +207,7 @@ class MainMenu(QtGui.QWidget):
 
     """ handles signal from reader that new line has been read """
     def newLineRead(self, newRow):
+        print 'MainMenu got new line'
         self.updateGraphs(newRow)
         self.checkValidity(newRow)
         

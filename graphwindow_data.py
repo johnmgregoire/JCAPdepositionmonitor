@@ -34,7 +34,7 @@ class GraphWindow(QtGui.QMainWindow):
         super(GraphWindow, self).__init__()
         # save spreadsheet filename
         self.source = datafile
-        self.updating = False
+        self.updating = True
 
         self.initUI()
 
