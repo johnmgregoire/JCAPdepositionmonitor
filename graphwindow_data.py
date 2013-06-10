@@ -9,7 +9,6 @@ Displays single auto-updating data graph
 
 from graph import *
 from profilecreator import *
-from date_helpers import *
 
 """ TO DO:
     - take data on certain conditions?
