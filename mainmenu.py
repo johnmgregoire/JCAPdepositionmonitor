@@ -23,12 +23,12 @@ class MainMenu(QtGui.QWidget):
         # save name of file from which application will read
         self.file = self.initReader()
         # initializes reader on data file
-        self.reader = DataReader(parent=self, filename=self.file)
-        self.reader.lineRead.connect(self.newLineRead)
-        print 'reader initialized'
-        self.processPool = QtCore.QThreadPool()
-        self.processPool.setMaxThreadCount(1)
-        print 'thread pool initialized'
+        #self.reader = DataReader(parent=self, filename=self.file)
+        #self.reader.lineRead.connect(self.newLineRead)
+        self.processor = ProcessorThread(parent=self, filename=self.file)
+        self.processor.lineRead.connect(self.newLineRead)
+        self.processor.newData.connect(self.depUpdate)
+        self.processor.start()
                 
         self.initUI()
 
@@ -209,9 +209,6 @@ class MainMenu(QtGui.QWidget):
         print 'line read'
         self.updateGraphs(newRow)
         self.checkValidity(newRow)
-        self.processor = DataProcessor(parent=self, row=newRow)
-        self.processor.newData.connect(self.depUpdate)
-        self.processPool.start(self.processor)
         
         # send new row to processor thread
         #newDepRates = processDataRow(newRow)
