@@ -1,11 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
-<<<<<<< HEAD
 # Created: 6/5/2013
 # Last Updated: 6/7/2013
-=======
-# Created: 6/05/2013
-# Last Updated: 6/07/2013
->>>>>>> 955c85e6a5e8c015f59fb35eef55bc5d1fe2fc51
 # For JCAP
 
 import numpy as np
@@ -23,6 +18,7 @@ class DepositionWindow(QtGui.QMainWindow):
 
         self.Lmnts = {}
         self.density = None
+        #self.hasPlot = False
         self.initUI()
 
     """ draws the user interface of the window """
@@ -37,6 +33,7 @@ class DepositionWindow(QtGui.QMainWindow):
         self.depgraph = DepositionGraph(self.main_widget)
         if DEP_DATA:
             self.depgraph.firstPlot()
+            #self.hasPlot = True
 
         self.setWindowTitle("Deposition Window - Work In Progress")
 
@@ -84,7 +81,6 @@ class DepositionWindow(QtGui.QMainWindow):
         self.sidelayout.addWidget(self.densityLine)
         self.sidelayout.addWidget(self.procChem)
 
-
         self.show()
 
 
@@ -93,19 +89,6 @@ class DepositionWindow(QtGui.QMainWindow):
         unitNameStr = str(unitName)
         
         if self.Lmnts:
-<<<<<<< HEAD
-            if "g/(scm^3)" == unitNameStr:
-                # just divide once to get the order of 10^-9 which has more passable units
-                #TEST VALUE
-                self.depgraph.convFactor = 5.
-            elif "nm/s" == unitNameStr:
-                #divide using the density - consider A/s
-                density = self.density
-                print "The density is", density
-                self.depgraph.convFactor = 1./density
-                print 1./density
-            elif "mol/(s*cm^2)" == unitNameStr:
-=======
             if "ng/(scm^2)" == unitNameStr:
                 self.depgraph.convFactor = 10
                 self.depgraph.units = 'ng/s cm'+r'$^2$'
@@ -114,18 +97,18 @@ class DepositionWindow(QtGui.QMainWindow):
                 self.depgraph.convFactor = 0.1/self.density
                 self.depgraph.units = 'nm/s'
             elif "nmol/(s*cm^2)" == unitNameStr:
->>>>>>> 003730f7a9cd31d35977b2d8e364642268408ef2
                 # divide using the molar mass to get this
                 scaledMass = self.Lmnts["Metal Name"].mass + self.Lmnts["Second Element"].mass \
                             *self.Lmnts["Second Element Stoich"]
                 factor = Fraction(self.Lmnts["Second Element Stoich"]).limit_denominator(100)
                 molarMass = scaledMass * factor._denominator
-                print "The molar mass is:", molarMass
-                self.depgraph.convFactor = 1./molarMass
+                self.depgraph.convFactor = 10./molarMass
+                self.depgraph.units = 'nmoles/s cm'+r'$^2$'
 
             self.depgraph.colorbar.set_label(self.depgraph.units)
 
             print self.depgraph.convFactor
+            
             self.depgraph.convertPlot()
         
 
@@ -186,7 +169,11 @@ class DepositionWindow(QtGui.QMainWindow):
 
     def updateWindow(self,newDepRates):
         # newDepRates = [(x, y, rate1), (x, y, rate2)]
+        """if not self.hasPlot:
+            self.depgraph.firstPlot()
+            self.hasPlot = True"""
         self.depgraph.updatePlot(newDepRates)
+        pass
 
     def redrawWindow(self):
 
