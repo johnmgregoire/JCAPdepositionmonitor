@@ -13,7 +13,7 @@ DATA_HEADINGS = {}
 """ thread that reads data from file """
 class DataReader(QtCore.QThread):
 
-    # initialize signal to processor when a full line has been read
+    # initialize signal to data processor when a full line has been read
     lineRead = QtCore.pyqtSignal(list)
     
     def __init__(self, parent=None, filename='default.csv'):
@@ -74,7 +74,7 @@ class DataReader(QtCore.QThread):
                     heading = DATA_HEADINGS.get(col)
                     DATA_DICT[heading].append(row[col])
                 # re-insert empty third column to keep indices
-                #   in strippedRow consisten with DATA_HEADINGS
+                #   in strippedRow consistent with DATA_HEADINGS
                 strippedRow.insert(2, '')
                 # send signal
                 self.lineRead.emit(strippedRow)
@@ -84,8 +84,8 @@ class DataReader(QtCore.QThread):
         # close file after end() has been called
         self.datafile.close()
 
+    """ called when application exits to terminate thread """
     def end(self):
-        print "Message Recieved - datareader ending"
         self.running = False
         
 
