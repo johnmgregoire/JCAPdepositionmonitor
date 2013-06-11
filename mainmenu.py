@@ -22,31 +22,29 @@ class MainMenu(QtGui.QWidget):
         self.profiles = {}
         # save name of file from which application will read
         self.file = self.initReader()
-        # initializes reader on data file
-        #self.reader = DataReader(parent=self, filename=self.file)
-        #self.reader.lineRead.connect(self.newLineRead)
         self.processor = pdd.ProcessorThread(parent=self, filename=self.file)
         self.processor.lineRead.connect(self.newLineRead)
         self.processor.newData.connect(self.depUpdate)
         self.processor.start()
                 
         self.initUI()
-
         self.initSupplyVars()
-
 
     """Initializes any variables that are useful for error checking"""
     def initSupplyVars(self):
         self.errors =[]
         self.supply = int(filename_handler.FILE_INFO.get("Supply"))
+        
         if self.supply % 2 == 0:
             self.rfl = getCol("Power Supply" + str(self.supply) + " Rfl Power")
             self.fwd = getCol("Power Supply" + str(self.supply) + " Fwd Power")
             self.dcbias = getCol("Power Supply" + str(self.supply) + " DC Bias")
 
         if self.supply % 2 == 1:
-            self.output_power = getCol("Power Supply" + str(self.supply) + " Output Power")
-            self.output_voltage = getCol("Power Supply" + str(self.supply) + " Output Voltage")
+            self.output_power = getCol("Power Supply" + str(self.supply) + \
+                                       " Output Power")
+            self.output_voltage = getCol("Power Supply" + str(self.supply) + \
+                                         " Output Voltage")
 
     """ automatically loads last modified data file
         when application launches """
@@ -67,14 +65,8 @@ class MainMenu(QtGui.QWidget):
     """ draws graphical user interface """
     def initUI(self):
         self.setGeometry(50, 150, 300, 400)
-        self.setWindowTitle('Deposition Monitor') # or whatever this application is actually going to be called
+        self.setWindowTitle('Deposition Monitor')
         self.layout = QtGui.QVBoxLayout(self)
-
-        # load data file
-        # choose graph [check]
-        # create profile [check]
-        # load profile [check]
-        # color wheel
 
         # load data file
         loadFileButton = QtGui.QPushButton('Choose Data File')
@@ -114,7 +106,7 @@ class MainMenu(QtGui.QWidget):
         dirname = QtGui.QFileDialog.getOpenFileName(self, 'Open data file',
                                                       'C:/Users/JCAP-HTE/Documents/GitHub/JCAPdepositionmonitor',
                                                       'CSV files (*.csv)')
-        # if Cancel is clicked, dirname will be empty string
+        # if cancel is clicked, dirname will be empty string
         if dirname != '':
             # converts Qstring to string
             dirString = str(dirname)
@@ -148,7 +140,9 @@ class MainMenu(QtGui.QWidget):
             error = QtGui.QMessageBox.information(None, "Load Profile Error",
                                                   "You have not saved any profiles.")
             return
+        
         menuList = []
+        
         while True:
             # unpickle each profile individually
             try:
@@ -159,6 +153,7 @@ class MainMenu(QtGui.QWidget):
                     menuList += [name]
             except EOFError:
                 break
+            
         loadMenu = LoadMenu(menuList)
         self.miscWindows.append(loadMenu)
         loadMenu.show()
