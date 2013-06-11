@@ -24,10 +24,8 @@ class DepositionGraph(FigureCanvas):
         FigureCanvas.updateGeometry(self)
         self.initPlotArea()
         self.convFactor = 1
-        self.z1 = None
-        self.z2 = None
-        self.z2index = None
-        self.zvar = None
+        self.currentZ = None
+        self.zvars = []
         self.maxRate = 0
         self.changeScale = False
         # formatted string that represents the units of the data
@@ -36,25 +34,24 @@ class DepositionGraph(FigureCanvas):
     def initPlotArea(self):
         self.xdata = []
         self.ydata = []
-        self.ratedata = []
-        
-        self.plot = self.figure.add_subplot(1, 1, 1, adjustable='box', aspect=1,
-                                            projection = '3d')
+        self.ratedata = []      
+        self.plot = self.figure.add_subplot(1, 1, 1, adjustable='box', aspect=1)
         self.plot.set_xlim(-50, 50)
         self.plot.set_ylim(-50, 50)
-        #self.plot.set_zlim(2.8, 3.8)
-        #self.plot.autoscale(enable=False, tight=False)
-        self.plot.autoscale_view(tight=False, scalex=False, scaley=False,
-                                 scalez=True)
+        self.plot.autoscale(enable=False, tight=False)
 
-    def firstPlot(self):
-        self.z1 = DEP_DATA[0][0]
-        self.zvar = self.z1
+    def firstPlot(self, zval = None):
+        self.currentZ = zval
+        if not zval:
+            self.currentZ = DEP_DATA[0][0]
+        if self.currentZ not in self.zvars:
+            self.zvars.append(self.currentZ)
+        #print 'currentZ:', self.currentZ
         for i, (z, x, y, rate) in enumerate(DEP_DATA):
-            if  not self.z2 and z != self.z1:
-                self.z2 = z
-                self.zvar = self.z2
-                self.z2index = i
+            if z != self.currentZ:
+                if z not in self.zvars:
+                    self.zvars.append(z)
+                continue
             self.xdata.append(x)
             self.ydata.append(y)
             modified_rate = rate*self.convFactor
@@ -63,35 +60,19 @@ class DepositionGraph(FigureCanvas):
                 self.maxRate = modified_rate
         self.scalarMap = cm.ScalarMappable(norm=colors.Normalize(vmin=0, vmax=self.maxRate))
         self.scalarMap.set_array(np.array(self.ratedata))
-        zarr = np.ones(len(self.xdata))*self.z1
-        if self.z2:
-            for i in range(self.z2index, len(zarr)):
-                zarr[i] = self.z2
-        self.datavis = self.plot.scatter(self.xdata, self.ydata, zs=zarr,
+        self.datavis = [self.plot.scatter(self.xdata, self.ydata,
                                          c = self.ratedata, cmap=self.scalarMap.get_cmap(),
-                                         marker='o', edgecolor='none', s=60,
-                                         alpha=1)
+                                         marker='o', edgecolor='none', s=60)]
         self.colorbar = self.figure.colorbar(self.scalarMap, ax = self.plot)
         self.colorbar.set_array(np.array(self.ratedata))
         self.colorbar.autoscale()
-        self.scalarMap.set_colorbar(self.colorbar, self.plot)
         self.colorbar.set_label(self.units)
+        self.draw()
 
     def updatePlot(self, newData):
-        for z, x, y, rate in newData:
-            if not self.z1:
-                self.firstPlot()
-            elif z != self.zvar:
-                self.z2 = z
-                self.z2index = len(self.xdata)
-                self.zvar = self.z2
-                # get center point from dictionary
-                center = DEP_DATA[-3]
-                print 'center:', center
-                self.xdata.append(center[1])
-                self.ydata.append(center[2])
-                modified_rate = center[3]*self.convFactor
-                self.ratedata.append(modified_rate)
+        for z, x, y, rate in [newData]:
+            if z!= self.currentZ:
+                break
             self.xdata.append(x)
             self.ydata.append(y)
             modified_rate = rate*self.convFactor
@@ -99,25 +80,34 @@ class DepositionGraph(FigureCanvas):
             if modified_rate > self.maxRate:
                 self.maxRate = modified_rate
                 self.changeScale = True
-        print "deposition graph updating"
-        self.datavis.remove()
-        if not self.changeScale:
-            self.datavis = self.plot.scatter(self.xdata[-2:], self.ydata[-2:], zs=self.zvar,
-                                             c = self.ratedata[-2:],
-                                             cmap=self.scalarMap.get_cmap(),
-                                             marker='o', edgecolor='none', s=60)
-        else:
-            self.scalarMap.set_clim(0, self.maxRate)
-            zarr = np.ones(len(self.xdata))*self.z1
-            if self.z2:
-                for i in range(self.z2index, len(zarr)):
-                    zarr[i] = self.z2
-            self.datavis = self.plot.scatter(self.xdata, self.ydata, zs=zarr,
-                                             c = self.ratedata,
-                                             cmap=self.scalarMap.get_cmap(),
-                                             marker='o', edgecolor='none', s=60)
-            self.colorbar.draw_all()
+            if not self.changeScale:
+                self.datavis += [self.plot.scatter(x, y, c = rate,
+                                                 cmap=self.scalarMap.get_cmap(),
+                                                 marker='o', edgecolor='none', s=60)]
+            else:
+                self.rescale()
+        
         self.draw()
+
+    def rescale(self):
+        for plot in self.datavis:
+            plot.remove()
+        self.scalarMap.set_clim(0, self.maxRate)
+        self.datavis = [self.plot.scatter(self.xdata, self.ydata,
+                                         c = self.ratedata,
+                                         cmap=self.scalarMap.get_cmap(),
+                                         marker='o', edgecolor='none', s=60)]
+        self.colorbar.draw_all()
+
+    def clearPlot(self):
+        self.figure.clear()
+        self.initPlotArea()
+        self.convFactor = 1
+        self.currentZ = None
+        self.zvars = []
+        self.maxRate = 0
+        self.changeScale = False
+        self.units = r'$10^{-8}$'+'g/s cm'+r'$^2$'
 
     def convertPlot(self):
         print "converting plot", self.convFactor

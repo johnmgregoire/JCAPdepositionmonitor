@@ -29,14 +29,11 @@ class MainMenu(QtGui.QWidget):
         self.processor.lineRead.connect(self.newLineRead)
         self.processor.newData.connect(self.depUpdate)
         self.processor.start()
-        self.processor.terminated.connect(self.debug)
                 
         self.initUI()
 
         self.initSupplyVars()
 
-    def debug(self):
-        print 'DATA PROCESSOR DIED'
 
     """Initializes any variables that are useful for error checking"""
     def initSupplyVars(self):

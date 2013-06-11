@@ -50,14 +50,17 @@ class DepositionWindow(QtGui.QMainWindow):
         self.mainlayout.setColumnStretch(0,5)
         self.mainlayout.setColumnStretch(1,0)
 
-        #drop down widget, text widgets, ect
+        #drop down widget, text widgets, etc.
         self.selectUnits = QtGui.QComboBox()
         self.chemEQ = QtGui.QLineEdit(self)
         self.densityLine = QtGui.QLineEdit(self)
         self.procChem = QtGui.QPushButton('Enter')
+        self.setZ = QtGui.QComboBox()
+        self.rescaleButton = QtGui.QPushButton('Reset Colors')
 
         # set connections up
         self.procChem.clicked.connect(self.handleEQS)
+        self.rescaleButton.clicked.connect(self.resetColors)
 
         # labels
         self.label_chemEQ = QtGui.QLabel('Chemical equation:')
@@ -69,6 +72,11 @@ class DepositionWindow(QtGui.QMainWindow):
 
         self.selectUnits.activated[str].connect(self.selectConversion)
 
+        for zval in self.depgraph.zvars:
+            self.setZ.addItem(str(zval))
+
+        self.setZ.activated[str].connect(self.switchZ)
+
         self.sidelayout.setAlignment(QtCore.Qt.AlignTop)
 
         #adding to sidelayout
@@ -78,6 +86,8 @@ class DepositionWindow(QtGui.QMainWindow):
         self.sidelayout.addWidget(self.label_density)
         self.sidelayout.addWidget(self.densityLine)
         self.sidelayout.addWidget(self.procChem)
+        self.sidelayout.addWidget(self.setZ)
+        self.sidelayout.addWidget(self.rescaleButton)
 
         self.show()
 
@@ -165,11 +175,33 @@ class DepositionWindow(QtGui.QMainWindow):
     
         return False
 
+<<<<<<< HEAD
     def updateWindow(self,newDepRates):
         # newDepRates = [(x, y, rate1), (x, y, rate2)]
         self.depgraph.updatePlot(newDepRates)
+=======
+    def switchZ(self, newZ):
+        zval = float(newZ)
+        self.depgraph.clearPlot()
+        self.depgraph.firstPlot(zval)
+
+    def resetColors(self):
+        self.depgraph.rescale()
+        self.depgraph.draw()
+
+    def updateWindow(self,newDepRate):
+        # newDepRates = (z, x, y, rate)
+        z = newDepRate[0]
+        # this will occur if the instrument has moved to
+        #   the next z-value, or if the graph window was opened
+        #   before the first data points had been processed
+        if z not in self.depgraph.zvars:
+            self.setZ.addItem(str(z))
+            self.setZ.setCurrentIndex(self.setZ.count()-1)
+            self.switchZ(z)
+        self.depgraph.updatePlot(newDepRate)
+>>>>>>> a5214829283867f6cb65566c52f98332055a2550
         pass
 
     def redrawWindow(self):
-
         pass
