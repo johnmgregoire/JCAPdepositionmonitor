@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 6/5/2013
-# Last Updated: 6/7/2013
+# Last Updated: 6/11/2013
 # For JCAP
 
 import numpy as np
@@ -16,8 +16,9 @@ class DepositionWindow(QtGui.QMainWindow):
     def __init__(self):
         super(DepositionWindow, self).__init__()
 
-        self.Lmnts = {}
-        self.density = None
+        # Lmnts is a dictionary to hold the information of the
+        # composition it was given.
+        self.Lmnts, self.density = {}, None
         self.initUI()
 
     """ draws the user interface of the window """
@@ -114,11 +115,9 @@ class DepositionWindow(QtGui.QMainWindow):
                 self.depgraph.units = 'nmoles/s cm'+r'$^2$'
 
             self.depgraph.colorbar.set_label(self.depgraph.units)
-
-            print self.depgraph.convFactor
-            
             self.depgraph.convertPlot()
-        
+            
+            print self.depgraph.convFactor    
 
     def handleEQS(self):
         formula = self.chemEQ.text()
@@ -152,15 +151,15 @@ class DepositionWindow(QtGui.QMainWindow):
         totalReg = reg0 + '(' + reg1+reg2 + ')' + reg3 + '(' + reg4 + reg5 + ')' + reg6
 
         regEX = re.compile(totalReg)
-        x = re.match(regEX,str(text))
+        matchedReg = re.match(regEX,str(text))
 
-        if x:
-            metalName = x.group(1)
-            otherElmntName = x.group(2)
-            otherElmntStoich  = x.group(3)
+        if matchedReg:
+            metalName, otherElmntName = matchedReg.group(1), matchedReg.group(2)
             
             if otherElmntStoich == "":
                 otherElmntStoich = 1.
+            else:
+                otherElmntStoich  = matchedReg.group(3)
 
             try:
                 metalElmntObject = ELEMENTS[metalName]
@@ -171,12 +170,15 @@ class DepositionWindow(QtGui.QMainWindow):
                 return True
 
             except KeyError:
+                # Todo, deside what to throw out and how.
+                # if here it's because it couldn't make something a float -- which it should be ok
+                # with since it matched the regex -- it is more likely that the thing is not a valid
+                # element
                 pass 
     
         return False
 
     def updateWindow(self,newDepRates):
-        # newDepRates = [(x, y, rate1), (x, y, rate2)]
         self.depgraph.updatePlot(newDepRates)
 
     def switchZ(self, newZ):
