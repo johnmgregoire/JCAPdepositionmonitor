@@ -9,6 +9,7 @@ from matplotlib.figure import Figure
 import matplotlib.colors as colors
 import matplotlib.cm as cm
 from process_deposition_data import DEP_DATA
+import numpy as np
 
 class DepositionGraph(FigureCanvas):
 
