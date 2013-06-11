@@ -18,7 +18,6 @@ class DepositionWindow(QtGui.QMainWindow):
 
         self.Lmnts = {}
         self.density = None
-        #self.hasPlot = False
         self.initUI()
 
     """ draws the user interface of the window """
@@ -33,7 +32,6 @@ class DepositionWindow(QtGui.QMainWindow):
         self.depgraph = DepositionGraph(self.main_widget)
         if DEP_DATA:
             self.depgraph.firstPlot()
-            #self.hasPlot = True
 
         self.setWindowTitle("Deposition Window - Work In Progress")
 
@@ -169,9 +167,6 @@ class DepositionWindow(QtGui.QMainWindow):
 
     def updateWindow(self,newDepRates):
         # newDepRates = [(x, y, rate1), (x, y, rate2)]
-        """if not self.hasPlot:
-            self.depgraph.firstPlot()
-            self.hasPlot = True"""
         self.depgraph.updatePlot(newDepRates)
         pass
 

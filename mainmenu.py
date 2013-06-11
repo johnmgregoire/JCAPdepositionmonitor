@@ -6,8 +6,8 @@
 from depositionwindow_data import *
 from graphwindow_data import *
 from profilewindow import *
-from process_deposition_data import *
 import os
+import process_deposition_data as pdd
 
 """ window that pops up when application launches """
 class MainMenu(QtGui.QWidget):
@@ -25,7 +25,7 @@ class MainMenu(QtGui.QWidget):
         # initializes reader on data file
         #self.reader = DataReader(parent=self, filename=self.file)
         #self.reader.lineRead.connect(self.newLineRead)
-        self.processor = ProcessorThread(parent=self, filename=self.file)
+        self.processor = pdd.ProcessorThread(parent=self, filename=self.file)
         self.processor.lineRead.connect(self.newLineRead)
         self.processor.newData.connect(self.depUpdate)
         self.processor.start()
@@ -41,7 +41,7 @@ class MainMenu(QtGui.QWidget):
     """Initializes any variables that are useful for error checking"""
     def initSupplyVars(self):
         self.errors =[]
-        self.supply = int(FILE_INFO.get("Supply"))
+        self.supply = int(filename_handler.FILE_INFO.get("Supply"))
         if self.supply % 2 == 0:
             self.rfl = getCol("Power Supply" + str(self.supply) + " Rfl Power")
             self.fwd = getCol("Power Supply" + str(self.supply) + " Fwd Power")

@@ -1,15 +1,15 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 6/06/2013
-# Last Updated: 6/07/2013
+# Last Updated: 6/11/2013
 # For JCAP
 
 from PyQt4 import QtGui
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from mpl_toolkits.mplot3d import Axes3D
+from mpl_toolkits.mplot3d import Axes3D # TODO: delete after pull
 import matplotlib.colors as colors
 import matplotlib.cm as cm
-from process_deposition_data import *
+from process_deposition_data import DEP_DATA
 
 class DepositionGraph(FigureCanvas):
 
