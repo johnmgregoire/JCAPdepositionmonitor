@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 6/05/2013
-# Last Updated: 6/07/2013
+# Last Updated: 6/11/2013
 # For JCAP
 
 import numpy as np
@@ -8,7 +8,7 @@ from dictionary_helpers import *
 from date_helpers import *
 from datareader import *
 
-# global dictionary holds all processed (x, y, rate)
+# global dictionary holds all processed (z, x, y, rate)
 #   data for this experiment
 DEP_DATA = []
 
@@ -46,6 +46,9 @@ class ProcessorThread(QtCore.QThread):
         self.lineRead.emit(newRow)
         self.processRow(newRow)
 
+    """ adds a new row to its own row buffer and processes the
+        data in the row buffer if the azimuth or z-value of the
+        instrument has changed """
     def processRow(self, row):
         if self.rowBuffer == []:
             self.rowBuffer += [row]
@@ -59,37 +62,42 @@ class ProcessorThread(QtCore.QThread):
             if (angle == prevangle and zval == prevz):
                 self.rowBuffer += [row]
             elif (angle == prevangle):
-                # make new graph
-                print 'drawing new graph for z =', zval
                 self.processData(prevz, prevangle, radius1)
                 self.processData(prevz, prevangle, radius2)
+                # indicates that center point will need to be
+                #   computed in next round of processing
                 self.changeZ = True
+                # reset row buffer
                 self.rowBuffer = [row]
             else:
                 self.processData(zval, prevangle, radius1)
                 self.processData(zval, prevangle, radius2)
                 self.rowBuffer = [row]
 
+    """ processes all rates at the same angle and z-value
+        to produce a single (x, y, rate) data point """
     def processData(self, z, angle, radius):
         global DEP_DATA
         rowRange = self.getRowRange()
-        #print 't:', FILE_INFO.get('TiltDeg')
-        #print 'rowRange:', rowRange
+        # only one or two data points indicates a transitional
+        #   angle that can be ignored
         if rowRange[1] - rowRange[0] <= 2:
             pass
         else:
-            #print 'self.rowBuffer', self.rowBuffer
+            # get only valid rows from buffer
             dataArray = self.rowBuffer[rowRange[0]:(rowRange[1]+1)]
+            # transpose matrix so that each column in the
+            #   spreadsheet becomes a row
             dataArrayT = np.array(dataArray).T
-            #print 'dataArrayT', dataArrayT
             timespan = self.getTimeSpan(dataArrayT)
             depRates = self.getDepRates(timespan, dataArrayT)
+            # normalize based on drifting center point
             rate0 = self.getXtalRate(3, dataArrayT).mean()
             rate = rate0
             if radius == radius1:
                 if angle == 0 or self.changeZ:
-                    #plot rate0 at (0, 0)
-                    print 'plotting rate0 at (0,0)'
+                    # plot center point along with first set
+                    #   of data for this z-value
                     DEP_DATA.append((z, 0.0, 0.0, rate))
                     self.newData.emit((z, 0.0, 0.0, rate))
                     self.changeZ = False
@@ -102,11 +110,14 @@ class ProcessorThread(QtCore.QThread):
                 y = radius * np.sin(angle * np.pi/180. + np.pi)
                 # rate2 corresponds to Xtal2 Rate
                 rate = rate0 * depRates[0]/depRates[1]
-            print (angle, radius, x, y, rate)
+            # store data points for initializing new graph
             DEP_DATA.append((z, x, y, rate))
-            # return the tuple above to depgraph
+            # indicate to exisiting graphs that there is
+            #   new data to display
             self.newData.emit((z, x, y, rate))
 
+    """ helper function to correct for instrument noise
+        in measuring z-value """
     def roundZ(self, zcol):
         zrnd=np.round(zcol, decimals=zndec)
         for zval in zrnd:
@@ -114,6 +125,8 @@ class ProcessorThread(QtCore.QThread):
                 zval = -1
         return zrnd
 
+    """ helper function to correct for instrument noise
+        in measuring tilt """
     def roundt(self, tcol):
         trnd=np.round(tcol, decimals=tndec)
         for tval in trnd:
@@ -121,6 +134,8 @@ class ProcessorThread(QtCore.QThread):
                 tval = -1
         return trnd
 
+    """ gets range of valid rows in row buffer based on
+        whether z and t values match experimental parameters """
     def getRowRange(self):
         zcolnum = getCol('Platen Zshift Motor 1 Position')
         tcolnum = getCol('Src%d Motor Tilt Position' % int(filename_handler.FILE_INFO['Source']))
@@ -132,6 +147,8 @@ class ProcessorThread(QtCore.QThread):
                                 (self.roundt(tcol)>=0))[0]
         return (inds_useful[0], inds_useful[-1])
 
+    """ gets time span of valid data set for given angle
+        and z-value """
     def getTimeSpan(self, dataArrayT):
         datecol = getCol('Date')
         timecol = getCol('Time')
@@ -141,10 +158,14 @@ class ProcessorThread(QtCore.QThread):
         durationObj = dateObjFloat(endStr) - dateObjFloat(startStr)
         return durationObj.total_seconds()
 
+    """ helper function to return column of Xtal rates
+        from valid data set """
     def getXtalRate(self, ratenum, dataArrayT):
         rcolnum = getCol('Xtal%d Rate' % ratenum)
         return np.array(map(float, dataArrayT[rcolnum]))
 
+    """ helper function to compute all deposition rates
+        as time-averaged Xtal rates """
     def getDepRates(self, timespan, dataArrayT):
         depRates = []
         for x in range(2,5):
@@ -153,6 +174,8 @@ class ProcessorThread(QtCore.QThread):
             depRates += [rateDiff/timespan]
         return depRates
 
+    """ re-initializes data sets and reader when a new
+        spreadsheet file is loaded """
     def newFile(self, newfile):
         global DEP_DATA
         DEP_DATA = []
@@ -170,7 +193,9 @@ class ProcessorThread(QtCore.QThread):
             processData(prevangle, radius1)
             processData(prevangle, radius2)
             self.rowBuffer = []
-            
+
+    """ kills both the reader and data processor threads;
+        called when application exits """
     def end(self):
         self.reader.end()
         self.running = False

@@ -16,10 +16,11 @@ Things to do:
 	- need to know where data files are going to be stored
 
 - Create menu for loading file [done for now]
-	- definitely in main menu - also in graph window? 
 
-- COLOR WHEELS?!?!?!
-	- normalize by center/don't normalize
+- display (x, y) coordinates when graph is clicked on
+
+- structure UI in depgraph window
+	- display correct units on axis label
 
 - In our testing, we've needed to start writing to the file
 before we open the program in order to read that file.
