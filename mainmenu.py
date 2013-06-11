@@ -116,8 +116,9 @@ class MainMenu(QtGui.QWidget):
             # hides all windows so they can be removed later
             for window in (self.graphWindows + self.depWindows + self.miscWindows):
                 window.hide()
-            self.processor.newFile(self.file)
 
+            # set everything up for the new file being read   
+            self.processor.newFile(self.file)
             self.initSupplyVars()
 
     """ creates window for single graph """
@@ -182,27 +183,15 @@ class MainMenu(QtGui.QWidget):
 
     """ updates all active graph windows every second """
     def redrawAll(self):
-        for window in self.graphWindows:
-            if window.isHidden():
-                self.graphWindows.remove(window)
-            else:
-                window.redrawWindow()
-
-        for window in self.depWindows:
-            if window.isHidden():
-                self.depWindows.remove(window)
-            else:
-                window.redrawWindow()
-
-        for window in self.miscWindows:
-            if window.isHidden():
-                self.miscWindows.remove(window)
-            else:
-                window.redrawWindow()
+        for windowType in (self.graphWindows,self.depWindows,self.miscWindows):
+            for window in windowType:
+                if window.isHidden():
+                    windowType.remove(window)
+                else:
+                    window.redrawWindow()
 
     """ terminates reader when window is closed """
     def closeEvent(self, event):
-        print "signal transmitted"
         self.processor.end()
         event.accept()
 
@@ -210,19 +199,12 @@ class MainMenu(QtGui.QWidget):
     def newLineRead(self, newRow):
         self.updateGraphs(newRow)
         self.checkValidity(newRow)
-        
-        # send new row to processor thread
-        #newDepRates = processDataRow(newRow)
-        """if newDepRates != None:
-            for window in self.depWindows:
-                window.updateWindow(newDepRates)"""
 
     """ Shows an error message is the data is invalid"""
     def checkValidity(self, row):
         errors_list = []
 
         if self.supply % 2 == 0:
-            
             fwdValue = float(row[self.fwd])
             dcBiasValue = float(row[self.dcbias])
             rflValue = float(row[self.rfl])
@@ -236,13 +218,13 @@ class MainMenu(QtGui.QWidget):
             opValue = float(row[self.output_power])
             if opValue < 5: errors_list.append("Output power is below 5") 
 
-        newErrors = [ x for x in errors_list if x not in self.errors]
+        newErrors = [ error for error in errors_list if error not in self.errors]
         self.errors += newErrors
+
+        # only process error warning if no warning has been given to user
         if newErrors:
             message = "You have the following errors: " + " ".join(newErrors)
-            print message
             validityError = QtGui.QMessageBox.information(None,"Unreliable Data Error", message)
-            pass
         
 """ main event loop """
 def main():
