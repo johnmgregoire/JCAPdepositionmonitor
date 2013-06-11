@@ -8,19 +8,23 @@ from dictionary_helpers import *
 from date_helpers import *
 from datareader import *
 
+# global dictionary holds all processed (x, y, rate)
+#   data for this experiment
 DEP_DATA = []
-
-""" does all of the data processing necessary for
-    deposition plots """
 
 zndec = 2
 tndec = 1
 radius1 = 28.
 radius2 = 45.
 
+""" does all of the data processing necessary for
+    deposition plots """
+
 class ProcessorThread(QtCore.QThread):
-    
+
+    # transfers new line from reader to MainMenu
     lineRead = QtCore.pyqtSignal(list)
+    # transfers new processed data to deposition graph
     newData = QtCore.pyqtSignal(tuple)
     
     def __init__(self, parent=None, filename='default.csv'):
@@ -37,6 +41,7 @@ class ProcessorThread(QtCore.QThread):
         while self.running:
             pass
 
+    """ called whenever the reader sends a full line """
     def newLineRead(self, newRow):
         self.lineRead.emit(newRow)
         self.processRow(newRow)
