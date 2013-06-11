@@ -1,13 +1,18 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/28/2013
-# Last Updated: 5/31/2013
+# Last Updated: 6/11/2013
 # For JCAP
 
-from depositionwindow_data import *
-from graphwindow_data import *
-from profilewindow import *
+from PyQt4 import QtGui
+from dictionary_helpers import getCol
+import depositionwindow_data
+import graphwindow_data
+import profilewindow
 import os
+import filename_handler
 import process_deposition_data as pdd
+import sys
+
 
 """ window that pops up when application launches """
 class MainMenu(QtGui.QWidget):
@@ -29,22 +34,6 @@ class MainMenu(QtGui.QWidget):
                 
         self.initUI()
         self.initSupplyVars()
-
-    """Initializes any variables that are useful for error checking"""
-    def initSupplyVars(self):
-        self.errors =[]
-        self.supply = int(filename_handler.FILE_INFO.get("Supply"))
-        
-        if self.supply % 2 == 0:
-            self.rfl = getCol("Power Supply" + str(self.supply) + " Rfl Power")
-            self.fwd = getCol("Power Supply" + str(self.supply) + " Fwd Power")
-            self.dcbias = getCol("Power Supply" + str(self.supply) + " DC Bias")
-
-        if self.supply % 2 == 1:
-            self.output_power = getCol("Power Supply" + str(self.supply) + \
-                                       " Output Power")
-            self.output_voltage = getCol("Power Supply" + str(self.supply) + \
-                                         " Output Voltage")
 
     """ automatically loads last modified data file
         when application launches """
@@ -94,12 +83,28 @@ class MainMenu(QtGui.QWidget):
         makeDepositionButton.clicked.connect(self.makeDeposition)
 
         # initialize the timer that updates all graphs in application
-        timer = QtCore.QTimer(self)
+        timer = pdd.QtCore.QTimer(self)
         timer.timeout.connect(self.redrawAll)
         # update graph every 1000 milliseconds
         timer.start(1000)
 
         self.show()
+
+    """Initializes any variables that are useful for error checking"""
+    def initSupplyVars(self):
+        self.errors =[]
+        self.supply = int(filename_handler.FILE_INFO.get("Supply"))
+        
+        if self.supply % 2 == 0:
+            self.rfl = getCol("Power Supply" + str(self.supply) + " Rfl Power")
+            self.fwd = getCol("Power Supply" + str(self.supply) + " Fwd Power")
+            self.dcbias = getCol("Power Supply" + str(self.supply) + " DC Bias")
+
+        if self.supply % 2 == 1:
+            self.output_power = getCol("Power Supply" + str(self.supply) + \
+                                       " Output Power")
+            self.output_voltage = getCol("Power Supply" + str(self.supply) + \
+                                         " Output Voltage")
 
     """ allows user to choose another data file """
     def loadDataFile(self):
@@ -123,7 +128,7 @@ class MainMenu(QtGui.QWidget):
 
     """ creates window for single graph """
     def makeGraph(self):
-        graph = GraphWindow(datafile=self.file)
+        graph = graphwindow_data.GraphWindow(datafile=self.file)
         self.graphWindows.append(graph)
         graph.show()
 
@@ -162,13 +167,13 @@ class MainMenu(QtGui.QWidget):
 
     """shows the deposition window"""
     def makeDeposition(self):
-        depWindow = DepositionWindow()
+        depWindow = depositionwindow_data.DepositionWindow()
         self.depWindows.append(depWindow)
 
     """ once profile is chosen, loads profile in new window """
     def loadProfile(self, name):
         varsList = self.profiles.get(str(name))
-        profileWindow = ProfileWindow(name, varsList)
+        profileWindow = profilewindow.ProfileWindow(name, varsList)
         self.graphWindows.append(profileWindow)
         profileWindow.show()
 
@@ -183,6 +188,7 @@ class MainMenu(QtGui.QWidget):
 
     """ updates all active graph windows every second """
     def redrawAll(self):
+        # we loop through all window types we have and udpate them or not
         for windowType in (self.graphWindows,self.depWindows,self.miscWindows):
             for window in windowType:
                 if window.isHidden():
@@ -228,7 +234,7 @@ class MainMenu(QtGui.QWidget):
         
 """ main event loop """
 def main():
-    app = QtGui.QApplication(sys.argv)
+    app = QtGui.QApplication(profilewindow.sys.argv)
     menu = MainMenu()
     sys.exit(app.exec_())
 
