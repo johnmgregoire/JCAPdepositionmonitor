@@ -1,11 +1,11 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/23/2013
-# Last Updated: 6/05/2013
+# Last Updated: 6/11/2013
 # For JCAP
 
 import csv
 from PyQt4 import QtCore
-from filename_handler import *
+import filename_handler 
 
 DATA_DICT = {}
 DATA_HEADINGS = {}
@@ -23,14 +23,13 @@ class DataReader(QtCore.QThread):
         self.running = True
 
     def initData(self, filename):
-        self.datafile = open(filename, 'rb')
-        parseFilename(filename)
-        # read column headings and create lists to hold data
-        headings = self.datafile.readline().split(',')
-        # strip off '/r/n' at end of line - only works on Windows
-        #headings[self.numColumns-1] = headings[self.numColumns-1][:-2]
         global DATA_DICT
         global DATA_HEADINGS
+        self.datafile = open(filename, 'rb')
+        filename_handler.parseFilename(filename)
+        
+        # read column headings and create lists to hold data
+        headings = self.datafile.readline().split(',')
         # clear dictionary in case it has already been used for a different file
         DATA_DICT.clear()
         DATA_HEADINGS.clear()
@@ -68,7 +67,7 @@ class DataReader(QtCore.QThread):
                 else:
                     break
             # check if we have all data from row and have read
-            #   up to the end of line character
+            # up to the end of line character
             if len(strippedRow) == self.numColumns and row[len(row)-1].endswith('\r\n'):
                 # add the new info to the respective column
                 for col in dataColNums:
@@ -77,7 +76,7 @@ class DataReader(QtCore.QThread):
                 # re-insert empty third column to keep indices
                 #   in strippedRow consisten with DATA_HEADINGS
                 strippedRow.insert(2, '')
-                # SEND SIGNAL
+                # send signal
                 self.lineRead.emit(strippedRow)
                 # move the reader cursor only if we read in a full line
                 self.lastEOFpos = self.datafile.tell()
@@ -86,7 +85,7 @@ class DataReader(QtCore.QThread):
         self.datafile.close()
 
     def end(self):
-        print "message received"
+        print "Message Recieved - datareader ending"
         self.running = False
         
 
