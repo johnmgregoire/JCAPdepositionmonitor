@@ -115,6 +115,7 @@ class ProcessorThread(QtCore.QThread):
             # indicate to exisiting graphs that there is
             #   new data to display
             self.newData.emit((z, x, y, rate))
+            print (angle, radius, z, x, y, rate)
 
     """ helper function to correct for instrument noise
         in measuring z-value """
@@ -185,17 +186,20 @@ class ProcessorThread(QtCore.QThread):
         self.reader.lineRead.connect(self.newLineRead)
         self.reader.start()     
 
-    # need to actually call this somewhere!
+    """ empties row buffer once experiment has ended """
     def onExit(self):
         if self.rowBuffer:
             anglecolnum = getCol('Platen Motor Position')
             angle = round(float(self.rowBuffer[0][anglecolnum]))
-            processData(prevangle, radius1)
-            processData(prevangle, radius2)
+            zcolnum = getCol('Platen Zshift Motor 1 Position')
+            zval = round(float(self.rowBuffer[0][zcolnum]), 1)
+            self.processData(zval, angle, radius1)
+            self.processData(zval, angle, radius2)
             self.rowBuffer = []
 
     """ kills both the reader and data processor threads;
         called when application exits """
     def end(self):
+        self.onExit()
         self.reader.end()
         self.running = False

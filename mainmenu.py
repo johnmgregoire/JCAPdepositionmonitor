@@ -82,6 +82,11 @@ class MainMenu(QtGui.QWidget):
         self.layout.addWidget(makeDepositionButton)
         makeDepositionButton.clicked.connect(self.makeDeposition)
 
+        # end data collection session
+        endButton = QtGui.QPushButton('End Experiment')
+        self.layout.addWidget(endButton)
+        endButton.clicked.connect(self.endExperiment)
+
         # initialize the timer that updates all graphs in application
         timer = pdd.QtCore.QTimer(self)
         timer.timeout.connect(self.redrawAll)
@@ -195,10 +200,15 @@ class MainMenu(QtGui.QWidget):
                     windowType.remove(window)
                 else:
                     window.redrawWindow()
-
-    """ terminates reader when window is closed """
-    def closeEvent(self, event):
+                    
+    """ terminates reader and data processor at end of experiment """
+    def endExperiment(self):
         self.processor.end()
+
+    """ terminates reader (if still active) when window is closed """
+    def closeEvent(self, event):
+        if self.processor:
+            self.processor.end()
         event.accept()
 
     """ handles signal from reader that new line has been read """
