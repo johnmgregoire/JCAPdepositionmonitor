@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/23/2013
-# Last Updated: 6/03/2013
+# Last Updated: 6/11/2013
 # For JCAP
 
 from PyQt4 import QtGui
@@ -180,7 +180,7 @@ class Graph(FigureCanvas):
                                 title="Left", prop={"size":"small"})
             self.legendL.draggable(state = True)
 
-   """ called when user specifies a time window to display """     
+    """ called when user specifies a time window to display """     
     def setXlim(self, amin=None, amax=None):
         self.axes.set_xlim(left=amin, right=amax)
 
