@@ -8,12 +8,11 @@ Has a function that helps us deal with time conversion
 """
 
 import time 
-from time import strftime
 import datetime
 
 # give a float of seconds - such as time.time() and it returns a datetime obj
 def dateObj(atime):
-    localCurrTime = strftime("%d/%m/%Y %H:%M:%S", time.localtime(atime))
+    localCurrTime = time.strftime("%d/%m/%Y %H:%M:%S", time.localtime(atime))
     return datetime.datetime.strptime(localCurrTime, "%d/%m/%Y %H:%M:%S")
 
 # give it a string of the form d/m/Y H:M:S:f and it returns a date time object
@@ -22,10 +21,10 @@ def dateObjFloat(fullTime):
 
 # gives the current local time in the form of a string
 def dateString():
-    localCurrTime = strftime("%d/%m/%Y %H:%M:%S", time.localtime(time.time()))
+    localCurrTime = time.strftime("%d/%m/%Y %H:%M:%S", time.localtime(time.time()))
     return localCurrTime
 
 # gives the current local time in the form of a string
 def dateStringFile():
-    localCurrTime = strftime("%d_%m_%Y-%H_%M_%S", time.localtime(time.time()))
+    localCurrTime = time.strftime("%d_%m_%Y-%H_%M_%S", time.localtime(time.time()))
     return localCurrTime

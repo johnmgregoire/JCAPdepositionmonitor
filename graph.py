@@ -3,8 +3,6 @@
 # Last Updated: 6/03/2013
 # For JCAP
 
-import datetime
-import time
 from PyQt4 import QtGui
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -118,12 +116,6 @@ class Graph(FigureCanvas):
                 rightLim = dateObj(currTime)
                 leftLim = dateObj(currTime - self.timeWindow)
                 self.setXlim(amin=leftLim, amax=rightLim)
-
-    """ helper function to get the column number associated with a heading
-        in the data spreadsheet """
-    def getCol(self, colName):
-        theCol = [k for k, v in DATA_HEADINGS.iteritems() if v == colName]
-        return theCol[0]
 
     def addRightAxis(self, rightvar):
         if self.hasRightAxis:

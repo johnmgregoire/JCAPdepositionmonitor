@@ -3,7 +3,7 @@
 # Last Updated: 6/05/2013
 # For JCAP
 
-import csv, time
+import csv
 from PyQt4 import QtCore
 from filename_handler import *
 

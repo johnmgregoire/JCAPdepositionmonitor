@@ -3,7 +3,6 @@
 # Last Updated: 5/31/2013
 # For JCAP
 
-from PyQt4 import QtCore, QtGui
 from graph import *
 
 """ window that displays profile after loading """
