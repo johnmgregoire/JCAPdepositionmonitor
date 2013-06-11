@@ -175,11 +175,10 @@ class DepositionWindow(QtGui.QMainWindow):
     
         return False
 
-<<<<<<< HEAD
     def updateWindow(self,newDepRates):
         # newDepRates = [(x, y, rate1), (x, y, rate2)]
         self.depgraph.updatePlot(newDepRates)
-=======
+
     def switchZ(self, newZ):
         zval = float(newZ)
         self.depgraph.clearPlot()
@@ -200,8 +199,6 @@ class DepositionWindow(QtGui.QMainWindow):
             self.setZ.setCurrentIndex(self.setZ.count()-1)
             self.switchZ(z)
         self.depgraph.updatePlot(newDepRate)
->>>>>>> a5214829283867f6cb65566c52f98332055a2550
-        pass
 
     def redrawWindow(self):
         pass

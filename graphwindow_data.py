@@ -27,7 +27,7 @@ from profilecreator import *
 """
 
 """ main window of the application """
-class GraphWindow(QtGui.QMainWindow):
+class GraphWindow(QtGui.QWidget):
 
     def __init__(self, datafile = "None"):
         super(GraphWindow, self).__init__()
@@ -41,17 +41,9 @@ class GraphWindow(QtGui.QMainWindow):
     def initUI(self):
         # set window size and position on screen
         self.setGeometry(300, 200, 1000, 600)
-        
-        # set up the menu bar and profile creator
-        menubar = self.menuBar()
-        fileMenu = menubar.addMenu('&File')
-        optionsMenu = menubar.addMenu('&Options')
-        profileAction = QtGui.QAction('&Add Profile', self)
-        profileAction.triggered.connect(self.createProfile)
-        optionsMenu.addAction(profileAction)
 
         # main_widget holds all other widgets in window
-        self.main_widget = QtGui.QWidget(self)
+        #self.main_widget = QtGui.QWidget(self)
 
         # get variables from spreadsheet
         global DATA_HEADINGS
@@ -60,7 +52,7 @@ class GraphWindow(QtGui.QMainWindow):
             self.vars += [DATA_HEADINGS.get(index)]
 
         # initialize default graph
-        self.graph = Graph(self.main_widget, xvarname="Time",
+        self.graph = Graph(self, xvarname="Time",
                            yvarname=self.vars[0])
         self.updating = True
         self.setWindowTitle(self.vars[0])
@@ -75,16 +67,15 @@ class GraphWindow(QtGui.QMainWindow):
             self.selectVar.addItem(var)
         self.selectVar.activated[str].connect(self.selectGraph)
 
-        # setup all the layouts - verify that they take in the correct
-        # widget  - TODO figure out what QT as parent means
-        self.layout = QtGui.QVBoxLayout(self.main_widget)
-        self.optionslayout = QtGui.QGridLayout(self.main_widget)
-        self.gridlayout = QtGui.QGridLayout(self.main_widget)
-        self.axeslayout = QtGui.QGridLayout(self.main_widget)
-        self.timelayout = QtGui.QGridLayout(self.main_widget)
+        # set up layout and sub-layouts
+        self.layout = QtGui.QVBoxLayout(self)
+        self.optionslayout = QtGui.QGridLayout(self)
+        self.gridlayout = QtGui.QGridLayout(self)
+        self.axeslayout = QtGui.QGridLayout(self)
+        self.timelayout = QtGui.QGridLayout(self)
         # this exists so auto axis buttons can move if necessary
-        self.autowidget = QtGui.QWidget(self.main_widget)
-        self.autolayout = QtGui.QGridLayout(self.autowidget)
+        self.autowidget = QtGui.QWidget(self)
+        self.autolayout = QtGui.QGridLayout(self)
 
         # first column holds graph, second column holds graph options
         # set the column stretches - 0 is the default
@@ -216,7 +207,7 @@ class GraphWindow(QtGui.QMainWindow):
         self.auto_yraxes.hide()
 
         # set main_widget as center of window
-        self.setCentralWidget(self.main_widget)
+        #self.setCentralWidget(self.main_widget)
         
         self.show()
 
@@ -230,7 +221,7 @@ class GraphWindow(QtGui.QMainWindow):
             self.graph.setParent(None)
             self.gridlayout.removeWidget(self.graph)
             self.graph =None
-            self.graph = Graph(self.main_widget, xvarname = "Time",
+            self.graph = Graph(self, xvarname = "Time",
                                yvarname = varString)
             self.gridlayout.addWidget(self.graph, 0, 0)
             self.setWindowTitle(varString)

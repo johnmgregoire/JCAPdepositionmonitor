@@ -6,7 +6,6 @@
 from PyQt4 import QtGui
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from mpl_toolkits.mplot3d import Axes3D # TODO: delete after pull
 import matplotlib.colors as colors
 import matplotlib.cm as cm
 from process_deposition_data import DEP_DATA
