@@ -110,20 +110,20 @@ class ProcessorThread(QtCore.QThread):
     def roundZ(self, zcol):
         zrnd=np.round(zcol, decimals=zndec)
         for zval in zrnd:
-            if zval not in FILE_INFO['Z_mm']:
+            if zval not in filename_handler.FILE_INFO['Z_mm']:
                 zval = -1
         return zrnd
 
     def roundt(self, tcol):
         trnd=np.round(tcol, decimals=tndec)
         for tval in trnd:
-            if tval not in FILE_INFO['TiltDeg']:
+            if tval not in filename_handler.FILE_INFO['TiltDeg']:
                 tval = -1
         return trnd
 
     def getRowRange(self):
         zcolnum = getCol('Platen Zshift Motor 1 Position')
-        tcolnum = getCol('Src%d Motor Tilt Position' % int(FILE_INFO['Source']))
+        tcolnum = getCol('Src%d Motor Tilt Position' % int(filename_handler.FILE_INFO['Source']))
         data = np.array(self.rowBuffer)
         datacols = data.T
         zcol = map(float, datacols[zcolnum])
