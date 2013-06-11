@@ -24,6 +24,8 @@ Things to do:
 
 - figure out naming conventions for screenshots?
 
+- Write user guide!
+
 - In our testing, we've needed to start writing to the file
 before we open the program in order to read that file.
 In practice, the file probably won't be created (and thus
