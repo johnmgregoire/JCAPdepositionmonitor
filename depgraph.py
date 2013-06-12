@@ -11,6 +11,8 @@ import matplotlib.cm as cm
 from process_deposition_data import DEP_DATA
 import numpy as np
 
+
+"""creates the depotion graph"""
 class DepositionGraph(FigureCanvas):
 
     def __init__(self, parent="None", width=2, height=2, dpi=120):
@@ -22,12 +24,14 @@ class DepositionGraph(FigureCanvas):
                                    QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
         self.initPlotArea()
-        
+
+        # maxRate used for the reseting the color scale
+        # currentZ for which z one is currently viewing
+        # zvars ia all the possible z's
         self.convFactor, self.maxRate = 1, 0
         self.currentZ, self.zvars = None, []
         # for the reset color map
         self.changeScale = False
-        
         # formatted string that represents the units of the data
         self.units = r'$10^{-8}$'+'g/s cm'+r'$^2$'
 
@@ -40,10 +44,12 @@ class DepositionGraph(FigureCanvas):
 
     def firstPlot(self, zval = None):
         self.currentZ = zval
+        # if zval is None, we need to get one from DEP_Data
         if not zval:
             self.currentZ = DEP_DATA[0][0]
         if self.currentZ not in self.zvars:
             self.zvars.append(self.currentZ)
+        # loop and get all the z's the we can find in DEP_DATA
         for i, (z, x, y, rate) in enumerate(DEP_DATA):
             if z != self.currentZ:
                 if z not in self.zvars:
@@ -66,6 +72,7 @@ class DepositionGraph(FigureCanvas):
         self.colorbar.set_label(self.units)
         self.draw()
 
+    """Same spirit as first plost, however, it only plots one point"""
     def updatePlot(self, newData):
         for z, x, y, rate in [newData]:
             if z!= self.currentZ:
@@ -108,8 +115,7 @@ class DepositionGraph(FigureCanvas):
     def convertPlot(self):
         lenOfRateData = len(self.ratedata)
         for rateLoc, (z, x, y, rate) in enumerate(DEP_DATA[:lenOfRateData]):
-            modified_rate = rate*self.convFactor
-            self.ratedata[rateLoc] = modified_rate
+            self.ratedata[rateLoc] = rate*self.convFactor
         self.scalarMap.set_clim(0, max(self.ratedata))
         self.colorbar.draw_all()
         self.draw()
