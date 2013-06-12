@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 6/5/2013
-# Last Updated: 6/11/2013
+# Last Updated: 6/12/2013
 # For JCAP
 
 import numpy as np
@@ -65,12 +65,14 @@ class DepositionWindow(QtGui.QMainWindow):
         self.rescaleButton.clicked.connect(self.resetColors)
 
         # labels
+        self.label_conversions = QtGui.QLabel('Conversions Available:')
         self.label_chemEQ = QtGui.QLabel('Chemical equation:')
         self.label_density = QtGui.QLabel('Density:')
-        self.unitOptions = ["ng/(scm^2)", "nm/s", "nmol/(s*cm^2)"]
+        self.label_zvars = QtGui.QLabel('Z values:')
+        self.unitOptions = []
 
-        for unit in self.unitOptions:
-            self.selectUnits.addItem(unit)
+        #for unit in self.unitOptions:
+            #self.selectUnits.addItem(unit)
 
         self.selectUnits.activated[str].connect(self.selectConversion)
 
@@ -82,12 +84,14 @@ class DepositionWindow(QtGui.QMainWindow):
         self.sidelayout.setAlignment(QtCore.Qt.AlignTop)
 
         #adding to sidelayout
+        self.sidelayout.addWidget(self.label_conversions)
         self.sidelayout.addWidget(self.selectUnits)
         self.sidelayout.addWidget(self.label_chemEQ)
         self.sidelayout.addWidget(self.chemEQ)
         self.sidelayout.addWidget(self.label_density)
         self.sidelayout.addWidget(self.densityLine)
         self.sidelayout.addWidget(self.procChem)
+        self.sidelayout.addWidget(self.label_zvars)
         self.sidelayout.addWidget(self.setZ)
         self.sidelayout.addWidget(self.rescaleButton)
 
@@ -120,27 +124,40 @@ class DepositionWindow(QtGui.QMainWindow):
             
             print self.depgraph.convFactor    
 
+    """Deals with the """
     def handleEQS(self):
         formula = self.chemEQ.text()
-
-        if not formula:
-            return
 
         if self.densityLine.text():
             try:
                 self.density = float(self.densityLine.text())
+                if "nm/s" not in self.unitOptions:
+                    self.unitOptions.append("nm/s")
+                    self.selectUnits.addItem("nm/s")
             except ValueError:
-                valEror = QtGui.QMessageBox.information(None,
+                valError = QtGui.QMessageBox.information(None,
                                                         "Invalid Density","Unxpected density value")
-            
-        if not self.checkRegEx(formula):
+        if not self.densityLine.text():
+            if "nm/s" in self.unitOptions:
+                self.selectUnits.removeItem(self.unitOptions.index("nm/s"))
+                self.unitOptions.remove("nm/s")
+
+        if formula and self.checkRegEx(formula):
+            if "nmol/(s*cm^2)" not in self.unitOptions:
+                self.unitOptions.append("nmol/(s*cm^2)")
+                self.selectUnits.addItem("nmol/(s*cm^2)")
+        if not formula:
+            if "nmol/(s*cm^2)" in self.unitOptions:
+                self.selectUnits.removeItem(self.unitOptions.index("nmol/(s*cm^2)"))
+                self.unitOptions.remove("nmol/(s*cm^2)")
+        if formula and not self.checkRegEx(formula):
             message = "The equation you entered is of the wrong format or is missing an element."
             message += "Some examples are: FeO and FeO1.5"
             inputError = QtGui.QMessageBox.information(None,"Wrong Format", message)
+
         
-
+    """Checks that the users chemical equation is the in the correct format"""
     def checkRegEx(self,text):
-
         reg0 = '^'
         reg1 = '[A-Z]'
         reg2 = '[a-z]?'
@@ -156,11 +173,10 @@ class DepositionWindow(QtGui.QMainWindow):
 
         if matchedReg:
             metalName, otherElmntName = matchedReg.group(1), matchedReg.group(2)
+            otherElmntStoich  = matchedReg.group(3)
             
             if otherElmntStoich == "":
                 otherElmntStoich = 1.
-            else:
-                otherElmntStoich  = matchedReg.group(3)
 
             try:
                 metalElmntObject = ELEMENTS[metalName]
@@ -171,37 +187,37 @@ class DepositionWindow(QtGui.QMainWindow):
                 return True
 
             except KeyError:
-                # Todo, deside what to throw out and how.
-                # if here it's because it couldn't make something a float -- which it should be ok
-                # with since it matched the regex -- it is more likely that the thing is not a valid
-                # element
-                pass 
+                pass
     
         return False
 
     def updateWindow(self,newDepRates):
         self.depgraph.updatePlot(newDepRates)
 
+    """ redraws the scatter plot when the z-position of the data changes """
     def switchZ(self, newZ):
         zval = float(newZ)
         self.depgraph.clearPlot()
         self.depgraph.firstPlot(zval)
 
+    """ manually redraws the colors in the scatter plot """
     def resetColors(self):
         self.depgraph.rescale()
         self.depgraph.draw()
 
+    """ redraws the scatter plot when new data point is processed """
     def updateWindow(self,newDepRate):
         # newDepRates = (z, x, y, rate)
         z = newDepRate[0]
-        # this will occur if the instrument has moved to
-        #   the next z-value, or if the graph window was opened
-        #   before the first data points had been processed
+        # this will occur if the instrument moved to a new z or the graph
+        # window was opened before the first data points had been processed
         if z not in self.depgraph.zvars:
             self.setZ.addItem(str(z))
             self.setZ.setCurrentIndex(self.setZ.count()-1)
             self.switchZ(z)
         self.depgraph.updatePlot(newDepRate)
 
+    """ the deposition graph is redrawn whenever new data comes in
+        rather than on every one-second interval """
     def redrawWindow(self):
         pass
