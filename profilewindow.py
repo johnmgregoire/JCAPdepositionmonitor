@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/28/2013
-# Last Updated: 5/31/2013
+# Last Updated: 6/12/2013
 # For JCAP
 
 from PyQt4 import QtCore, QtGui
@@ -31,23 +31,16 @@ class ProfileWindow(QtGui.QMainWindow):
         self.setCentralWidget(self.main_widget)
         grid = QtGui.QGridLayout(self.main_widget)
 
-        # divides graphs between two rows in display
+        # creates and adds graphs to appropriate row
         num_graphs = len(self.varsList)
         midpoint = (num_graphs+1)/2
-        first_row = self.varsList[:midpoint]
-        second_row = self.varsList[midpoint:]
-
-        # creates and adds graphs to appropriate row
-        for index in range(len(first_row)):
+        for index in range(num_graphs):
             newGraph = graph.Graph(parent=None, xvarname="Time",
-                             yvarname=first_row[index])
+                                   yvarname=self.varsList[index])
             self.graphs += [newGraph]
-            grid.addWidget(newGraph, 0, index)
-        for index in range(len(second_row)):
-            newGraph = graph.Graph(parent=None, xvarname="Time",
-                             yvarname=second_row[index])
-            self.graphs += [newGraph]
-            grid.addWidget(newGraph, 1, index)
+            
+            column = 0 if index < midpoint else 1
+            grid.addWidget(newGraph,column,index%midpoint)         
 
     """ called whenever new data is ready to be plotted """
     def updateWindow(self, newRow):

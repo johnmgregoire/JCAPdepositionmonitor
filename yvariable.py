@@ -5,7 +5,7 @@
 
 
 
-""" used for multi-plots - holds information for the given variable"""
+""" holds information for the given variable - useful for multiplot"""
 class YVariable():
 
     def __init__(self, varName = None, axis = "None", columnNumber = None, color = "bo"):
