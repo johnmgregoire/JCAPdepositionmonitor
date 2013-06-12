@@ -202,6 +202,7 @@ class GraphWindow(QtGui.QWidget):
         
         # add widget that holds auto axis buttons
         self.axeslayout.addWidget(self.autowidget, 22, 0, 1, 2)
+        self.autowidget.setLayout(self.autolayout)
         # add auto axis buttons
         self.autolayout.addWidget(self.auto_xaxes, 0 , 0)
         self.autolayout.addWidget(self.auto_yaxes, 0 , 1)
