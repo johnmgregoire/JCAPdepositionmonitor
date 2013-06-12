@@ -1,12 +1,14 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 6/05/2013
-# Last Updated: 6/11/2013
+# Last Updated: 6/12/2013
 # For JCAP
 
 import numpy as np
+from PyQt4 import QtCore
 from dictionary_helpers import *
-from date_helpers import *
-from datareader import *
+import date_helpers
+import filename_handler
+import datareader
 
 # global dictionary holds all processed (z, x, y, rate)
 #   data for this experiment
@@ -33,7 +35,7 @@ class ProcessorThread(QtCore.QThread):
         self.rowBuffer = []
         self.changeZ = False
         self.running = True
-        self.reader = DataReader(parent=self, filename=self.file)
+        self.reader = datareader.DataReader(parent=self, filename=self.file)
         self.reader.lineRead.connect(self.newLineRead)
 
     def run(self):
@@ -156,7 +158,7 @@ class ProcessorThread(QtCore.QThread):
         datetimeTup = zip(dataArrayT[datecol], dataArrayT[timecol])
         startStr = datetimeTup[0][0] + ' ' + datetimeTup[0][1]
         endStr = datetimeTup[-1][0] + ' ' + datetimeTup[-1][1]
-        durationObj = dateObjFloat(endStr) - dateObjFloat(startStr)
+        durationObj = date_helpers.dateObjFloat(endStr) - date_helpers.dateObjFloat(startStr)
         return durationObj.total_seconds()
 
     """ helper function to return column of Xtal rates
@@ -182,7 +184,7 @@ class ProcessorThread(QtCore.QThread):
         DEP_DATA = []
         self.rowBuffer = []
         self.reader.end()
-        self.reader = DataReader(parent=self, filename=newfile)
+        self.reader = datareader.DataReader(parent=self, filename=newfile)
         self.reader.lineRead.connect(self.newLineRead)
         self.reader.start()     
 

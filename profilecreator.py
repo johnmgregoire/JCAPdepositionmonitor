@@ -1,10 +1,10 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/23/2013
-# Last Updated: 6/05/2013
+# Last Updated: 6/12/2013
 # For JCAP
 
-from PyQt4 import QtGui
-from datareader import *
+from PyQt4 import QtGui, QtCore
+from datareader import DATA_HEADINGS
 import cPickle as pickle
 
 """widget to make profiles"""

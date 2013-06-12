@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/28/2013
-# Last Updated: 6/11/2013
+# Last Updated: 6/12/2013
 # For JCAP
 
 from PyQt4 import QtGui
@@ -8,10 +8,12 @@ from dictionary_helpers import getCol
 import depositionwindow_data
 import graphwindow_data
 import profilewindow
+import profilecreator
 import os
 import filename_handler
 import process_deposition_data as pdd
 import sys
+import cPickle as pickle
 
 
 """ window that pops up when application launches """
@@ -139,7 +141,7 @@ class MainMenu(QtGui.QWidget):
 
     """ shows profile creator window """
     def makeProfile(self):
-        profileCreator = ProfileCreator(datafile=self.file)
+        profileCreator = profilecreator.ProfileCreator(datafile=self.file)
         self.miscWindows.append(profileCreator)
         profileCreator.show()
 
@@ -165,7 +167,7 @@ class MainMenu(QtGui.QWidget):
             except EOFError:
                 break
             
-        loadMenu = LoadMenu(menuList)
+        loadMenu = profilewindow.LoadMenu(menuList)
         self.miscWindows.append(loadMenu)
         loadMenu.show()
         loadMenu.profileChosen.connect(self.loadProfile)

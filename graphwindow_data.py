@@ -1,14 +1,17 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/21/2013
-# Last Updated: 5/31/2013
+# Last Updated: 6/12/2013
 # For JCAP
 
 """
 Displays single auto-updating data graph
 """
-
-from graph import *
-from profilecreator import *
+from PyQt4 import QtGui, QtCore
+from datareader import DATA_HEADINGS
+import graph
+import profilecreator
+import date_helpers
+import time
 
 """ TO DO:
     - take data on certain conditions?
@@ -52,7 +55,7 @@ class GraphWindow(QtGui.QWidget):
             self.vars += [DATA_HEADINGS.get(index)]
 
         # initialize default graph
-        self.graph = Graph(self, xvarname="Time",
+        self.graph = graph.Graph(self, xvarname="Time",
                            yvarname=self.vars[0])
         self.updating = True
         self.setWindowTitle(self.vars[0])
@@ -221,7 +224,7 @@ class GraphWindow(QtGui.QWidget):
             self.graph.setParent(None)
             self.gridlayout.removeWidget(self.graph)
             self.graph =None
-            self.graph = Graph(self, xvarname = "Time",
+            self.graph = graph.Graph(self, xvarname = "Time",
                                yvarname = varString)
             self.gridlayout.addWidget(self.graph, 0, 0)
             self.setWindowTitle(varString)
@@ -302,7 +305,7 @@ class GraphWindow(QtGui.QWidget):
         # measured in seconds
         timeBack = 0
         # x-axis maximum is current time
-        setXAxes[2] = dateObj(currTime)
+        setXAxes[2] = date_helpers.dateObj(currTime)
 
         # get and save input from all fields
         min_input = self.minutes.text()
@@ -336,7 +339,7 @@ class GraphWindow(QtGui.QWidget):
                 pass
 
         # set x-axis minimum to current time minus specified time window
-        setXAxes[1] = dateObj(currTime - timeBack)
+        setXAxes[1] = date_helpers.dateObj(currTime - timeBack)
 
         # if y-axis limits have been changed
         if setYAxes[0]:
@@ -395,12 +398,12 @@ class GraphWindow(QtGui.QWidget):
 
     """ called when 'Create Profile' is chosen from options menu """
     def createProfile(self):
-        self.profileCreator = ProfileCreator(datafile=self.source)
+        self.profileCreator = profilecreator.ProfileCreator(datafile=self.source)
         # launches profile creator window
         self.profileCreator.show()
 
     """ called when 'Screen Shot' button is clicked """
     def takeScreenShot(self):
         print "Taking screen shot"
-        self.graph.figure.savefig(dateStringFile() + ".png")
+        self.graph.figure.savefig(date_helpers.dateStringFile() + ".png")
         print "Screen shot saved"

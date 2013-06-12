@@ -4,8 +4,9 @@
 # For JCAP
 
 import numpy as np
-from graph import *
-from depgraph import *
+from PyQt4 import QtCore, QtGui
+import depgraph
+from process_deposition_data import DEP_DATA
 from elements import ELEMENTS
 from fractions import Fraction
 import re
@@ -30,7 +31,7 @@ class DepositionWindow(QtGui.QMainWindow):
         self.main_widget = QtGui.QWidget(self)
 
         # initialize the graph
-        self.depgraph = DepositionGraph(self.main_widget)
+        self.depgraph = depgraph.DepositionGraph(self.main_widget)
         if DEP_DATA:
             self.depgraph.firstPlot()
 

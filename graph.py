@@ -1,17 +1,18 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/23/2013
-# Last Updated: 6/11/2013
+# Last Updated: 6/12/2013
 # For JCAP
 
 from PyQt4 import QtGui
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from pylab import *
-from datareader import *
-from date_helpers import *
+from pylab import matplotlib
+import sys
+import date_helpers
+import yvariable
 import copy
-from yvariable import *
 import itertools
+import time
 from dictionary_helpers import *
 
 
@@ -29,7 +30,7 @@ class Graph(FigureCanvas):
         # holds matplotlib keywords for color of plots
         self.colors = itertools.cycle(["g","c","m","y","k","b","r"])
         # put first y-var into list of y-vars on left axis
-        self.yvarsL = [YVariable(varName = yvarname,
+        self.yvarsL = [yvariable.YVariable(varName = yvarname,
                                    columnNumber = getCol(yvarname), color = "b")]
         # used to access date/time data for formatting
         #   and displaying on the x-axis
@@ -78,7 +79,7 @@ class Graph(FigureCanvas):
         
         for index in range(len(time_array)):
             full_time = date_array[index] + " " + time_array[index]
-            formatted_time = dateObjFloat(full_time)
+            formatted_time = date_helpers.dateObjFloat(full_time)
             list_of_times += [formatted_time]
             
         timeToPlot = matplotlib.dates.date2num(list_of_times)
@@ -98,7 +99,7 @@ class Graph(FigureCanvas):
     """ adds new data to graph whenever reader sends new row """
     def updatePlot(self, row):
         # turn date/time strings into time objects
-        time_value = dateObjFloat(row[self.colNums[0]] + " " + row[self.colNums[1]])
+        time_value = date_helpers.dateObjFloat(row[self.colNums[0]] + " " + row[self.colNums[1]])
         # plot new point for all left-hand y-vars
         for i in range(len(self.yvarsL)):
             self.axes.plot_date(time_value, row[self.yvarsL[i].columnNumber],
@@ -115,8 +116,8 @@ class Graph(FigureCanvas):
     def timeFrame(self):
             if not self.auto:
                 currTime = time.time()
-                rightLim = dateObj(currTime)
-                leftLim = dateObj(currTime - self.timeWindow)
+                rightLim = date_helpers.dateObj(currTime)
+                leftLim = date_helpers.dateObj(currTime - self.timeWindow)
                 self.setXlim(amin=leftLim, amax=rightLim)
 
     """ initializes the right-hand y-axis and adds the first variable """
@@ -134,7 +135,7 @@ class Graph(FigureCanvas):
         self.rightAxes.get_xaxis().set_visible(False)
 
         # save the right-hand axis information 
-        self.yvarsR = [YVariable(varName = rightvar, axis = self.rightAxes,
+        self.yvarsR = [yvariable.YVariable(varName = rightvar, axis = self.rightAxes,
                                  columnNumber = getCol(rightvar), color = "r")]
         self.firstPlot(self.yvarsR[0])
 
@@ -144,7 +145,7 @@ class Graph(FigureCanvas):
 
     """ adds another variable to the specified y-axis """
     def addVarToAxis(self, varString, axis="left"):
-        newVar = YVariable(varName = varString, axis = self.axes,
+        newVar = yvariable.YVariable(varName = varString, axis = self.axes,
                                       columnNumber = getCol(varString), color = self.colors.next())
         if axis == "left":
             self.axes.get_yaxis().get_label().set_visible(False)

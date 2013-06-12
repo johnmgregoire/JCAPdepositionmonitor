@@ -3,7 +3,9 @@
 # Last Updated: 5/31/2013
 # For JCAP
 
-from graph import *
+from PyQt4 import QtCore, QtGui
+import sys
+import graph
 
 """ window that displays profile after loading """
 class ProfileWindow(QtGui.QMainWindow):
@@ -37,12 +39,12 @@ class ProfileWindow(QtGui.QMainWindow):
 
         # creates and adds graphs to appropriate row
         for index in range(len(first_row)):
-            newGraph = Graph(parent=None, xvarname="Time",
+            newGraph = graph.Graph(parent=None, xvarname="Time",
                              yvarname=first_row[index])
             self.graphs += [newGraph]
             grid.addWidget(newGraph, 0, index)
         for index in range(len(second_row)):
-            newGraph = Graph(parent=None, xvarname="Time",
+            newGraph = graph.Graph(parent=None, xvarname="Time",
                              yvarname=second_row[index])
             self.graphs += [newGraph]
             grid.addWidget(newGraph, 1, index)
