@@ -28,12 +28,14 @@ class Graph(FigureCanvas):
         self.legendL = None
         self.xvar = xvarname
         # holds matplotlib keywords for color of plots
-        self.colors = itertools.cycle(["g","c","m","y","k","b","r"])
+        self.colors = itertools.cycle(["b","r","g","c","m","y","k"])
+        
         # put first y-var into list of y-vars on left axis
         self.yvarsL = [yvariable.YVariable(varName = yvarname,
-                                   columnNumber = getCol(yvarname), color = "b")]
+                                   columnNumber = getCol(yvarname), color = self.colors.next())]
+        self.yvarsR = []
         # used to access date/time data for formatting
-        #   and displaying on the x-axis
+        # and displaying on the x-axis
         self.colNums = [getCol("Date"),getCol(self.xvar)]
         self.figure = Figure(figsize=(width, height), dpi=dpi)
 
@@ -47,7 +49,7 @@ class Graph(FigureCanvas):
         self.initPlot()
         
         # clicking on graph gives x and y coordinates
-        #   (not enabled when right y axis is present)
+        # (not enabled when right y axis is present)
         self.figure.canvas.mpl_connect('button_press_event', self.onclick)
         
         
@@ -100,25 +102,21 @@ class Graph(FigureCanvas):
     def updatePlot(self, row):
         # turn date/time strings into time objects
         time_value = date_helpers.dateObjFloat(row[self.colNums[0]] + " " + row[self.colNums[1]])
-        # plot new point for all left-hand y-vars
-        for i in range(len(self.yvarsL)):
-            self.axes.plot_date(time_value, row[self.yvarsL[i].columnNumber],
-                                markerfacecolor=self.yvarsL[i].color,
-                                markeredgecolor=self.yvarsL[i].color)
-        # plot new point for all right-hand y-vars
-        if self.hasRightAxis:
-            for i in range(len(self.yvarsR)):
-                self.rightAxes.plot_date(time_value, row[self.yvarsR[i].columnNumber],
-                                         markerfacecolor=self.yvarsR[i].color,
-                                         markeredgecolor=self.yvarsR[i].color)
+        
+        # plot new point for all y-vars no matter which of the two axis
+        for  axis in (self.yvarsL, self.yvarsR):
+            for graphPlots in axis:
+                graphPlots.axis.plot_date(time_value,row[graphPlots.columnNumber],
+                                          markerfacecolor=graphPlots.color,
+                                          markeredgecolor=graphPlots.color)
 
     """ resets the x-axis limits when specific time window is selected """
     def timeFrame(self):
-            if not self.auto:
-                currTime = time.time()
-                rightLim = date_helpers.dateObj(currTime)
-                leftLim = date_helpers.dateObj(currTime - self.timeWindow)
-                self.setXlim(amin=leftLim, amax=rightLim)
+        if not self.auto:
+            currTime = time.time()
+            rightLim = date_helpers.dateObj(currTime)
+            leftLim = date_helpers.dateObj(currTime - self.timeWindow)
+            self.setXlim(amin=leftLim, amax=rightLim)
 
     """ initializes the right-hand y-axis and adds the first variable """
     def addRightAxis(self, rightvar):
@@ -136,10 +134,10 @@ class Graph(FigureCanvas):
 
         # save the right-hand axis information 
         self.yvarsR = [yvariable.YVariable(varName = rightvar, axis = self.rightAxes,
-                                 columnNumber = getCol(rightvar), color = "r")]
+                                 columnNumber = getCol(rightvar), color = self.colors.next())]
         self.firstPlot(self.yvarsR[0])
 
-        # add legend if 3 or more variables on same plot
+        # add legend if 2 or more variables on the same axis
         if len(self.yvarsL) > 1:
             self.addLegends()
 
@@ -174,12 +172,11 @@ class Graph(FigureCanvas):
             # add left-hand legend to upper Axes object so
             #   it can be manipulated
             self.rightAxes.add_artist(self.legendL)
-            self.legendL.draggable(state = True)
             self.legendR.draggable(state = True)
         else:
             self.legendL = self.axes.legend(linesL, labelsL, loc=2,
                                 title="Left", prop={"size":"small"})
-            self.legendL.draggable(state = True)
+        self.legendL.draggable(state = True)
 
     """ called when user specifies a time window to display """     
     def setXlim(self, amin=None, amax=None):
@@ -199,7 +196,6 @@ class Graph(FigureCanvas):
 
     """ called when user clicks on graph to display (x, y) data """
     def onclick(self,event):
-        print "clicked graph"
         if not self.hasRightAxis:
             try:
                 datetime_date = matplotlib.dates.num2date(event.xdata)
