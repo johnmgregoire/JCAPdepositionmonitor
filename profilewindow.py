@@ -55,8 +55,9 @@ class ProfileWindow(QtGui.QMainWindow):
 """ menu that shows avaiable profiles and loads user's selection """
 class LoadMenu(QtGui.QDialog):
 
-    # this signal will be sent to MainMenu
+    # these signals will be sent to MainMenu
     profileChosen = QtCore.pyqtSignal(str)
+    profileToDelete = QtCore.pyqtSignal(str)
 
     """ takes in a list of profiles saved for the current data file """
     def __init__(self, menuList = []):
@@ -74,8 +75,11 @@ class LoadMenu(QtGui.QDialog):
         buttons = QtGui.QDialogButtonBox()
         buttons.setStandardButtons(QtGui.QDialogButtonBox.Ok
                                          | QtGui.QDialogButtonBox.Cancel)
+        deleteButton = QtGui.QPushButton('Delete')
+        buttons.addButton(deleteButton, QtGui.QDialogButtonBox.DestructiveRole)
         buttons.accepted.connect(self.sendName)
         buttons.rejected.connect(self.close)
+        deleteButton.clicked.connect(self.deleteName)
         self.layout.addWidget(buttons)
 
     """ sends name of selected profile to MainMenu,
@@ -83,6 +87,16 @@ class LoadMenu(QtGui.QDialog):
     def sendName(self):
         name = str(self.list.currentItem().text())
         self.profileChosen.emit(name)
+        self.close()
+
+    def deleteName(self):
+        name = str(self.list.currentItem().text())
+        confirm = QtGui.QMessageBox.question(None, 'Delete Profile',
+                                             'Are you sure you want to delete this profile?',
+                                             QtGui.QMessageBox.Yes |
+                                             QtGui.QMessageBox.No)
+        if (confirm == QtGui.QMessageBox.Yes):
+            self.profileToDelete.emit(name)
         self.close()
 
     """ called by MainMenu every second; nothing for this widget to do """

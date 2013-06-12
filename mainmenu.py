@@ -5,6 +5,7 @@
 
 from PyQt4 import QtGui
 from dictionary_helpers import getCol
+from datareader import DATA_HEADINGS
 import depositionwindow_data
 import graphwindow_data
 import profilewindow
@@ -128,9 +129,12 @@ class MainMenu(QtGui.QWidget):
             # hides all windows so they can be removed later
             for window in (self.graphWindows + self.depWindows + self.miscWindows):
                 window.hide()
-
             # set everything up for the new file being read   
-            self.processor.newFile(self.file)
+            self.processor.end()
+            self.processor = pdd.ProcessorThread(parent=self, filename=self.file)
+            self.processor.lineRead.connect(self.newLineRead)
+            self.processor.newData.connect(self.depUpdate)
+            self.processor.start()
             self.initSupplyVars()
 
     """ creates window for single graph """
@@ -147,32 +151,28 @@ class MainMenu(QtGui.QWidget):
 
     """ shows load profile window """
     def selectProfile(self):
-        try:
-            savefile = open('saved_profiles.txt', 'rb')
-        except IOError:
-            error = QtGui.QMessageBox.information(None, "Load Profile Error",
-                                                  "You have not saved any profiles.")
-            return
+        savefile = open('saved_profiles.txt', 'rb')
         
         menuList = []
-        
-        while True:
-            # unpickle each profile individually
-            try:
-                datafile, name, varsList = pickle.load(savefile)
-                # only show profiles associated with current data file
-                if datafile == self.file:
+
+        savedProfiles = pickle.load(savefile)
+        if not savedProfiles:
+            error = QtGui.QMessageBox.information(None, "Load Profile Error",
+                                                  "There are no saved profiles.")
+            return
+        for name, varsList in savedProfiles:
+            if all(var in DATA_HEADINGS.values() for var in varsList):
                     self.profiles[name] = varsList
                     menuList += [name]
-            except EOFError:
-                break
-            
+        
+        savefile.close()
         loadMenu = profilewindow.LoadMenu(menuList)
         self.miscWindows.append(loadMenu)
         loadMenu.show()
         loadMenu.profileChosen.connect(self.loadProfile)
+        loadMenu.profileToDelete.connect(self.deleteProfile)
 
-    """shows the deposition window"""
+    """ shows the deposition window """
     def makeDeposition(self):
         depWindow = depositionwindow_data.DepositionWindow()
         self.depWindows.append(depWindow)
@@ -183,6 +183,20 @@ class MainMenu(QtGui.QWidget):
         profileWindow = profilewindow.ProfileWindow(name, varsList)
         self.graphWindows.append(profileWindow)
         profileWindow.show()
+
+    """ deletes a chosen profile from the LoadMenu """
+    def deleteProfile(self, name):
+        # 'r+b' indicates that the file is open for reading
+        #   and writing
+        savefile = open('saved_profiles.txt', 'rb')
+        savedProfiles = pickle.load(savefile)
+        savefile.close()
+        for profile in savedProfiles:
+            if profile[0] == name:
+                savedProfiles.remove(profile)
+        savefile = open('saved_profiles.txt', 'wb')
+        pickle.dump(savedProfiles, savefile)
+        savefile.close()
 
     """ sends new data received by reader to active graph windows """
     def updateGraphs(self, newRow):
@@ -205,9 +219,11 @@ class MainMenu(QtGui.QWidget):
                     
     """ terminates reader and data processor at end of experiment """
     def endExperiment(self):
-        self.processor.end()
+        if self.processor:
+            print 'still haz processor'
+            self.processor.end()
 
-    """ terminates reader (if still active) when window is closed """
+    """ terminates reader (if still active) when main window is closed """
     def closeEvent(self, event):
         if self.processor:
             self.processor.end()

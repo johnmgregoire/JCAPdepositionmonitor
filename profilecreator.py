@@ -85,11 +85,19 @@ class ProfileCreator(QtGui.QWidget):
                                               'Please enter a name for this profile.')
         # saves profile if name is entered and OK is clicked
         if name and ok:
-            # 'ab+' indicates append to file
-            savefile = open('saved_profiles.txt', 'ab+')
+            try:
+                # open file for reading
+                savefile = open('saved_profiles.txt', 'rb')
+                savedProfiles = pickle.load(savefile)
+                savefile.close()
+            except IOError:
+                savedProfiles = []
             # save tuple of profile name and list of variables in profile
-            pickle.dump((self.source, str(name), varsList), savefile)
+            savedProfiles.append((str(name), varsList))
+            savefile = open('saved_profiles.txt', 'wb')
+            pickle.dump(savedProfiles, savefile)
             print 'Saved!'
+            savefile.close()
         self.close()
 
     """sends error message if more than 8 variables selected"""
