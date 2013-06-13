@@ -16,7 +16,8 @@ import process_deposition_data as pdd
 import sys
 import cPickle as pickle
 
-DATA_FILE_DIR = 'C:/Users/JCAP-HTE/Documents/GitHub/JCAPdepositionmonitor'
+#DATA_FILE_DIR = 'C:/Users/JCAP-HTE/Documents/GitHub/JCAPdepositionmonitor'
+DATA_FILE_DIR = 'Z:/CMS/PM/Data/log/signal/2013_1_16'
 
 """ window that pops up when application launches """
 class MainMenu(QtGui.QWidget):
@@ -45,18 +46,18 @@ class MainMenu(QtGui.QWidget):
     """ automatically loads last modified data file
         when application launches """
     def initReader(self):
-        #targetDir = 'C:/Users/JCAP-HTE/Documents/GitHub/JCAPdepositionmonitor'
         lastModifiedFile = ''
         lastModifiedTime = 0
         # use os.walk() to recursively traverse directories if necessary
         allFiles = os.listdir(DATA_FILE_DIR)
+        print allFiles
         data = filter(lambda filename: filename.endswith('.csv'), allFiles)
         for filename in data:
-            statbuf = os.stat(filename)
+            statbuf = os.stat(os.path.join(DATA_FILE_DIR, filename))
             if statbuf.st_mtime > lastModifiedTime:
                 lastModifiedTime = statbuf.st_mtime
                 lastModifiedFile = filename
-        return lastModifiedFile
+        return os.path.join(DATA_FILE_DIR, lastModifiedFile)
 
     """ draws graphical user interface """
     def initUI(self):
@@ -251,7 +252,7 @@ class MainMenu(QtGui.QWidget):
     """ handles signal from reader when new line has been read """
     def newLineRead(self, newRow):
         self.updateGraphs(newRow)
-        #self.checkValidity(newRow)
+        self.checkValidity(newRow)
 
     """ shows an error message if data indicates experiment failure"""
     def checkValidity(self, row):
