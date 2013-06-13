@@ -210,7 +210,6 @@ class DepositionWindow(QtGui.QWidget):
     def switchZ(self, newZ):
         zval = float(newZ)
         self.depgraph.clearPlot()
-        self.depgraph.convFactor = 1
         self.depgraph.firstPlot(zval)
 
     """ manually redraws the colors in the scatter plot """
