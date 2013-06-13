@@ -17,7 +17,7 @@ import sys
 import cPickle as pickle
 
 #DATA_FILE_DIR = 'C:/Users/JCAP-HTE/Documents/GitHub/JCAPdepositionmonitor'
-DATA_FILE_DIR = 'Z:/CMS/PM/Data/log/signal/2013_1_16'
+DATA_FILE_DIR = 'Z:/CMS/PM/Data/log/signal/2013_1_15'
 
 """ window that pops up when application launches """
 class MainMenu(QtGui.QWidget):
@@ -36,11 +36,11 @@ class MainMenu(QtGui.QWidget):
         filenameError = filename_handler.parseFilename(self.file)
         # if not, ask user for experiment parameters
         if filenameError:
-            self.requestFileInfo()
-        self.initUI()
+            self.requestFileInfo(0)
         # otherwise, finish setting up program
-        if not filenameError:
-            self.initData()
+        else:
+            self.initData(0)
+        self.initUI()
         
 
     """ automatically loads last modified data file
@@ -104,13 +104,18 @@ class MainMenu(QtGui.QWidget):
 
     """ initializes all elements of program that require experiment
         information (FILE_INFO must be complete) """
-    def initData(self):
-        # initialize data processor (includes reader)
+    def initData(self, mode):
         filepath = os.path.join(DATA_FILE_DIR, self.file)
-        self.processor = pdd.ProcessorThread(parent=self, filename=filepath)
-        self.processor.lineRead.connect(self.newLineRead)
-        self.processor.newData.connect(self.depUpdate)
-        self.processor.start()
+        # if application has just been opened
+        if mode == 0:
+            # initialize data processor (includes reader)
+            self.processor = pdd.ProcessorThread(parent=self, filename=filepath)
+            self.processor.lineRead.connect(self.newLineRead)
+            self.processor.newData.connect(self.depUpdate)
+            self.processor.start()
+        # if loading a new file
+        else:
+            self.processor.newFile(filepath)
         self.initSupplyVars()
 
     """Initializes any variables that are useful for error checking"""
@@ -131,13 +136,14 @@ class MainMenu(QtGui.QWidget):
 
     """ if filename is not in correct format, ask user to enter
         experiment parameters manually """
-    def requestFileInfo(self):
-        fileErrorDialog = FileInfoDialog()
+    def requestFileInfo(self, mode):
+        fileErrorDialog = FileInfoDialog(mode)
         self.miscWindows.append(fileErrorDialog)
         fileErrorDialog.fileInfoComplete.connect(self.initData)
 
     """ allows user to choose another data file """
     def loadDataFile(self):
+        global DATA_FILE_DIR
         dirname = QtGui.QFileDialog.getOpenFileName(self, 'Open data file',
                                                       DATA_FILE_DIR,
                                                       'CSV files (*.csv)')
@@ -147,14 +153,18 @@ class MainMenu(QtGui.QWidget):
             dirString = str(dirname)
             # gets filename from current directory (will be changed eventually)
             dirList = dirString.split('/')
+            DATA_FILE_DIR = '/'.join(dirList[:len(dirList)-1])
             self.file = dirList[len(dirList)-1]
             # hides all windows so they can be removed later
             for window in (self.graphWindows + self.depWindows + self.miscWindows):
                 window.hide()
+            # check filename for correct format
+            filenameError = filename_handler.parseFilename(self.file)
+            if filenameError:
+                self.requestFileInfo(1)
             # set everything up for the new file being read
-            filepath = os.path.join(DATA_FILE_DIR, self.file)
-            self.processor.newFile(filepath)
-            self.initSupplyVars()
+            else:
+                self.initData(1)
 
     """ creates window for single graph """
     def makeGraph(self):
@@ -284,12 +294,15 @@ class MainMenu(QtGui.QWidget):
 """ custom dialog box to request necessary file info from user """
 class FileInfoDialog(QtGui.QWidget):
 
-    """ signal sent to MainMenu when all information has
-        been entered """
-    fileInfoComplete = pdd.QtCore.pyqtSignal(dict)
-    
-    def __init__(self):
+    """ sends signal and mode to MainMenu once all information
+        has been entered """
+    fileInfoComplete = pdd.QtCore.pyqtSignal(int)
+
+    """ mode is 0 if called when the application is first opened,
+        1 if called when the user loads a new file """
+    def __init__(self, mode):
         super(FileInfoDialog, self).__init__()
+        self.mode = mode
         self.setWindowModality(pdd.QtCore.Qt.ApplicationModal)
         self.initUI()
 
@@ -318,8 +331,7 @@ class FileInfoDialog(QtGui.QWidget):
         self.layout.addWidget(self.enter, alignment=pdd.QtCore.Qt.AlignRight)
         self.show()
 
-    """ populates FILE_INFO dictionary and sends complete
-        information to MainMenu """
+    """ populates FILE_INFO dictionary and sends signal to MainMenu """
     def sendInfo(self):
         global FILE_INFO
         for i, (tag, val) in enumerate(self.tagsList):
@@ -337,7 +349,7 @@ class FileInfoDialog(QtGui.QWidget):
                     return
             else:
                 filename_handler.FILE_INFO[tag] = newValStr
-        self.fileInfoComplete.emit(filename_handler.FILE_INFO)
+        self.fileInfoComplete.emit(self.mode)
         self.close()
 
     """ brings up an error message if not all fields are filled in """

@@ -107,6 +107,7 @@ class ProcessorThread(QtCore.QThread):
                 y = radius * np.sin(angle * np.pi/180.)
                 # rate1 corresponds to Xtal4 Rate
                 rate = rate0 * depRates[2]/depRates[1]
+                print (angle, radius, z, x, y, rate)
             else:
                 x = radius * np.cos(angle * np.pi/180. + np.pi)
                 y = radius * np.sin(angle * np.pi/180. + np.pi)
@@ -117,7 +118,6 @@ class ProcessorThread(QtCore.QThread):
             # indicate to exisiting graphs that there is
             #   new data to display
             self.newData.emit((z, x, y, rate))
-            print (angle, radius, z, x, y, rate)
 
     """ helper function to correct for instrument noise
         in measuring z-value """
