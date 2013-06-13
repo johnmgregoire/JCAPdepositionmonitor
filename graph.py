@@ -27,6 +27,8 @@ class Graph(FigureCanvas):
         self.hasRightAxis = False
         self.legendL = None
         self.xvar = xvarname
+        # keeps track of label for coordinates on graph
+        self.xyLabel = None
         # holds matplotlib keywords for color of plots
         self.colors = itertools.cycle(["b","r","g","c","m","y","k"])
         
@@ -201,5 +203,17 @@ class Graph(FigureCanvas):
                 datetime_date = matplotlib.dates.num2date(event.xdata)
                 formatted_xdate = datetime_date.strftime("%m/%d/%Y %H:%M:%S")
                 print 'xdata=%s, ydata=%f'%(formatted_xdate, event.ydata)
+                if self.xyLabel:
+                    self.xyLabel.set_visible(False)
+                # textcoords is the coordinate system used to place the
+                #   text on the axes; 0.55 is horizontal placement,
+                #   1.05 is vertical placement (where 1,1 is upper right corner)
+                self.xyLabel = self.axes.annotate('x = %s, y = %f'
+                                                  %(formatted_xdate, event.ydata),
+                                                  xy=(event.xdata, event.ydata),
+                                                  textcoords='axes fraction',
+                                                  xytext=(0.55,1.05))
+                self.draw()
             except TypeError:
-                pass
+                if self.xyLabel:
+                    self.xyLabel.set_visible(False)
