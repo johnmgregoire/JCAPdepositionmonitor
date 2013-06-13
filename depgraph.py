@@ -139,9 +139,12 @@ class DepositionGraph(FigureCanvas):
     """ convert all rate data and change labels on colorbar
         when converting units """
     def convertPlot(self):
+        # Just in case
+        self.maxRate *=self.convFactor
         lenOfRateData = len(self.ratedata)
         for rateLoc, (z, x, y, rate) in enumerate(pdd.DEP_DATA[:lenOfRateData]):
             self.ratedata[rateLoc] = rate*self.convFactor
-        self.scalarMap.set_clim(0, max(self.ratedata))
+        self.maxRate = max(self.ratedata)
+        self.scalarMap.set_clim(0, self.maxRate)
         self.colorbar.draw_all()
         self.draw()
