@@ -36,10 +36,10 @@ class MainMenu(QtGui.QWidget):
         filenameError = filename_handler.parseFilename(self.file)
         # if not, ask user for experiment parameters
         if filenameError:
-            self.requestFileInfo(0)
+            self.requestFileInfo(1)
         # otherwise, finish setting up program
         else:
-            self.initData(0)
+            self.initData(1)
         self.initUI()
         
 
@@ -104,12 +104,12 @@ class MainMenu(QtGui.QWidget):
 
     """ initializes all elements of program that require experiment
         information (FILE_INFO must be complete)
-        (mode is 0 if called when the application is first opened,
-        1 if called when the user loads a new file) """
+        (mode is 1 if called when the application is first opened,
+        0 if called when the user loads a new file) """
     def initData(self, mode):
         filepath = os.path.join(DATA_FILE_DIR, self.file)
         # if application has just been opened
-        if mode == 0:
+        if mode == 1:
             # initialize data processor (includes reader)
             self.processor = pdd.ProcessorThread(parent=self, filename=filepath)
             self.processor.lineRead.connect(self.newLineRead)
@@ -138,8 +138,8 @@ class MainMenu(QtGui.QWidget):
 
     """ if filename is not in correct format, ask user to enter
         experiment parameters manually
-        (mode is 0 if called when the application is first opened,
-        1 if called when the user loads a new file) """
+        (mode is 1 if called when the application is first opened,
+        0 if called when the user loads a new file) """
     def requestFileInfo(self, mode):
         fileErrorDialog = FileInfoDialog(mode)
         self.miscWindows.append(fileErrorDialog)
@@ -147,9 +147,9 @@ class MainMenu(QtGui.QWidget):
         fileErrorDialog.fileAborted.connect(self.loadDataFile)
 
     """ allows user to choose another data file
-        (mode is 0 if called to replace default file,
-        1 if the user loads a new file through main menu) """
-    def loadDataFile(self, mode=1):
+        (mode is 1 if called to replace default file,
+        0 if the user loads a new file through main menu) """
+    def loadDataFile(self, mode=0):
         global DATA_FILE_DIR
         global FILE_INFO
         dirname = QtGui.QFileDialog.getOpenFileName(self, 'Open data file',
@@ -310,8 +310,8 @@ class FileInfoDialog(QtGui.QWidget):
     # sends signal and mode to MainMenu if user closes dialog
     fileAborted = pdd.QtCore.pyqtSignal(int)
 
-    """ mode is 0 if called when the application is first opened,
-        1 if called when the user loads a new file """
+    """ mode is 1 if called when the application is first opened,
+        0 if called when the user loads a new file """
     def __init__(self, mode):
         super(FileInfoDialog, self).__init__()
         self.mode = mode
