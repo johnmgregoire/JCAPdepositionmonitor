@@ -118,7 +118,7 @@ class DepositionWindow(QtGui.QWidget):
                 factor = Fraction(self.Lmnts["Second Element Stoich"]).limit_denominator(100)
                 molarMass = scaledMass * factor._denominator
                 self.depgraph.convFactor = 10./molarMass
-                self.depgraph.units = 'nmoles/s cm'+r'$^2$'
+                self.depgraph.units = 'nmol/s cm'+r'$^2$'
 
             self.depgraph.colorbar.set_label(self.depgraph.units)
             self.depgraph.convertPlot()
