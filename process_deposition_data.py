@@ -41,8 +41,7 @@ class ProcessorThread(QtCore.QThread):
     def run(self):
         self.reader.start()
         while self.running:
-            continue
-        return
+            pass
 
     """ called whenever the reader sends a full line """
     def newLineRead(self, newRow):
@@ -183,17 +182,15 @@ class ProcessorThread(QtCore.QThread):
     def newFile(self, newfile):
         global DEP_DATA
         DEP_DATA = []
-        print DEP_DATA
         self.rowBuffer = []
-        self.reader.end()
+        if self.reader:
+            self.reader.end()
         self.reader = datareader.DataReader(parent=self, filename=newfile)
         self.reader.lineRead.connect(self.newLineRead)
-        self.reader.start()     
+        self.reader.start()
 
     """ empties row buffer once experiment has ended """
-    def onExit(self):
-        print 'Is processor alive?', self.running
-        print 'Is reader alive?', self.running
+    def onEndExperiment(self):
         if self.rowBuffer:
             anglecolnum = getCol('Platen Motor Position')
             angle = round(float(self.rowBuffer[0][anglecolnum]))
@@ -202,13 +199,16 @@ class ProcessorThread(QtCore.QThread):
             self.processData(zval, angle, radius1)
             self.processData(zval, angle, radius2)
             self.rowBuffer = []
+        if self.reader:
+            self.reader.end()
+            self.reader = None
 
     """ kills both the reader and data processor threads;
         called when application exits """
     def end(self):
-        self.onExit()
+        #self.onExit()
         self.reader.end()
         self.running = False
-        print 'Is this thread running?', self.isRunning()
-        print 'Is this thread finished?', self.isFinished()
-        self.exit()
+        #print 'Is this thread running?', self.isRunning()
+        #print 'Is this thread finished?', self.isFinished()
+        #self.exit()

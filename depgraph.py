@@ -8,7 +8,8 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.colors as colors
 import matplotlib.cm as cm
-from process_deposition_data import DEP_DATA
+#from process_deposition_data import DEP_DATA
+import process_deposition_data as pdd
 import numpy as np
 
 
@@ -36,7 +37,7 @@ class DepositionGraph(FigureCanvas):
         self.units = r'$10^{-8}$'+'g/s cm'+r'$^2$'
 
     def initPlotArea(self):
-        self.xdata, self.ydata, self.ratedata = [], [], []   
+        self.xdata, self.ydata, self.ratedata = [], [], []
         self.plot = self.figure.add_subplot(1, 1, 1, adjustable='box', aspect=1)
         self.plot.set_xlim(-50, 50)
         self.plot.set_ylim(-50, 50)
@@ -46,11 +47,11 @@ class DepositionGraph(FigureCanvas):
         self.currentZ = zval
         # if zval is None, we need to get one from DEP_Data
         if not zval:
-            self.currentZ = DEP_DATA[0][0]
+            self.currentZ = pdd.DEP_DATA[0][0]
         if self.currentZ not in self.zvars:
             self.zvars.append(self.currentZ)
         # loop and get all the z's the we can find in DEP_DATA
-        for i, (z, x, y, rate) in enumerate(DEP_DATA):
+        for i, (z, x, y, rate) in enumerate(pdd.DEP_DATA):
             if z != self.currentZ:
                 if z not in self.zvars:
                     self.zvars.append(z)
@@ -114,7 +115,7 @@ class DepositionGraph(FigureCanvas):
 
     def convertPlot(self):
         lenOfRateData = len(self.ratedata)
-        for rateLoc, (z, x, y, rate) in enumerate(DEP_DATA[:lenOfRateData]):
+        for rateLoc, (z, x, y, rate) in enumerate(pdd.DEP_DATA[:lenOfRateData]):
             self.ratedata[rateLoc] = rate*self.convFactor
         self.scalarMap.set_clim(0, max(self.ratedata))
         self.colorbar.draw_all()

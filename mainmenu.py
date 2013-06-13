@@ -129,12 +129,8 @@ class MainMenu(QtGui.QWidget):
             # hides all windows so they can be removed later
             for window in (self.graphWindows + self.depWindows + self.miscWindows):
                 window.hide()
-            # set everything up for the new file being read   
-            self.processor.end()
-            self.processor = pdd.ProcessorThread(parent=self, filename=self.file)
-            self.processor.lineRead.connect(self.newLineRead)
-            self.processor.newData.connect(self.depUpdate)
-            self.processor.start()
+            # set everything up for the new file being read
+            self.processor.newFile(self.file)
             self.initSupplyVars()
 
     """ creates window for single graph """
@@ -219,9 +215,7 @@ class MainMenu(QtGui.QWidget):
                     
     """ terminates reader and data processor at end of experiment """
     def endExperiment(self):
-        if self.processor:
-            print 'still haz processor'
-            self.processor.end()
+        self.processor.onEndExperiment()
 
     """ terminates reader (if still active) when main window is closed """
     def closeEvent(self, event):

@@ -6,7 +6,8 @@
 import numpy as np
 from PyQt4 import QtCore, QtGui
 import depgraph
-from process_deposition_data import DEP_DATA
+#from process_deposition_data import DEP_DATA
+import process_deposition_data as pdd
 from elements import ELEMENTS
 from fractions import Fraction
 import re
@@ -32,7 +33,7 @@ class DepositionWindow(QtGui.QMainWindow):
 
         # initialize the graph
         self.depgraph = depgraph.DepositionGraph(self.main_widget)
-        if DEP_DATA:
+        if pdd.DEP_DATA:
             self.depgraph.firstPlot()
 
         self.setWindowTitle("Deposition Window - Work In Progress")
