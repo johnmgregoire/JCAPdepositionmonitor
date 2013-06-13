@@ -161,10 +161,10 @@ class DepositionWindow(QtGui.QWidget):
     """ parse the user input for chemical formula """
     def checkRegEx(self,text):
         # Currently does not support things like O2 or Bi2.
-        # In order to support that the dictionary needs to be change
-        # There must now be another input. Along with that the regular
-        # expression must change. There must be a '[\d]*' after reg2
-        # parenthesis should be added to help get the info. Overall there
+        # In order to support that the dictionary needs to be changed.
+        # There must now be another input. Along with that, the regular
+        # expression must change. There must be a '[\d]*' after reg2.
+        # Parenthesis should be added to help get the info. Overall there
         # would be a shift in the names but that is it.
         reg0 = '^'
         reg1 = '[A-Z]'
