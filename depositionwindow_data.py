@@ -101,7 +101,7 @@ class DepositionWindow(QtGui.QWidget):
         rePlot = False
         
         if "ng/(scm^2)" == unitNameStr:
-            self.depgraph.convFactor = 10
+            self.depgraph.convFactor = 10.
             self.depgraph.units = 'ng/s cm'+r'$^2$'
             rePlot = True
         if self.density:
