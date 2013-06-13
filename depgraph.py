@@ -68,10 +68,10 @@ class DepositionGraph(FigureCanvas):
             self.ydata.append(y)
             modified_rate = rate*self.convFactor
             self.ratedata.append(modified_rate)
-            if modified_rate > self.maxRate*self.convFactor:
+            if modified_rate > self.maxRate:
                 self.maxRate = modified_rate
         # holds information about the scale of the colorbar
-        self.scalarMap = cm.ScalarMappable(norm=colors.Normalize(vmin=0, vmax=self.maxRate*self.convFactor))
+        self.scalarMap = cm.ScalarMappable(norm=colors.Normalize(vmin=0, vmax=self.maxRate))
         self.scalarMap.set_array(np.array(self.ratedata))
         # plot all available data and save scatter object for
         #   later deletion
@@ -83,7 +83,7 @@ class DepositionGraph(FigureCanvas):
         self.colorbar.set_array(np.array(self.ratedata))
         self.colorbar.autoscale()
         self.colorbar.set_label(self.units)
-        self.scalarMap.set_clim(0, self.maxRate*self.convFactor)
+        self.scalarMap.set_clim(0, self.maxRate)
         self.scalarMap.changed()
         self.draw()
 
@@ -98,7 +98,7 @@ class DepositionGraph(FigureCanvas):
             modified_rate = rate*self.convFactor
             self.ratedata.append(modified_rate)
             # reset colorbar scale if necessary
-            if modified_rate > self.maxRate*self.convFactor:
+            if modified_rate > self.maxRate:
                 self.maxRate = modified_rate
                 self.changeScale = True
             # add single point to plot
@@ -118,7 +118,7 @@ class DepositionGraph(FigureCanvas):
         for plot in self.datavis:
             plot.remove()
         # reset limits of color scale
-        self.scalarMap.set_clim(0, self.maxRate*self.convFactor)
+        self.scalarMap.set_clim(0, self.maxRate)
         # plot entire set of data according to new scale
         self.datavis = [self.plot.scatter(self.xdata, self.ydata,
                                          c = self.ratedata,
@@ -139,9 +139,12 @@ class DepositionGraph(FigureCanvas):
     """ convert all rate data and change labels on colorbar
         when converting units """
     def convertPlot(self):
+        # Just in case
+        self.maxRate *=self.convFactor
         lenOfRateData = len(self.ratedata)
         for rateLoc, (z, x, y, rate) in enumerate(pdd.DEP_DATA[:lenOfRateData]):
             self.ratedata[rateLoc] = rate*self.convFactor
-        self.scalarMap.set_clim(0, max(self.ratedata))
+        self.maxRate = max(self.ratedata)
+        self.scalarMap.set_clim(0, self.maxRate)
         self.colorbar.draw_all()
         self.draw()
