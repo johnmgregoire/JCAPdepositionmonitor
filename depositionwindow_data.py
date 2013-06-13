@@ -111,8 +111,10 @@ class DepositionWindow(QtGui.QWidget):
                 self.depgraph.units = 'nm/s'
             elif "nmol/(s*cm^2)" == unitNameStr:
                 # divide using the molar mass to get this
-                scaledMass = self.Lmnts["Metal Name"].mass + self.Lmnts["Second Element"].mass \
-                            *self.Lmnts["Second Element Stoich"]
+                scaledMass = self.Lmnts["Metal Name"].mass
+                if self.Lmnts["Second Element"]:
+                    scaledMass += self.Lmnts["Second Element"].mass *\
+                                  self.Lmnts["Second Element Stoich"]
                 factor = Fraction(self.Lmnts["Second Element Stoich"]).limit_denominator(100)
                 molarMass = scaledMass * factor._denominator
                 self.depgraph.convFactor = 10./molarMass
@@ -120,8 +122,6 @@ class DepositionWindow(QtGui.QWidget):
 
             self.depgraph.colorbar.set_label(self.depgraph.units)
             self.depgraph.convertPlot()
-            
-            print self.depgraph.convFactor    
 
     """ displays available options in unit conversion drop-down
         menu based on user input """
@@ -142,7 +142,9 @@ class DepositionWindow(QtGui.QWidget):
                 self.selectUnits.removeItem(self.unitOptions.index("nm/s"))
                 self.unitOptions.remove("nm/s")
 
-        if formula and self.checkRegEx(formula):
+        boolReg = self.checkRegEx(formula)
+        
+        if formula and boolReg:
             if "nmol/(s*cm^2)" not in self.unitOptions:
                 self.unitOptions.append("nmol/(s*cm^2)")
                 self.selectUnits.addItem("nmol/(s*cm^2)")
@@ -150,7 +152,7 @@ class DepositionWindow(QtGui.QWidget):
             if "nmol/(s*cm^2)" in self.unitOptions:
                 self.selectUnits.removeItem(self.unitOptions.index("nmol/(s*cm^2)"))
                 self.unitOptions.remove("nmol/(s*cm^2)")
-        if formula and not self.checkRegEx(formula):
+        if formula and not boolReg:
             message = "The equation you entered is of the wrong format or is missing an element."
             message += "Some examples are: FeO and FeO1.5"
             inputError = QtGui.QMessageBox.information(None,"Wrong Format", message)
@@ -158,29 +160,34 @@ class DepositionWindow(QtGui.QWidget):
         
     """ parse the user input for chemical formula """
     def checkRegEx(self,text):
+        # Currently does not support things like O2 or Bi2.
+        # In order to support that the dictionary needs to be change
+        # There must now be another input. Along with that the regular
+        # expression must change. There must be a '[\d]*' after reg2
+        # parenthesis should be added to help get the info. Overall there
+        # would be a shift in the names but that is it.
         reg0 = '^'
         reg1 = '[A-Z]'
         reg2 = '[a-z]?'
         reg3 = '([ONBC])'
         reg4 = '[\d]*'
         reg5 = '(\.\d+)?'
-        reg6 = '$'
-        
-        totalReg = reg0 + '(' + reg1+reg2 + ')' + reg3 + '(' + reg4 + reg5 + ')' + reg6
-
+        reg6 = '(' + reg3 + '(' + reg4 + reg5 + ')' +')?'
+        reg7 = '$'
+        totalReg = reg0 +'(' + reg1+reg2 + ')' + reg6 + reg7
+            
         regEX = re.compile(totalReg)
         matchedReg = re.match(regEX,str(text))
 
         if matchedReg:
-            metalName, otherElmntName = matchedReg.group(1), matchedReg.group(2)
-            otherElmntStoich  = matchedReg.group(3)
-            
-            if otherElmntStoich == "":
-                otherElmntStoich = 1.
+            metalName, otherElmntName = matchedReg.group(1), matchedReg.group(3)
+            otherElmntStoich = matchedReg.group(4)
 
             try:
                 metalElmntObject = ELEMENTS[metalName]
-                secondElmntObject = ELEMENTS[otherElmntName]
+                secondElmntObject = ELEMENTS[otherElmntName] if otherElmntName else ""
+                if not otherElmntStoich:
+                    otherElmntStoich = 1.
                 self.Lmnts["Metal Name"] = metalElmntObject
                 self.Lmnts["Second Element"] = secondElmntObject
                 self.Lmnts["Second Element Stoich"] = float(otherElmntStoich)
