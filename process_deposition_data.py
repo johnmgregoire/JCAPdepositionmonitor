@@ -189,11 +189,12 @@ class ProcessorThread(QtCore.QThread):
         self.reader.lineRead.connect(self.newLineRead)
         self.reader.start()
 
-    """ empties row buffer once experiment has ended """
+    """ empties row buffer and kills reader when experiment
+        has ended """
     def onEndExperiment(self):
         if self.rowBuffer:
             anglecolnum = getCol('Platen Motor Position')
-            angle = round(float(self.rowBuffer[0][anglecolnum]))
+            angle = round(float(self.rowBuffer[0] [anglecolnum]))
             zcolnum = getCol('Platen Zshift Motor 1 Position')
             zval = round(float(self.rowBuffer[0][zcolnum]), 1)
             self.processData(zval, angle, radius1)
@@ -206,9 +207,6 @@ class ProcessorThread(QtCore.QThread):
     """ kills both the reader and data processor threads;
         called when application exits """
     def end(self):
-        #self.onExit()
-        self.reader.end()
+        if self.reader:
+            self.reader.end()
         self.running = False
-        #print 'Is this thread running?', self.isRunning()
-        #print 'Is this thread finished?', self.isFinished()
-        #self.exit()

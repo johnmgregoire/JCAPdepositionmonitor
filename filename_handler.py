@@ -3,7 +3,8 @@
 # Last Updated: 6/05/2013
 # For JCAP
 
-FILE_INFO = {}
+FILE_INFO = {'Element':'', 'Source':'', 'Supply':'', 'TiltDeg':[],
+             'Z_mm':[]}
 
 def parseFilename(filename):
     global FILE_INFO
@@ -26,7 +27,12 @@ def parseFilename(filename):
                 FILE_INFO[stdName] = tagVal
         elif (tag.istitle() and tag.isalpha()):
             FILE_INFO['Element'] = tag
-    if len(FILE_INFO) != 5:
-        print 'Filename in incorrect format'
-        # throw error
+
+    invalidTags = []
+    for tag in FILE_INFO:
+        if not FILE_INFO.get(tag):
+            print 'No info entered for', tag
+            invalidTags.append(tag)
+    
     print FILE_INFO
+    return invalidTags

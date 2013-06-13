@@ -29,7 +29,8 @@ import time
     - Format of data files
 """
 
-""" main window of the application """
+""" window that displays a single graph area and various
+    customization options """
 class GraphWindow(QtGui.QWidget):
 
     def __init__(self, datafile = "None"):
@@ -44,9 +45,6 @@ class GraphWindow(QtGui.QWidget):
     def initUI(self):
         # set window size and position on screen
         self.setGeometry(300, 200, 1000, 600)
-
-        # main_widget holds all other widgets in window
-        #self.main_widget = QtGui.QWidget(self)
 
         # get variables from spreadsheet
         global DATA_HEADINGS
@@ -136,7 +134,6 @@ class GraphWindow(QtGui.QWidget):
         self.Ymax.setSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Preferred)
         self.YminR.setSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Preferred)
         self.YmaxR.setSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Preferred)
-        #self.set_axes.setSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Preferred)
 
         # initialize menu to choose variable for right-hand axis
         self.label_raxis = QtGui.QLabel('Choose a variable to plot on the right-hand axis:')
@@ -209,9 +206,6 @@ class GraphWindow(QtGui.QWidget):
         self.autolayout.addWidget(self.auto_yraxes, 0 , 2)
         # hide option for auto right axis initially
         self.auto_yraxes.hide()
-
-        # set main_widget as center of window
-        #self.setCentralWidget(self.main_widget)
         
         self.show()
 

@@ -13,13 +13,15 @@ from fractions import Fraction
 import re
 import sys
 
-class DepositionWindow(QtGui.QMainWindow):
+""" window that displays a polar deposition graph and its
+    customization options """
+class DepositionWindow(QtGui.QWidget):
 
     def __init__(self):
         super(DepositionWindow, self).__init__()
 
         # Lmnts is a dictionary to hold the information of the
-        # composition it was given.
+        #   user-defined elemental composition.
         self.Lmnts, self.density = {}, None
         self.initUI()
 
@@ -28,32 +30,26 @@ class DepositionWindow(QtGui.QMainWindow):
         # set window size and position on screen
         self.setGeometry(300, 200, 1000, 600)
 
-        # main_widget holds all other widgets in window
-        self.main_widget = QtGui.QWidget(self)
-
         # initialize the graph
-        self.depgraph = depgraph.DepositionGraph(self.main_widget)
+        self.depgraph = depgraph.DepositionGraph(self)
         if pdd.DEP_DATA:
             self.depgraph.firstPlot()
 
-        self.setWindowTitle("Deposition Window - Work In Progress")
-
-        # set main_widget as center of window
-        self.setCentralWidget(self.main_widget)
+        self.setWindowTitle("Deposition Graph")
 
         # dealing with layouts and design
-        self.mainlayout = QtGui.QGridLayout(self.main_widget)
-        self.sidelayout = QtGui.QGridLayout(self.main_widget)
+        self.mainlayout = QtGui.QGridLayout(self)
+        self.sidelayout = QtGui.QGridLayout(self)
 
         # adding layouts to one another
         self.mainlayout.addWidget(self.depgraph,0,0)
         self.mainlayout.addLayout(self.sidelayout,0,1)
 
-        #set the streches
+        # set the streches
         self.mainlayout.setColumnStretch(0,5)
         self.mainlayout.setColumnStretch(1,0)
 
-        #drop down widget, text widgets, etc.
+        # drop down widget, text widgets, etc.
         self.selectUnits = QtGui.QComboBox()
         self.chemEQ = QtGui.QLineEdit(self)
         self.densityLine = QtGui.QLineEdit(self)
@@ -61,15 +57,15 @@ class DepositionWindow(QtGui.QMainWindow):
         self.setZ = QtGui.QComboBox()
         self.rescaleButton = QtGui.QPushButton('Reset Colors')
 
-        # set connections up
+        # set up button connections
         self.procChem.clicked.connect(self.handleEQS)
         self.rescaleButton.clicked.connect(self.resetColors)
 
         # labels
-        self.label_conversions = QtGui.QLabel('Conversions Available:')
-        self.label_chemEQ = QtGui.QLabel('Chemical equation:')
+        self.label_conversions = QtGui.QLabel('Conversions available:')
+        self.label_chemEQ = QtGui.QLabel('Chemical formula:')
         self.label_density = QtGui.QLabel('Density:')
-        self.label_zvars = QtGui.QLabel('Z values:')
+        self.label_zvars = QtGui.QLabel('Z-position:')
         self.unitOptions = []
 
         #for unit in self.unitOptions:
@@ -77,6 +73,7 @@ class DepositionWindow(QtGui.QMainWindow):
 
         self.selectUnits.activated[str].connect(self.selectConversion)
 
+        # populate drop-down menu of z-values
         for zval in self.depgraph.zvars:
             self.setZ.addItem(str(zval))
 
@@ -84,7 +81,7 @@ class DepositionWindow(QtGui.QMainWindow):
 
         self.sidelayout.setAlignment(QtCore.Qt.AlignTop)
 
-        #adding to sidelayout
+        # place all customization widgets next to graph
         self.sidelayout.addWidget(self.label_conversions)
         self.sidelayout.addWidget(self.selectUnits)
         self.sidelayout.addWidget(self.label_chemEQ)
@@ -98,7 +95,8 @@ class DepositionWindow(QtGui.QMainWindow):
 
         self.show()
 
-
+    """ converts the units of the deposition graph based on
+        user inputs for chemical formula and density """
     def selectConversion(self, unitName):
 
         unitNameStr = str(unitName)
@@ -125,7 +123,8 @@ class DepositionWindow(QtGui.QMainWindow):
             
             print self.depgraph.convFactor    
 
-    """Deals with the """
+    """ displays available options in unit conversion drop-down
+        menu based on user input """
     def handleEQS(self):
         formula = self.chemEQ.text()
 
@@ -157,7 +156,7 @@ class DepositionWindow(QtGui.QMainWindow):
             inputError = QtGui.QMessageBox.information(None,"Wrong Format", message)
 
         
-    """Checks that the users chemical equation is the in the correct format"""
+    """ parse the user input for chemical formula """
     def checkRegEx(self,text):
         reg0 = '^'
         reg1 = '[A-Z]'
@@ -192,10 +191,11 @@ class DepositionWindow(QtGui.QMainWindow):
     
         return False
 
+    """ update the plot whenever a new data point has been calculated """
     def updateWindow(self,newDepRates):
         self.depgraph.updatePlot(newDepRates)
 
-    """ redraws the scatter plot when the z-position of the data changes """
+    """ redraw the scatter plot when the z-position of the data changes """
     def switchZ(self, newZ):
         zval = float(newZ)
         self.depgraph.clearPlot()

@@ -5,7 +5,6 @@
 
 import csv
 from PyQt4 import QtCore
-import filename_handler 
 
 DATA_DICT = {}
 DATA_HEADINGS = {}
@@ -26,7 +25,6 @@ class DataReader(QtCore.QThread):
         global DATA_DICT
         global DATA_HEADINGS
         self.datafile = open(filename, 'rb')
-        filename_handler.parseFilename(filename)
         
         # read column headings and create lists to hold data
         headings = self.datafile.readline().split(',')

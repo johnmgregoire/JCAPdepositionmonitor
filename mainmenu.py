@@ -16,6 +16,7 @@ import process_deposition_data as pdd
 import sys
 import cPickle as pickle
 
+DATA_FILE_DIR = 'C:/Users/JCAP-HTE/Documents/GitHub/JCAPdepositionmonitor'
 
 """ window that pops up when application launches """
 class MainMenu(QtGui.QWidget):
@@ -30,6 +31,11 @@ class MainMenu(QtGui.QWidget):
         self.profiles = {}
         # save name of file from which application will read
         self.file = self.initReader()
+        filenameError = filename_handler.parseFilename(self.file)
+        if filenameError:
+            print 'ABORT'
+            self.requestFileInfo(filenameError)
+        # initialize data processor (includes reader)
         self.processor = pdd.ProcessorThread(parent=self, filename=self.file)
         self.processor.lineRead.connect(self.newLineRead)
         self.processor.newData.connect(self.depUpdate)
@@ -41,11 +47,11 @@ class MainMenu(QtGui.QWidget):
     """ automatically loads last modified data file
         when application launches """
     def initReader(self):
-        targetDir = 'C:/Users/JCAP-HTE/Documents/GitHub/JCAPdepositionmonitor'
+        #targetDir = 'C:/Users/JCAP-HTE/Documents/GitHub/JCAPdepositionmonitor'
         lastModifiedFile = ''
         lastModifiedTime = 0
         # use os.walk() to recursively traverse directories if necessary
-        allFiles = os.listdir(targetDir)
+        allFiles = os.listdir(DATA_FILE_DIR)
         data = filter(lambda filename: filename.endswith('.csv'), allFiles)
         for filename in data:
             statbuf = os.stat(filename)
@@ -114,10 +120,20 @@ class MainMenu(QtGui.QWidget):
             self.output_voltage = getCol("Power Supply" + str(self.supply) + \
                                          " Output Voltage")
 
+    """ WORK IN PROGRESS """
+    def requestFileInfo(self, tagsToEnter):
+        dialog = QtGui.QDialog()
+        dialog.setModal(True)
+        labels = []
+        lineEdits = []
+        for tag in tagsToEnter:
+            labels.append(QtGui.QLabel(tag+':', dialog))
+            lineEdits.append(QtGui.QLineEdit(dialog))
+
     """ allows user to choose another data file """
     def loadDataFile(self):
         dirname = QtGui.QFileDialog.getOpenFileName(self, 'Open data file',
-                                                      'C:/Users/JCAP-HTE/Documents/GitHub/JCAPdepositionmonitor',
+                                                      DATA_FILE_DIR,
                                                       'CSV files (*.csv)')
         # if cancel is clicked, dirname will be empty string
         if dirname != '':
@@ -148,19 +164,17 @@ class MainMenu(QtGui.QWidget):
     """ shows load profile window """
     def selectProfile(self):
         savefile = open('saved_profiles.txt', 'rb')
-        
         menuList = []
-
         savedProfiles = pickle.load(savefile)
         if not savedProfiles:
             error = QtGui.QMessageBox.information(None, "Load Profile Error",
                                                   "There are no saved profiles.")
             return
+        # only show profiles with headings that correspond to this file
         for name, varsList in savedProfiles:
             if all(var in DATA_HEADINGS.values() for var in varsList):
                     self.profiles[name] = varsList
                     menuList += [name]
-        
         savefile.close()
         loadMenu = profilewindow.LoadMenu(menuList)
         self.miscWindows.append(loadMenu)
@@ -168,7 +182,7 @@ class MainMenu(QtGui.QWidget):
         loadMenu.profileChosen.connect(self.loadProfile)
         loadMenu.profileToDelete.connect(self.deleteProfile)
 
-    """ shows the deposition window """
+    """ shows deposition graph window """
     def makeDeposition(self):
         depWindow = depositionwindow_data.DepositionWindow()
         self.depWindows.append(depWindow)
@@ -182,14 +196,14 @@ class MainMenu(QtGui.QWidget):
 
     """ deletes a chosen profile from the LoadMenu """
     def deleteProfile(self, name):
-        # 'r+b' indicates that the file is open for reading
-        #   and writing
+        # savefile holds list of all profiles
         savefile = open('saved_profiles.txt', 'rb')
         savedProfiles = pickle.load(savefile)
         savefile.close()
         for profile in savedProfiles:
             if profile[0] == name:
                 savedProfiles.remove(profile)
+        # save updated list of profiles
         savefile = open('saved_profiles.txt', 'wb')
         pickle.dump(savedProfiles, savefile)
         savefile.close()
@@ -199,36 +213,38 @@ class MainMenu(QtGui.QWidget):
         for window in self.graphWindows:
             window.updateWindow(newRow)
 
+    """ sends new processed data to active deposition graph windows """
     def depUpdate(self, newDepRates):
         for window in self.depWindows:
             window.updateWindow(newDepRates)
 
     """ updates all active graph windows every second """
     def redrawAll(self):
-        # we loop through all window types we have and udpate them or not
         for windowType in (self.graphWindows,self.depWindows,self.miscWindows):
             for window in windowType:
+                # release memory resources for all closed windows
                 if window.isHidden():
                     windowType.remove(window)
+                # graph windows will redraw; all other windows
+                #   ignore this command
                 else:
                     window.redrawWindow()
                     
-    """ terminates reader and data processor at end of experiment """
+    """ processes final data set and terminates reader at end of experiment """
     def endExperiment(self):
         self.processor.onEndExperiment()
 
     """ terminates reader (if still active) when main window is closed """
     def closeEvent(self, event):
-        if self.processor:
-            self.processor.end()
+        self.processor.end()
         event.accept()
 
-    """ handles signal from reader that new line has been read """
+    """ handles signal from reader when new line has been read """
     def newLineRead(self, newRow):
         self.updateGraphs(newRow)
         self.checkValidity(newRow)
 
-    """ Shows an error message is the data is invalid"""
+    """ shows an error message if data indicates experiment failure"""
     def checkValidity(self, row):
         errors_list = []
 
