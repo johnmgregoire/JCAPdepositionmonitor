@@ -26,6 +26,8 @@ class DepositionGraph(FigureCanvas):
                                    QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
         self.initPlotArea()
+        
+        self.figure.canvas.mpl_connect('button_press_event', self.onclick)
 
         # conversion factor is scalar used for changing units
         # maxRate is used for resetting the color scale
@@ -84,7 +86,6 @@ class DepositionGraph(FigureCanvas):
         self.colorbar.autoscale()
         self.colorbar.set_label(self.units)
         self.scalarMap.set_clim(0, self.maxRate)
-        self.scalarMap.changed()
         self.draw()
 
     """ plots newly-processed data on preexisting graph """
@@ -139,12 +140,21 @@ class DepositionGraph(FigureCanvas):
     """ convert all rate data and change labels on colorbar
         when converting units """
     def convertPlot(self):
-        # Just in case
+        # just in case
         self.maxRate *=self.convFactor
         lenOfRateData = len(self.ratedata)
         for rateLoc, (z, x, y, rate) in enumerate(pdd.DEP_DATA[:lenOfRateData]):
             self.ratedata[rateLoc] = rate*self.convFactor
-        self.maxRate = max(self.ratedata)
+        # again, in case of errors due to float precision
+        self.maxRate = max(max(self.ratedata), self.maxRate)
         self.scalarMap.set_clim(0, self.maxRate)
         self.colorbar.draw_all()
         self.draw()
+
+    """ called when user clicks on graph to display (x, y) data """
+    def onclick(self,event):
+            try:
+                xcorr = event.xdata
+                ycorr = event.ydata
+            except TypeError:
+                pass
