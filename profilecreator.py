@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/23/2013
-# Last Updated: 6/12/2013
+# Last Updated: 6/13/2013
 # For JCAP
 
 from PyQt4 import QtGui, QtCore
@@ -11,10 +11,8 @@ import cPickle as pickle
 class ProfileCreator(QtGui.QWidget):
 
     """sets up the Widget"""
-    def __init__(self, datafile="None"):
+    def __init__(self):
         super(ProfileCreator, self).__init__()
-        self.source = datafile
-
         self.initUI()
 
     """creates all graphics in the Widget"""

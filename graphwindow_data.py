@@ -1,11 +1,8 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/21/2013
-# Last Updated: 6/12/2013
+# Last Updated: 6/13/2013
 # For JCAP
 
-"""
-Displays single auto-updating data graph
-"""
 from PyQt4 import QtGui, QtCore
 from datareader import DATA_HEADINGS
 import graph
@@ -13,30 +10,12 @@ import profilecreator
 import date_helpers
 import time
 
-""" TO DO:
-    - take data on certain conditions?
-    - try/catch with partial rows (and other places)
-
-    More things to consider:
-    - Is importing a library file more than once dangerous?
-    - Should we use a QListWidget for the profile creator?
-    - Can we detect when the writer has closed the data file?
-    - Does it take up too much processing power to keep reading when
-        no new data is being sent?
-    - How regularly does information get sent to the data file?
-    - Is the data file saved (so we can detect that it's been modified)
-        after each write?
-    - Format of data files
-"""
-
 """ window that displays a single graph area and various
     customization options """
 class GraphWindow(QtGui.QWidget):
 
-    def __init__(self, datafile = "None"):
+    def __init__(self):
         super(GraphWindow, self).__init__()
-        # save spreadsheet filename
-        self.source = datafile
         self.updating = False
 
         self.initUI()
@@ -389,13 +368,6 @@ class GraphWindow(QtGui.QWidget):
         self.graph.rightAxes.autoscale(axis ='y')
         self.YminR.clear()
         self.YmaxR.clear()
-
-
-    """ called when 'Create Profile' is chosen from options menu """
-    def createProfile(self):
-        self.profileCreator = profilecreator.ProfileCreator(datafile=self.source)
-        # launches profile creator window
-        self.profileCreator.show()
 
     """ called when 'Screen Shot' button is clicked """
     def takeScreenShot(self):

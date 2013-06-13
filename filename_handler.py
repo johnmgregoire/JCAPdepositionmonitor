@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 6/05/2013
-# Last Updated: 6/05/2013
+# Last Updated: 6/13/2013
 # For JCAP
 
 FILE_INFO = {'Element':'', 'Source':'', 'Supply':'', 'TiltDeg':[],

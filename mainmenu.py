@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/28/2013
-# Last Updated: 6/12/2013
+# Last Updated: 6/13/2013
 # For JCAP
 
 from PyQt4 import QtGui
@@ -16,8 +16,8 @@ import process_deposition_data as pdd
 import sys
 import cPickle as pickle
 
-DATA_FILE_DIR = 'C:/Users/JCAP-HTE/Documents/GitHub/JCAPdepositionmonitor'
-#DATA_FILE_DIR = 'Z:/CMS/PM/Data/log/signal/2013_1_16'
+#DATA_FILE_DIR = 'C:/Users/JCAP-HTE/Documents/GitHub/JCAPdepositionmonitor'
+DATA_FILE_DIR = 'Z:/CMS/PM/Data/log/signal/2013_1_16'
 
 """ window that pops up when application launches """
 class MainMenu(QtGui.QWidget):
@@ -50,14 +50,13 @@ class MainMenu(QtGui.QWidget):
         lastModifiedTime = 0
         # use os.walk() to recursively traverse directories if necessary
         allFiles = os.listdir(DATA_FILE_DIR)
-        print allFiles
         data = filter(lambda filename: filename.endswith('.csv'), allFiles)
         for filename in data:
             statbuf = os.stat(os.path.join(DATA_FILE_DIR, filename))
             if statbuf.st_mtime > lastModifiedTime:
                 lastModifiedTime = statbuf.st_mtime
                 lastModifiedFile = filename
-        return os.path.join(DATA_FILE_DIR, lastModifiedFile)
+        return lastModifiedFile
 
     """ draws graphical user interface """
     def initUI(self):
@@ -107,11 +106,11 @@ class MainMenu(QtGui.QWidget):
         information (FILE_INFO must be complete) """
     def initData(self):
         # initialize data processor (includes reader)
-        self.processor = pdd.ProcessorThread(parent=self, filename=self.file)
+        filepath = os.path.join(DATA_FILE_DIR, self.file)
+        self.processor = pdd.ProcessorThread(parent=self, filename=filepath)
         self.processor.lineRead.connect(self.newLineRead)
         self.processor.newData.connect(self.depUpdate)
         self.processor.start()
-        print datareader.DATA_HEADINGS
         self.initSupplyVars()
 
     """Initializes any variables that are useful for error checking"""
@@ -153,18 +152,19 @@ class MainMenu(QtGui.QWidget):
             for window in (self.graphWindows + self.depWindows + self.miscWindows):
                 window.hide()
             # set everything up for the new file being read
-            self.processor.newFile(self.file)
+            filepath = os.path.join(DATA_FILE_DIR, self.file)
+            self.processor.newFile(filepath)
             self.initSupplyVars()
 
     """ creates window for single graph """
     def makeGraph(self):
-        graph = graphwindow_data.GraphWindow(datafile=self.file)
+        graph = graphwindow_data.GraphWindow()
         self.graphWindows.append(graph)
         graph.show()
 
     """ shows profile creator window """
     def makeProfile(self):
-        profileCreator = profilecreator.ProfileCreator(datafile=self.file)
+        profileCreator = profilecreator.ProfileCreator()
         self.miscWindows.append(profileCreator)
         profileCreator.show()
 
