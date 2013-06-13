@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 6/06/2013
-# Last Updated: 6/12/2013
+# Last Updated: 6/13/2013
 # For JCAP
 
 from PyQt4 import QtGui
@@ -83,6 +83,8 @@ class DepositionGraph(FigureCanvas):
         self.colorbar.set_array(np.array(self.ratedata))
         self.colorbar.autoscale()
         self.colorbar.set_label(self.units)
+        self.scalarMap.set_clim(0, self.maxRate)
+        self.scalarMap.changed()
         self.draw()
 
     """ plots newly-processed data on preexisting graph """
