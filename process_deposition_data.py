@@ -14,8 +14,8 @@ import datareader
 #   data for this experiment
 DEP_DATA = []
 
-zndec = 2
-tndec = 1
+zndec = 1
+tndec = 0
 radius1 = 28.
 radius2 = 45.
 
@@ -123,18 +123,18 @@ class ProcessorThread(QtCore.QThread):
         in measuring z-value """
     def roundZ(self, zcol):
         zrnd=np.round(zcol, decimals=zndec)
-        for zval in zrnd:
+        for i, zval in enumerate(zrnd):
             if zval not in filename_handler.FILE_INFO['Z_mm']:
-                zval = -1
+                zrnd[i] = -1
         return zrnd
 
     """ helper function to correct for instrument noise
         in measuring tilt """
     def roundt(self, tcol):
         trnd=np.round(tcol, decimals=tndec)
-        for tval in trnd:
+        for i, tval in enumerate(trnd):
             if tval not in filename_handler.FILE_INFO['TiltDeg']:
-                tval = -1
+                trnd[i] = -1
         return trnd
 
     """ gets range of valid rows in row buffer based on
@@ -148,7 +148,11 @@ class ProcessorThread(QtCore.QThread):
         tcol = map(float, datacols[tcolnum])
         inds_useful=np.where((self.roundZ(zcol)>=0)&
                                 (self.roundt(tcol)>=0))[0]
-        return (inds_useful[0], inds_useful[-1])
+        # if rowRange is nonzero, send it
+        if inds_useful.size:
+            return (inds_useful[0], inds_useful[-1])
+        # otherwise, send dummy rowRange to processData
+        return (0, 0)
 
     """ gets time span of valid data set for given angle
         and z-value """

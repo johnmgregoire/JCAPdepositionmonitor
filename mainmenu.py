@@ -17,7 +17,7 @@ import sys
 import cPickle as pickle
 
 #DATA_FILE_DIR = 'C:/Users/JCAP-HTE/Documents/GitHub/JCAPdepositionmonitor'
-DATA_FILE_DIR = 'Z:/CMS/PM/Data/log/signal/2013_1_15'
+DATA_FILE_DIR = 'Z:/CMS/PM/Data/log/signal/2013_1_14'
 
 """ window that pops up when application launches """
 class MainMenu(QtGui.QWidget):
