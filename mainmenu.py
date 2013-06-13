@@ -5,7 +5,7 @@
 
 from PyQt4 import QtGui
 from dictionary_helpers import getCol
-from datareader import DATA_HEADINGS
+import datareader
 import depositionwindow_data
 import graphwindow_data
 import profilewindow
@@ -31,18 +31,16 @@ class MainMenu(QtGui.QWidget):
         self.profiles = {}
         # save name of file from which application will read
         self.file = self.initReader()
+        # check if filename is in valid format
         filenameError = filename_handler.parseFilename(self.file)
+        # if not, ask user for experiment parameters
         if filenameError:
-            print 'ABORT'
-            self.requestFileInfo(filenameError)
-        # initialize data processor (includes reader)
-        self.processor = pdd.ProcessorThread(parent=self, filename=self.file)
-        self.processor.lineRead.connect(self.newLineRead)
-        self.processor.newData.connect(self.depUpdate)
-        self.processor.start()
-                
+            self.requestFileInfo()
         self.initUI()
-        self.initSupplyVars()
+        # otherwise, finish setting up program
+        if not filenameError:
+            self.initData()
+        
 
     """ automatically loads last modified data file
         when application launches """
@@ -104,6 +102,16 @@ class MainMenu(QtGui.QWidget):
 
         self.show()
 
+    """ initializes all elements of program that require experiment
+        information (FILE_INFO must be complete) """
+    def initData(self):
+        # initialize data processor (includes reader)
+        self.processor = pdd.ProcessorThread(parent=self, filename=self.file)
+        self.processor.lineRead.connect(self.newLineRead)
+        self.processor.newData.connect(self.depUpdate)
+        self.processor.start()
+        self.initSupplyVars()
+
     """Initializes any variables that are useful for error checking"""
     def initSupplyVars(self):
         self.errors =[]
@@ -120,15 +128,12 @@ class MainMenu(QtGui.QWidget):
             self.output_voltage = getCol("Power Supply" + str(self.supply) + \
                                          " Output Voltage")
 
-    """ WORK IN PROGRESS """
-    def requestFileInfo(self, tagsToEnter):
-        dialog = QtGui.QDialog()
-        dialog.setModal(True)
-        labels = []
-        lineEdits = []
-        for tag in tagsToEnter:
-            labels.append(QtGui.QLabel(tag+':', dialog))
-            lineEdits.append(QtGui.QLineEdit(dialog))
+    """ if filename is not in correct format, ask user to enter
+        experiment parameters manually """
+    def requestFileInfo(self):
+        fileErrorDialog = FileInfoDialog()
+        self.miscWindows.append(fileErrorDialog)
+        fileErrorDialog.fileInfoComplete.connect(self.initData)
 
     """ allows user to choose another data file """
     def loadDataFile(self):
@@ -163,19 +168,23 @@ class MainMenu(QtGui.QWidget):
 
     """ shows load profile window """
     def selectProfile(self):
-        savefile = open('saved_profiles.txt', 'rb')
+        try:
+            # open file for reading
+            savefile = open('saved_profiles.txt', 'rb')
+            savedProfiles = pickle.load(savefile)
+            savefile.close()
+        except IOError:
+            savedProfiles = []
         menuList = []
-        savedProfiles = pickle.load(savefile)
         if not savedProfiles:
             error = QtGui.QMessageBox.information(None, "Load Profile Error",
                                                   "There are no saved profiles.")
             return
         # only show profiles with headings that correspond to this file
         for name, varsList in savedProfiles:
-            if all(var in DATA_HEADINGS.values() for var in varsList):
+            if all(var in datareader.DATA_HEADINGS.values() for var in varsList):
                     self.profiles[name] = varsList
                     menuList += [name]
-        savefile.close()
         loadMenu = profilewindow.LoadMenu(menuList)
         self.miscWindows.append(loadMenu)
         loadMenu.show()
@@ -242,7 +251,7 @@ class MainMenu(QtGui.QWidget):
     """ handles signal from reader when new line has been read """
     def newLineRead(self, newRow):
         self.updateGraphs(newRow)
-        self.checkValidity(newRow)
+        #self.checkValidity(newRow)
 
     """ shows an error message if data indicates experiment failure"""
     def checkValidity(self, row):
@@ -269,6 +278,85 @@ class MainMenu(QtGui.QWidget):
         if newErrors:
             message = "You have the following errors: " + " ".join(newErrors)
             validityError = QtGui.QMessageBox.information(None,"Unreliable Data Error", message)
+
+""" custom dialog box to request necessary file info from user """
+class FileInfoDialog(QtGui.QWidget):
+
+    """ signal sent to MainMenu when all information has
+        been entered """
+    fileInfoComplete = pdd.QtCore.pyqtSignal(dict)
+    
+    def __init__(self):
+        super(FileInfoDialog, self).__init__()
+        self.setWindowModality(pdd.QtCore.Qt.ApplicationModal)
+        self.initUI()
+
+    """ draws user interface of window """
+    def initUI(self):
+        self.setWindowTitle('Experiment Information')
+        self.layout = QtGui.QVBoxLayout(self)
+        self.gridlayout = QtGui.QGridLayout(self)
+        self.setLayout(self.layout)
+        self.labels = []
+        self.lineEdits = []
+        self.tagsList = [tag for tag in filename_handler.FILE_INFO.iteritems()]
+        self.tagsList.sort(key = lambda x: x[0])
+        self.layout.addWidget(QtGui.QLabel('Please enter values for the following parameters:'))
+        self.layout.addLayout(self.gridlayout)
+        for i, (tag, val) in enumerate(self.tagsList):
+            if type(val) == list:
+                val = ','.join([str(x) for x in val])
+            self.labels.append(QtGui.QLabel(tag+':'))
+            self.lineEdits.append(QtGui.QLineEdit(str(val)))
+            self.gridlayout.addWidget(self.labels[i], i, 0)
+            self.gridlayout.addWidget(self.lineEdits[i], i, 1)
+        self.enter = QtGui.QPushButton('Enter')
+        self.enter.setDefault(True)
+        self.enter.clicked.connect(self.sendInfo)
+        self.layout.addWidget(self.enter, alignment=pdd.QtCore.Qt.AlignRight)
+        self.show()
+
+    """ populates FILE_INFO dictionary and sends complete
+        information to MainMenu """
+    def sendInfo(self):
+        global FILE_INFO
+        for i, (tag, val) in enumerate(self.tagsList):
+            newValStr = str(self.lineEdits[i].text())
+            if not newValStr:
+                self.completionError()
+                return
+            if type(filename_handler.FILE_INFO.get(tag)) == list:
+                newValStrList = newValStr.split(',')
+                try:
+                    newValList = [float(x) for x in newValStrList]
+                    filename_handler.FILE_INFO[tag] = newValList
+                except ValueError:
+                    self.formatError()
+                    return
+            else:
+                filename_handler.FILE_INFO[tag] = newValStr
+        self.fileInfoComplete.emit(filename_handler.FILE_INFO)
+        self.close()
+
+    """ brings up an error message if not all fields are filled in """
+    def completionError(self):
+        message = "Please enter values for all parameters."
+        error = QtGui.QMessageBox.warning(self, "Error", message,
+                                          QtGui.QMessageBox.Ok)
+
+    """ brings up an error message if z and t entries are invalid """
+    def formatError(self):
+        message = "Please enter comma-separated decimal values for Z and tilt."
+        error = QtGui.QMessageBox.warning(self, "Error", message,
+                                          QtGui.QMessageBox.Ok)
+        if error == QtGui.QMessageBox.Ok:
+            for i, (tag, val) in enumerate(self.tagsList):
+                if type(filename_handler.FILE_INFO.get(tag)) == list:
+                    self.lineEdits[i].clear()
+
+    """ nothing to redraw every second """
+    def redrawWindow(self):
+        pass
         
 """ main event loop """
 def main():

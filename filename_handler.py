@@ -20,9 +20,9 @@ def parseFilename(filename):
         if strippedTag in tagsDict:
             stdName = tagsDict.get(strippedTag)
             if (stdName == 'Z_mm' and stdName in FILE_INFO):
-                FILE_INFO[stdName] += [tagVal]
+                FILE_INFO[stdName] += [float(tagVal)]
             elif (stdName == 'Z_mm' or stdName == 'TiltDeg'):
-                FILE_INFO[stdName] = [tagVal]
+                FILE_INFO[stdName] = [float(tagVal)]
             else:
                 FILE_INFO[stdName] = tagVal
         elif (tag.istitle() and tag.isalpha()):
