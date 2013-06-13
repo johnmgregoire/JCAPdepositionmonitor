@@ -144,11 +144,14 @@ class MainMenu(QtGui.QWidget):
     """ allows user to choose another data file """
     def loadDataFile(self):
         global DATA_FILE_DIR
+        global FILE_INFO
         dirname = QtGui.QFileDialog.getOpenFileName(self, 'Open data file',
                                                       DATA_FILE_DIR,
                                                       'CSV files (*.csv)')
         # if cancel is clicked, dirname will be empty string
         if dirname != '':
+            filename_handler.FILE_INFO = {'Element':'', 'Source':'', 'Supply':'', 'TiltDeg':[],
+             'Z_mm':[]}
             # converts Qstring to string
             dirString = str(dirname)
             # gets filename from current directory (will be changed eventually)
