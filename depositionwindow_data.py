@@ -66,11 +66,9 @@ class DepositionWindow(QtGui.QWidget):
         self.label_chemEQ = QtGui.QLabel('Chemical formula:')
         self.label_density = QtGui.QLabel('Density:')
         self.label_zvars = QtGui.QLabel('Z-position:')
-        self.unitOptions = []
+        self.unitOptions = ["ng/(scm^2)"]
 
-        #for unit in self.unitOptions:
-            #self.selectUnits.addItem(unit)
-
+        self.selectUnits.addItem("ng/(scm^2)")
         self.selectUnits.activated[str].connect(self.selectConversion)
 
         # populate drop-down menu of z-values
@@ -93,23 +91,27 @@ class DepositionWindow(QtGui.QWidget):
         self.sidelayout.addWidget(self.setZ)
         self.sidelayout.addWidget(self.rescaleButton)
 
+
         self.show()
 
     """ converts the units of the deposition graph based on
         user inputs for chemical formula and density """
     def selectConversion(self, unitName):
-
         unitNameStr = str(unitName)
+        rePlot = False
         
-        if self.Lmnts:
-            if "ng/(scm^2)" == unitNameStr:
-                self.depgraph.convFactor = 10
-                self.depgraph.units = 'ng/s cm'+r'$^2$'
-            elif "nm/s" == unitNameStr:
+        if "ng/(scm^2)" == unitNameStr:
+            self.depgraph.convFactor = 10
+            self.depgraph.units = 'ng/s cm'+r'$^2$'
+            rePlot = True
+        if self.density:
+            if "nm/s" == unitNameStr:
                 #divide using the density - consider A/s
                 self.depgraph.convFactor = 0.1/self.density
                 self.depgraph.units = 'nm/s'
-            elif "nmol/(s*cm^2)" == unitNameStr:
+                rePlot = True
+        if self.Lmnts:
+            if "nmol/(s*cm^2)" == unitNameStr:
                 # divide using the molar mass to get this
                 scaledMass = self.Lmnts["Metal Name"].mass
                 if self.Lmnts["Second Element"]:
@@ -119,7 +121,9 @@ class DepositionWindow(QtGui.QWidget):
                 molarMass = scaledMass * factor._denominator
                 self.depgraph.convFactor = 10./molarMass
                 self.depgraph.units = 'nmol/s cm'+r'$^2$'
+                rePlot = True
 
+        if rePlot:
             self.depgraph.colorbar.set_label(self.depgraph.units)
             self.depgraph.convertPlot()
 
