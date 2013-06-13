@@ -85,6 +85,7 @@ class DepositionGraph(FigureCanvas):
         self.colorbar.set_label(self.units)
         self.scalarMap.set_clim(0, self.maxRate)
         self.scalarMap.changed()
+        print self.ratedata
         self.draw()
 
     """ plots newly-processed data on preexisting graph """
