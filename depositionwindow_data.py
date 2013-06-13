@@ -101,7 +101,7 @@ class DepositionWindow(QtGui.QWidget):
         rePlot = False
         
         if "ng/(scm^2)" == unitNameStr:
-            self.depgraph.convFactor = 10
+            self.depgraph.convFactor = 10.
             self.depgraph.units = 'ng/s cm'+r'$^2$'
             rePlot = True
         if self.density:
@@ -210,6 +210,7 @@ class DepositionWindow(QtGui.QWidget):
     def switchZ(self, newZ):
         zval = float(newZ)
         self.depgraph.clearPlot()
+        self.depgraph.convFactor = 1
         self.depgraph.firstPlot(zval)
 
     """ manually redraws the colors in the scatter plot """

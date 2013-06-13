@@ -103,7 +103,9 @@ class MainMenu(QtGui.QWidget):
         self.show()
 
     """ initializes all elements of program that require experiment
-        information (FILE_INFO must be complete) """
+        information (FILE_INFO must be complete)
+        (mode is 0 if called when the application is first opened,
+        1 if called when the user loads a new file) """
     def initData(self, mode):
         filepath = os.path.join(DATA_FILE_DIR, self.file)
         # if application has just been opened
@@ -135,14 +137,19 @@ class MainMenu(QtGui.QWidget):
                                          " Output Voltage")
 
     """ if filename is not in correct format, ask user to enter
-        experiment parameters manually """
+        experiment parameters manually
+        (mode is 0 if called when the application is first opened,
+        1 if called when the user loads a new file) """
     def requestFileInfo(self, mode):
         fileErrorDialog = FileInfoDialog(mode)
         self.miscWindows.append(fileErrorDialog)
         fileErrorDialog.fileInfoComplete.connect(self.initData)
+        fileErrorDialog.fileAborted.connect(self.loadDataFile)
 
-    """ allows user to choose another data file """
-    def loadDataFile(self):
+    """ allows user to choose another data file
+        (mode is 0 if called to replace default file,
+        1 if the user loads a new file through main menu) """
+    def loadDataFile(self, mode=1):
         global DATA_FILE_DIR
         global FILE_INFO
         dirname = QtGui.QFileDialog.getOpenFileName(self, 'Open data file',
@@ -164,10 +171,10 @@ class MainMenu(QtGui.QWidget):
             # check filename for correct format
             filenameError = filename_handler.parseFilename(self.file)
             if filenameError:
-                self.requestFileInfo(1)
+                self.requestFileInfo(mode)
             # set everything up for the new file being read
             else:
-                self.initData(1)
+                self.initData(mode)
 
     """ creates window for single graph """
     def makeGraph(self):
@@ -297,9 +304,11 @@ class MainMenu(QtGui.QWidget):
 """ custom dialog box to request necessary file info from user """
 class FileInfoDialog(QtGui.QWidget):
 
-    """ sends signal and mode to MainMenu once all information
-        has been entered """
+    #sends signal and mode to MainMenu once all information
+    #   has been entered
     fileInfoComplete = pdd.QtCore.pyqtSignal(int)
+    # sends signal and mode to MainMenu if user closes dialog
+    fileAborted = pdd.QtCore.pyqtSignal(int)
 
     """ mode is 0 if called when the application is first opened,
         1 if called when the user loads a new file """
@@ -374,6 +383,19 @@ class FileInfoDialog(QtGui.QWidget):
     """ nothing to redraw every second """
     def redrawWindow(self):
         pass
+
+    """ confirms that user doesn't want to load data file if
+        user tries to close dialog """
+    def closeEvent(self, event):
+        message = "If you close this window, you will be prompted to open another file."
+        response = QtGui.QMessageBox.information(self, "Note", message,
+                                                    QtGui.QMessageBox.Ok |
+                                                    QtGui.QMessageBox.Cancel)
+        if response == QtGui.QMessageBox.Ok:
+            self.fileAborted.emit(self.mode)
+            event.accept()
+        else:
+            event.ignore()
         
 """ main event loop """
 def main():
