@@ -38,11 +38,14 @@ class DataReader(QtCore.QThread):
         DATA_DICT['Date'] = []
         # initialize each heading with an array to store the column data
         for col in range(3, len(headings)):
+            # strip extra " characters that may have been added to
+            #   spreadsheet cells by Excel
+            colName = headings[col].strip('"')
             # ignore empty columns at end of spreadsheet
-            if headings[col] == '':
+            if colName == '':
                 break
-            DATA_HEADINGS[col] = headings[col]
-            DATA_DICT[headings[col]] = []
+            DATA_HEADINGS[col] = colName
+            DATA_DICT[colName] = []
         self.numColumns = len(DATA_HEADINGS)
         self.lastEOFpos = self.datafile.tell()
 
@@ -59,6 +62,7 @@ class DataReader(QtCore.QThread):
             strippedRow = []
             # ignore empty third column in spreadsheet
             for col in (row[:2] + row[3:]):
+                col = col.strip('"')
                 if col != '':
                     strippedRow += [col]
                 # ignore empty columns at end of spreadsheet
@@ -67,13 +71,13 @@ class DataReader(QtCore.QThread):
             # check if we have all data from row and have read
             # up to the end of line character
             if len(strippedRow) == self.numColumns and row[len(row)-1].endswith('\r\n'):
-                # add the new info to the respective column
-                for col in dataColNums:
-                    heading = DATA_HEADINGS.get(col)
-                    DATA_DICT[heading].append(row[col])
                 # re-insert empty third column to keep indices
                 #   in strippedRow consistent with DATA_HEADINGS
                 strippedRow.insert(2, '')
+                # add the new info to the respective column
+                for col in dataColNums:
+                    heading = DATA_HEADINGS.get(col)
+                    DATA_DICT[heading].append(strippedRow[col])
                 # send signal
                 self.lineRead.emit(strippedRow)
                 # move the reader cursor only if we read in a full line

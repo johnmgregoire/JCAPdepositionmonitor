@@ -16,8 +16,8 @@ import process_deposition_data as pdd
 import sys
 import cPickle as pickle
 
-#DATA_FILE_DIR = 'C:/Users/JCAP-HTE/Documents/GitHub/JCAPdepositionmonitor'
-DATA_FILE_DIR = 'Z:/CMS/PM/Data/log/signal/2013_1_16'
+DATA_FILE_DIR = 'C:/Users/JCAP-HTE/Documents/GitHub/JCAPdepositionmonitor'
+#DATA_FILE_DIR = 'Z:/CMS/PM/Data/log/signal/2013_1_16'
 
 """ window that pops up when application launches """
 class MainMenu(QtGui.QWidget):
@@ -111,6 +111,7 @@ class MainMenu(QtGui.QWidget):
         self.processor.lineRead.connect(self.newLineRead)
         self.processor.newData.connect(self.depUpdate)
         self.processor.start()
+        print datareader.DATA_HEADINGS
         self.initSupplyVars()
 
     """Initializes any variables that are useful for error checking"""
