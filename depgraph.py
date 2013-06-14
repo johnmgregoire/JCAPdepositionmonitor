@@ -87,6 +87,8 @@ class DepositionGraph(FigureCanvas):
         self.colorbar.set_label(self.units)
         self.scalarMap.set_clim(0, self.maxRate)
         self.scalarMap.changed()
+        
+        self.scalarMap.changed()
         self.draw()
 
     """ plots newly-processed data on preexisting graph """
@@ -121,6 +123,7 @@ class DepositionGraph(FigureCanvas):
             plot.remove()
         # reset limits of color scale
         self.scalarMap.set_clim(0, self.maxRate)
+        
         # plot entire set of data according to new scale
         self.datavis = [self.plot.scatter(self.xdata, self.ydata,
                                          c = self.ratedata,
@@ -144,11 +147,19 @@ class DepositionGraph(FigureCanvas):
         # just in case
         self.maxRate *=self.convFactor
         lenOfRateData = len(self.ratedata)
-        for rateLoc, (z, x, y, rate) in enumerate(pdd.DEP_DATA[:lenOfRateData]):
-            self.ratedata[rateLoc] = rate*self.convFactor
+        currLocation = 0
+        for rateLoc, (z, x, y, rate) in enumerate(pdd.DEP_DATA):
+            if currLocation < lenOfRateData and z == self.currentZ:
+                self.ratedata[currLocation] = rate*self.convFactor
+            elif currLocation >= lenOfRateData:
+                break
         # again, in case of errors due to float precision
-        self.maxRate = max(max(self.ratedata), self.maxRate)
+        self.maxRate = max(self.ratedata)
         self.scalarMap.set_clim(0, self.maxRate)
+
+        ## Perhaps calling the regraphing here instead of doing everything?
+        ## Or doing another thing with pass? 
+        self.scalarMap.changed()
         self.colorbar.draw_all()
         self.draw()
 

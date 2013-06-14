@@ -126,7 +126,6 @@ class DepositionWindow(QtGui.QWidget):
         if rePlot:
             self.depgraph.colorbar.set_label(self.depgraph.units)
             self.depgraph.convertPlot()
-
     """ displays available options in unit conversion drop-down
         menu based on user input """
     def handleEQS(self):
@@ -209,11 +208,9 @@ class DepositionWindow(QtGui.QWidget):
     """ redraw the scatter plot when the z-position of the data changes """
     def switchZ(self, newZ):
         zval = float(newZ)
-        print self.depgraph.ratedata
         self.depgraph.clearPlot()
         self.depgraph.firstPlot(zval)
-        print self.depgraph.ratedata
-
+        
     """ manually redraws the colors in the scatter plot """
     def resetColors(self):
         self.depgraph.rescale()
