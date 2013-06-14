@@ -210,7 +210,11 @@ class DepositionWindow(QtGui.QWidget):
         zval = float(newZ)
         self.depgraph.clearPlot()
         self.depgraph.firstPlot(zval)
+<<<<<<< HEAD
+
+=======
         
+>>>>>>> 3501346f4aba061d6031bfc3fbb8056c9f25f7dd
     """ manually redraws the colors in the scatter plot """
     def resetColors(self):
         self.depgraph.rescale()
