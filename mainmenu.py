@@ -41,7 +41,7 @@ class MainMenu(QtGui.QWidget):
             self.requestFileInfo(1)
         # otherwise, finish setting up program
         else:
-            self.initData(1)
+            self.initData()
         self.initUI()
         
 
@@ -50,7 +50,6 @@ class MainMenu(QtGui.QWidget):
     def initReader(self):
         lastModifiedFile = ''
         lastModifiedTime = 0
-        # use os.walk() to recursively traverse directories if necessary
         allFiles = os.listdir(DATA_FILE_DIR)
         data = filter(lambda filename: filename.endswith('.csv'), allFiles)
         for filename in data:
@@ -200,6 +199,8 @@ class MainMenu(QtGui.QWidget):
             savefile = open('saved_profiles.txt', 'rb')
             savedProfiles = pickle.load(savefile)
             savefile.close()
+        # this will occur if profiles have never been saved before
+        #   and saved_profiles.txt does not exist
         except IOError:
             savedProfiles = []
         menuList = []
@@ -281,7 +282,7 @@ class MainMenu(QtGui.QWidget):
         self.updateGraphs(newRow)
         self.checkValidity(newRow)
 
-    """ shows an error message if data indicates experiment failure"""
+    """ shows an error message if data indicates experiment failure """
     def checkValidity(self, row):
         errors_list = []
 
@@ -302,7 +303,7 @@ class MainMenu(QtGui.QWidget):
         newErrors = [ error for error in errors_list if error not in self.errors]
         self.errors += newErrors
 
-        # only process error warning if no warning has been given to user
+        # show error warnings if necessary
         if newErrors:
             message = "You have the following errors: " + " ".join(newErrors)
             validityError = QtGui.QMessageBox.information(None,"Unreliable Data Error", message)

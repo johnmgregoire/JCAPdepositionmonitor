@@ -66,7 +66,7 @@ class Graph(FigureCanvas):
         self.axes.xaxis.set_major_formatter(self.time_format)
         self.axes.set_ylabel(self.yvarsL[0].varName)
 
-        # Assign first y variable to left-hand axis
+        # Assign first y-variable to left-hand axis
         self.yvarsL[0].axis = self.axes
         
         self.firstPlot(self.yvarsL[0])

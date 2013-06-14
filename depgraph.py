@@ -103,18 +103,14 @@ class DepositionGraph(FigureCanvas):
                 self.maxRate = modified_rate
                 self.changeScale = True
             # add single point to plot
-            if not self.changeScale:
+            """if not self.changeScale:
                 self.datavis += [self.plot.scatter(x, y, c = rate,
                                                  cmap=self.scalarMap.get_cmap(),
                                                  marker='o', edgecolor='none', s=60)]
-            else:
-                self.rescale()
-<<<<<<< HEAD
+            else:"""
+            self.rescale()
+                #self.changeScale = False
             self.draw()
-=======
-                self.changeScale = False
-        self.draw()
->>>>>>> 3b3a2206379569faf3b81467d43c2cefaf60e066
 
     """ redraws the graph according to the new color scale
         determined by the new maximum rate value """
