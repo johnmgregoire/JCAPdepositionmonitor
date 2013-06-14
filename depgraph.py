@@ -108,6 +108,7 @@ class DepositionGraph(FigureCanvas):
                                                  marker='o', edgecolor='none', s=60)]
             else:
                 self.rescale()
+                self.changeScale = False
         self.draw()
 
     """ redraws the graph according to the new color scale
@@ -135,25 +136,21 @@ class DepositionGraph(FigureCanvas):
         self.changeScale = False
         self.units = r'$10^{-8}$'+'g/s cm'+r'$^2$'
 
-    """ convert all rate data and change labels on colorbar
-        when converting units """
+    """ convert rate data and change label on colorbar when converting units """
     def convertPlot(self):
-        # just in case
-        self.maxRate *=self.convFactor
+        # used to make sure we got all the data values for the given z
         lenOfRateData = len(self.ratedata)
         currLocation = 0
-        for rateLoc, (z, x, y, rate) in enumerate(pdd.DEP_DATA):
+        for z, x, y, rate in pdd.DEP_DATA:
+            # convert only those rate with the desired z
             if currLocation < lenOfRateData and z == self.currentZ:
                 self.ratedata[currLocation] = rate*self.convFactor
                 currLocation +=1 
             elif currLocation >= lenOfRateData:
                 break
-        # again, in case of errors due to float precision
+        # get new maxRate with max function to prevent errors due to precision
         self.maxRate = max(self.ratedata)
         self.scalarMap.set_clim(0, self.maxRate)
-
-        ## Perhaps calling the regraphing here instead of doing everything?
-        ## Or doing another thing with pass? 
         self.scalarMap.changed()
         self.colorbar.draw_all()
         self.draw()
