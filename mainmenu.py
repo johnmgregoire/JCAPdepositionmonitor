@@ -310,16 +310,19 @@ class MainMenu(QtGui.QWidget):
 
         if self.supply % 2 == 1:
             opValue = float(row[self.output_power])
-            if opValue < 5: errors_list.append("Output power is below 5") 
+            if opValue < 5: errors_list.append("Output power is below 5.") 
 
-        newErrors = [ error for error in errors_list if error not in self.errors]
+        newErrors = [error for error in errors_list if error not in self.errors]
         self.errors += newErrors
 
         # show error warnings if necessary
         if newErrors:
-            message = "You have the following errors: " + " ".join(newErrors)
-            validityError = QtGui.QMessageBox.warning(None,
-                                                      "Unreliable Data Error", message)
+            self.powerError(newErrors)
+
+    def powerError(self, newErrors):
+        message = "You have the following errors: " + " ".join(newErrors)
+        self.validityError = QtGui.QErrorMessage()
+        self.validityError.showMessage(message)
 
     """ kills data processor and prompts user to load new file if
         invalid source number was provided """
