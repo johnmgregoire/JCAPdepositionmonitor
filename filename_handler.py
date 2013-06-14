@@ -3,6 +3,8 @@
 # Last Updated: 6/14/2013
 # For JCAP
 
+from elements import ELEMENTS
+
 # holds important information associated with data file
 FILE_INFO = {'Element':'', 'Source':'', 'Supply':'', 'TiltDeg':[],
              'Z_mm':[]}
@@ -36,9 +38,7 @@ def parseFilename(filename):
             # all other values can be saved as string
             else:
                 FILE_INFO[stdName] = tagVal
-        # element starts with capital letter and is not grouped with
-        #   any numbers
-        elif (tag.istitle() and tag.isalpha()):
+        elif tag in ELEMENTS:
             FILE_INFO['Element'] = tag
 
     # keep track of any parameters that were not found in filename

@@ -25,6 +25,7 @@ class ProcessorThread(QtCore.QThread):
     lineRead = QtCore.pyqtSignal(list)
     # transfers new processed data to deposition graph
     newData = QtCore.pyqtSignal(tuple)
+    srcError = QtCore.pyqtSignal(int)
     
     def __init__(self, parent=None, filename='default.csv'):
         super(ProcessorThread, self).__init__()
@@ -37,6 +38,13 @@ class ProcessorThread(QtCore.QThread):
 
     def run(self):
         self.reader.start()
+        # initialize DATA_DICT column numbers used for data processing
+        try:
+            self.tcolnum = getCol('Src%d Motor Tilt Position' %int(filename_handler.FILE_INFO['Source']))
+        except IndexError:
+            self.srcError.emit(int(filename_handler.FILE_INFO['Source']))
+        self.zcolnum = getCol('Platen Zshift Motor 1 Position')
+        self.anglecolnum = getCol('Platen Motor Position')
         while self.running:
             pass
 
@@ -52,12 +60,10 @@ class ProcessorThread(QtCore.QThread):
         if self.rowBuffer == []:
             self.rowBuffer += [row]
         else:
-            anglecolnum = getCol('Platen Motor Position')
-            angle = round(float(row[anglecolnum]))
-            zcolnum = getCol('Platen Zshift Motor 1 Position')
-            zval = round(float(row[zcolnum]), 1)
-            prevangle = round(float(self.rowBuffer[-1][anglecolnum]), 0)
-            prevz = round(float(self.rowBuffer[-1][zcolnum]), 1)
+            angle = round(float(row[self.anglecolnum]))
+            zval = round(float(row[self.zcolnum]), 1)
+            prevangle = round(float(self.rowBuffer[-1][self.anglecolnum]), 0)
+            prevz = round(float(self.rowBuffer[-1][self.zcolnum]), 1)
             if (angle == prevangle and zval == prevz):
                 self.rowBuffer += [row]
             elif (angle == prevangle):
@@ -135,12 +141,10 @@ class ProcessorThread(QtCore.QThread):
     """ gets range of valid rows in row buffer based on
         whether z and t values match experimental parameters """
     def getRowRange(self):
-        zcolnum = getCol('Platen Zshift Motor 1 Position')
-        tcolnum = getCol('Src%d Motor Tilt Position' % int(filename_handler.FILE_INFO['Source']))
         data = np.array(self.rowBuffer)
         datacols = data.T
-        zcol = map(float, datacols[zcolnum])
-        tcol = map(float, datacols[tcolnum])
+        zcol = map(float, datacols[self.zcolnum])
+        tcol = map(float, datacols[self.tcolnum])
         inds_useful=np.where((self.roundZ(zcol)>=0)&(self.roundT(tcol)>=0))[0]
         # if rowRange is nonzero, send it
         if inds_useful.size:
@@ -184,14 +188,19 @@ class ProcessorThread(QtCore.QThread):
         self.reader = datareader.DataReader(parent=self, filename=newfile)
         self.reader.lineRead.connect(self.newLineRead)
         self.reader.start()
+        # re-initialize DATA_DICT column numbers used for data processing
+        try:
+            self.tcolnum = getCol('Src%d Motor Tilt Position' %int(filename_handler.FILE_INFO['Source']))
+        except IndexError:
+            self.srcError.emit(int(filename_handler.FILE_INFO['Source']))
+        self.zcolnum = getCol('Platen Zshift Motor 1 Position')
+        self.anglecolnum = getCol('Platen Motor Position')
 
     """ empties row buffer and kills reader when experiment has ended """
     def onEndExperiment(self):
         if self.rowBuffer:
-            anglecolnum = getCol('Platen Motor Position')
-            angle = round(float(self.rowBuffer[0] [anglecolnum]))
-            zcolnum = getCol('Platen Zshift Motor 1 Position')
-            zval = round(float(self.rowBuffer[0][zcolnum]), 1)
+            angle = round(float(self.rowBuffer[0][self.anglecolnum]))
+            zval = round(float(self.rowBuffer[0][self.zcolnum]), 1)
             self.processData(zval, angle, radius1)
             self.processData(zval, angle, radius2)
             self.rowBuffer = []

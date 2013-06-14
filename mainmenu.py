@@ -113,10 +113,11 @@ class MainMenu(QtGui.QWidget):
         filepath = os.path.join(DATA_FILE_DIR, self.file)
         # if application has just been opened
         if not self.processor:
-            # initialize data processor (includes reader)
+            # initialize data processor (includes reader)           
             self.processor = pdd.ProcessorThread(parent=self, filename=filepath)
             self.processor.lineRead.connect(self.newLineRead)
             self.processor.newData.connect(self.depUpdate)
+            self.processor.srcError.connect(self.sourceError)
             self.processor.start()
         # if loading a new file
         else:
@@ -318,6 +319,14 @@ class MainMenu(QtGui.QWidget):
         if newErrors:
             message = "You have the following errors: " + " ".join(newErrors)
             validityError = QtGui.QMessageBox.warning(None,"Unreliable Data Error", message)
+
+    """ kills data processor and prompts user to load new file if
+        invalid source number was provided """
+    def sourceError(self, srcNum):
+        self.processor.end()
+        message = "Source %d is not a valid source.  Please load a new file." % srcNum
+        srcError = QtGui.QMessageBox.warning(None, "Source Error", message)
+        self.loadDataFile(1)
 
 """ custom dialog box to request necessary file info from user """
 class FileInfoDialog(QtGui.QWidget):
