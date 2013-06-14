@@ -46,9 +46,10 @@ class DepositionWindow(QtGui.QWidget):
         self.mainlayout.addWidget(self.depgraph,0,0)
         self.mainlayout.addLayout(self.sidelayout,0,1)
 
-        # set the streches
+        # set the streches and minimum widths
         self.mainlayout.setColumnStretch(0,5)
         self.mainlayout.setColumnStretch(1,0)
+        self.mainlayout.setColumnMinimumWidth(0,300)
 
         # drop down widget, text widgets, etc.
         self.selectUnits = QtGui.QComboBox()
