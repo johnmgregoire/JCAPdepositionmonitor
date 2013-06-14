@@ -126,7 +126,6 @@ class DepositionWindow(QtGui.QWidget):
         if rePlot:
             self.depgraph.colorbar.set_label(self.depgraph.units)
             self.depgraph.convertPlot()
-
     """ displays available options in unit conversion drop-down
         menu based on user input """
     def handleEQS(self):
@@ -211,7 +210,11 @@ class DepositionWindow(QtGui.QWidget):
         zval = float(newZ)
         self.depgraph.clearPlot()
         self.depgraph.firstPlot(zval)
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 3501346f4aba061d6031bfc3fbb8056c9f25f7dd
     """ manually redraws the colors in the scatter plot """
     def resetColors(self):
         self.depgraph.rescale()
