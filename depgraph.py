@@ -24,19 +24,20 @@ class DepositionGraph(FigureCanvas):
                                    QtGui.QSizePolicy.Expanding,
                                    QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
-        # set up a preliminary plot and the constants need
+        # set up the axes and their properties
         self.initPlotArea()
     
         # conversion factor is scalar used for changing units
         # maxRate is used for resetting the color scale
         self.convFactor, self.maxRate = 1, 0
-        # currentZ is the z-position that the graph
-        # is displaying for the deposition rate data
+        # currentZ is the z-position for which the graph
+        #   is displaying deposition rate data
         # zvars holds all z-values for this experiment
         self.currentZ, self.zvars = None, []
         # used for resetting the color scale
         self.changeScale = False
         # formatted string that represents the units of the data
+        #   (defaults to 10^-8 g/(s cm^2))
         self.units = r'$10^{-8}$'+'g/s cm'+r'$^2$'
 
     """ initializes the graph's data and axes """
@@ -78,7 +79,7 @@ class DepositionGraph(FigureCanvas):
         self.datavis = [self.plot.scatter(self.xdata, self.ydata,
                                          c = self.ratedata, cmap=self.scalarMap.get_cmap(),
                                          marker='o', edgecolor='none', s=60)]
-        # initialize colorbar and set any preferences
+        # initialize colorbar and set its properties
         self.colorbar = self.figure.colorbar(self.scalarMap, ax = self.plot)
         self.colorbar.set_array(np.array(self.ratedata))
         self.colorbar.autoscale()
@@ -108,7 +109,7 @@ class DepositionGraph(FigureCanvas):
                                                  marker='o', edgecolor='none', s=60)]
             else:
                 self.rescale()
-        self.draw()
+            self.draw()
 
     """ redraws the graph according to the new color scale
         determined by the new maximum rate value """
@@ -139,7 +140,7 @@ class DepositionGraph(FigureCanvas):
         when converting units """
     def convertPlot(self):
         # just in case
-        self.maxRate *=self.convFactor
+        self.maxRate *= self.convFactor
         lenOfRateData = len(self.ratedata)
         currLocation = 0
         for rateLoc, (z, x, y, rate) in enumerate(pdd.DEP_DATA):

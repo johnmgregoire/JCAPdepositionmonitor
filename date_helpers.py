@@ -4,18 +4,19 @@
 # For JCAP
 
 """
-Has a function that helps us deal with time conversion
+Helper functions that deal with time conversion
 """
 
 import time 
 import datetime
 
-# give a float of seconds - such as time.time() and it returns a datetime obj
+# given a seconds value in floating-point format (such as time.time()),
+#   returns a datetime object
 def dateObj(atime):
     localCurrTime = time.strftime("%d/%m/%Y %H:%M:%S", time.localtime(atime))
     return datetime.datetime.strptime(localCurrTime, "%d/%m/%Y %H:%M:%S")
 
-# give it a string of the form d/m/Y H:M:S:f and it returns a date time object
+# given a string of the form d/m/Y H:M:S:f, returns a date time object
 def dateObjFloat(fullTime):
     return datetime.datetime.strptime(fullTime,"%d/%m/%Y %H:%M:%S:%f")
 

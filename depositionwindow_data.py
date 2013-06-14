@@ -1,12 +1,11 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 6/5/2013
-# Last Updated: 6/12/2013
+# Last Updated: 6/14/2013
 # For JCAP
 
 import numpy as np
 from PyQt4 import QtCore, QtGui
 import depgraph
-#from process_deposition_data import DEP_DATA
 import process_deposition_data as pdd
 from elements import ELEMENTS
 from fractions import Fraction
@@ -32,6 +31,8 @@ class DepositionWindow(QtGui.QWidget):
 
         # initialize the graph
         self.depgraph = depgraph.DepositionGraph(self)
+        # wait for first data points to be processed before
+        #   drawing plot
         if pdd.DEP_DATA:
             self.depgraph.firstPlot()
 
@@ -90,15 +91,13 @@ class DepositionWindow(QtGui.QWidget):
         self.sidelayout.addWidget(self.label_zvars)
         self.sidelayout.addWidget(self.setZ)
         self.sidelayout.addWidget(self.rescaleButton)
-
-
+        
         self.show()
 
     """ converts the units of the deposition graph based on
         user inputs for chemical formula and density """
     def selectConversion(self, unitName):
         unitNameStr = str(unitName)
-        rePlot = False
         
         if "ng/(scm^2)" == unitNameStr:
             self.depgraph.convFactor = 10.
@@ -106,7 +105,7 @@ class DepositionWindow(QtGui.QWidget):
             rePlot = True
         if self.density:
             if "nm/s" == unitNameStr:
-                #divide using the density - consider A/s
+                #divide by the density and a power of 10
                 self.depgraph.convFactor = 0.1/self.density
                 self.depgraph.units = 'nm/s'
                 rePlot = True
@@ -123,11 +122,11 @@ class DepositionWindow(QtGui.QWidget):
                 self.depgraph.units = 'nmol/s cm'+r'$^2$'
                 rePlot = True
 
-        if rePlot:
-            self.depgraph.colorbar.set_label(self.depgraph.units)
-            self.depgraph.convertPlot()
+        self.depgraph.colorbar.set_label(self.depgraph.units)
+        self.depgraph.convertPlot()
+        
     """ displays available options in unit conversion drop-down
-        menu based on user input """
+        menu based on text input fields """
     def handleEQS(self):
         formula = self.chemEQ.text()
 
@@ -139,7 +138,7 @@ class DepositionWindow(QtGui.QWidget):
                     self.selectUnits.addItem("nm/s")
             except ValueError:
                 valError = QtGui.QMessageBox.information(None,
-                                                        "Invalid Density","Unxpected density value")
+                                                        "Invalid Density","Unxpected density value.")
         if not self.densityLine.text():
             if "nm/s" in self.unitOptions:
                 self.selectUnits.removeItem(self.unitOptions.index("nm/s"))
@@ -156,14 +155,13 @@ class DepositionWindow(QtGui.QWidget):
                 self.selectUnits.removeItem(self.unitOptions.index("nmol/(s*cm^2)"))
                 self.unitOptions.remove("nmol/(s*cm^2)")
         if formula and not boolReg:
-            message = "The equation you entered is of the wrong format or is missing an element."
-            message += "Some examples are: FeO and FeO1.5"
+            message = "The equation you entered is in the wrong format or is missing an element."
+            message += "  Examples of valid formulas are FeO and FeO1.5."
             inputError = QtGui.QMessageBox.information(None,"Wrong Format", message)
 
-        
     """ parse the user input for chemical formula """
     def checkRegEx(self,text):
-        # Currently does not support things like O2 or Bi2.
+        # Currently does not support compounds like O2 or Bi2.
         # In order to support that the dictionary needs to be changed.
         # There must now be another input. Along with that, the regular
         # expression must change. There must be a '[\d]*' after reg2.
@@ -210,17 +208,13 @@ class DepositionWindow(QtGui.QWidget):
         zval = float(newZ)
         self.depgraph.clearPlot()
         self.depgraph.firstPlot(zval)
-<<<<<<< HEAD
 
-=======
-        
->>>>>>> 3501346f4aba061d6031bfc3fbb8056c9f25f7dd
-    """ manually redraws the colors in the scatter plot """
+    """ manually redraw the colors in the scatter plot """
     def resetColors(self):
         self.depgraph.rescale()
         self.depgraph.draw()
 
-    """ redraws the scatter plot when new data point is processed """
+    """ redraw the scatter plot when new data point is processed """
     def updateWindow(self,newDepRate):
         # newDepRates = (z, x, y, rate)
         z = newDepRate[0]

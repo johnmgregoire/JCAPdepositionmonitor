@@ -86,7 +86,8 @@ class DataReader(QtCore.QThread):
         # close file after end() has been called
         self.datafile.close()
 
-    """ called when application exits to terminate thread """
+    """ called when application exits, experiment, ends or new file is loaded
+        to terminate thread """
     def end(self):
         self.running = False
         

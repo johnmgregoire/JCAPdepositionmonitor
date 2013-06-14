@@ -16,8 +16,8 @@ import process_deposition_data as pdd
 import sys
 import cPickle as pickle
 
-#DATA_FILE_DIR = 'C:/Users/JCAP-HTE/Documents/GitHub/JCAPdepositionmonitor'
-DATA_FILE_DIR = 'Z:/CMS/PM/Data/log/signal/2013_1_14'
+DATA_FILE_DIR = 'C:/Users/JCAP-HTE/Documents/GitHub/JCAPdepositionmonitor'
+#DATA_FILE_DIR = 'Z:/CMS/PM/Data/log/signal/2013_1_14'
 
 """ window that pops up when application launches """
 class MainMenu(QtGui.QWidget):
@@ -30,6 +30,7 @@ class MainMenu(QtGui.QWidget):
         self.miscWindows = []
         # holds all profiles associated with current file
         self.profiles = {}
+        # data processor is not initialized until FILE_INFO is complete
         self.processor = None
         # save name of file from which application will read
         self.file = self.initReader()
