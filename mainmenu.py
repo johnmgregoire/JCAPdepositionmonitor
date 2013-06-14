@@ -16,8 +16,8 @@ import process_deposition_data as pdd
 import sys
 import cPickle as pickle
 
-DATA_FILE_DIR = 'C:/Users/JCAP-HTE/Documents/GitHub/JCAPdepositionmonitor'
-#DATA_FILE_DIR = 'Z:/CMS/PM/Data/log/signal/2013_1_14'
+#DATA_FILE_DIR = 'C:/Users/JCAP-HTE/Documents/GitHub/JCAPdepositionmonitor'
+DATA_FILE_DIR = 'Z:/CMS/PM/Data/log/signal/2013_1_16'
 
 """ window that pops up when application launches """
 class MainMenu(QtGui.QWidget):
@@ -34,6 +34,10 @@ class MainMenu(QtGui.QWidget):
         self.processor = None
         # save name of file from which application will read
         self.file = self.initReader()
+        # if there are no .csv files in working folder, have user
+        #   choose file to load
+        if not self.file:
+            self.loadDataFile(1)
         # check if filename is in valid format
         filenameError = filename_handler.parseFilename(self.file)
         # if not, ask user for experiment parameters
