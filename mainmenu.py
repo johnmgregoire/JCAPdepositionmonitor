@@ -30,6 +30,7 @@ class MainMenu(QtGui.QWidget):
         self.miscWindows = []
         # holds all profiles associated with current file
         self.profiles = {}
+        self.processor = None
         # save name of file from which application will read
         self.file = self.initReader()
         # check if filename is in valid format
@@ -103,13 +104,11 @@ class MainMenu(QtGui.QWidget):
         self.show()
 
     """ initializes all elements of program that require experiment
-        information (FILE_INFO must be complete)
-        (mode is 1 if called when the application is first opened,
-        0 if called when the user loads a new file) """
-    def initData(self, mode):
+        information (FILE_INFO must be complete) """
+    def initData(self):
         filepath = os.path.join(DATA_FILE_DIR, self.file)
         # if application has just been opened
-        if mode == 1:
+        if not self.processor:
             # initialize data processor (includes reader)
             self.processor = pdd.ProcessorThread(parent=self, filename=filepath)
             self.processor.lineRead.connect(self.newLineRead)
@@ -174,7 +173,12 @@ class MainMenu(QtGui.QWidget):
                 self.requestFileInfo(mode)
             # set everything up for the new file being read
             else:
-                self.initData(mode)
+                self.initData()
+        # if user declines to use default file and declines to open a
+        #   new file, quit the application
+        else:
+            if mode == 1:
+                self.close()
 
     """ creates window for single graph """
     def makeGraph(self):
@@ -267,7 +271,8 @@ class MainMenu(QtGui.QWidget):
 
     """ terminates reader (if still active) when main window is closed """
     def closeEvent(self, event):
-        self.processor.end()
+        if self.processor:
+            self.processor.end()
         event.accept()
 
     """ handles signal from reader when new line has been read """
@@ -362,7 +367,7 @@ class FileInfoDialog(QtGui.QWidget):
             else:
                 filename_handler.FILE_INFO[tag] = newValStr
         self.fileInfoComplete.emit(self.mode)
-        self.close()
+        self.hide()
 
     """ brings up an error message if not all fields are filled in """
     def completionError(self):
