@@ -17,7 +17,7 @@ class DepositionGraph(FigureCanvas):
 
     def __init__(self, parent="None", width=2, height=2, dpi=120):
         # initialize matplotlib figure
-        self.figure = Figure(figsize=(width, height), dpi=dpi)
+        self.figure = Figure(figsize=(width, height), dpi=dpi, tight_layout=True)
         FigureCanvas.__init__(self, self.figure)
         # let graph expand when window expands
         FigureCanvas.setSizePolicy(self,
@@ -34,6 +34,8 @@ class DepositionGraph(FigureCanvas):
         #   is displaying deposition rate data
         # zvars holds all z-values for this experiment
         self.currentZ, self.zvars = None, []
+        # used for resetting the color scale
+        self.changeScale = False
         # formatted string that represents the units of the data
         #   (defaults to 10^-8 g/(s cm^2))
         self.units = r'$10^{-8}$'+'g/s cm'+r'$^2$'
@@ -74,9 +76,9 @@ class DepositionGraph(FigureCanvas):
         self.scalarMap = cm.ScalarMappable(norm=colors.Normalize(vmin=0, vmax=self.maxRate))
         self.scalarMap.set_array(np.array(self.ratedata))
         # plot all available data and save scatter object for later deletion
-        self.datavis = self.plot.scatter(self.xdata, self.ydata,
+        self.datavis = [self.plot.scatter(self.xdata, self.ydata,
                                          c = self.ratedata, cmap=self.scalarMap.get_cmap(),
-                                         marker='o', edgecolor='none', s=60)
+                                         marker='o', edgecolor='none', s=60)]
         # initialize colorbar and set its properties
         self.colorbar = self.figure.colorbar(self.scalarMap, ax = self.plot)
         self.colorbar.set_array(np.array(self.ratedata))
@@ -99,31 +101,30 @@ class DepositionGraph(FigureCanvas):
             # reset colorbar scale if necessary
             if modified_rate > self.maxRate:
                 self.maxRate = modified_rate
-            # redraw plot with new point
-            self.rescale()
+                self.changeScale = True
+            # add single point to plot
+            if not self.changeScale:
+                self.datavis += [self.plot.scatter(x, y, c = rate,
+                                                 cmap=self.scalarMap.get_cmap(),
+                                                 marker='o', edgecolor='none', s=60)]
+            else:
+                self.rescale()
+                self.changeScale = False
             self.draw()
 
-    """ NOTE: We redraw the entire plot every time a new point comes in
-        rather than simply adding the point to the preexisting plot because
-        matplotlib was often unable to associate the new point with the
-        existing colormap, resulting in a lot of dark blue dots (representing
-        0 on the scale, as far as we could tell) on the graph, which the user
-        would have to correct manually by clicking 'Reset Colors.'  We decided
-        that it was worth a negligible amount of extra memory to provide the
-        user with a less frustrating experience. """
-
-    """ redraws the graph with new data and new color scale
-        (if maxRate has changed) """
+    """ redraws the graph according to the new color scale
+        determined by the new maximum rate value """
     def rescale(self):
         # clear old color values from plot
-        self.datavis.remove()
+        for plot in self.datavis:
+            plot.remove()
         # reset limits of color scale
         self.scalarMap.set_clim(0, self.maxRate)
         # plot entire set of data according to new scale
-        self.datavis = self.plot.scatter(self.xdata, self.ydata,
+        self.datavis = [self.plot.scatter(self.xdata, self.ydata,
                                          c = self.ratedata,
                                          cmap=self.scalarMap.get_cmap(),
-                                         marker='o', edgecolor='none', s=60)
+                                         marker='o', edgecolor='none', s=60)]
         # rescale the colorbar
         self.colorbar.draw_all()
 
@@ -133,6 +134,7 @@ class DepositionGraph(FigureCanvas):
         self.initPlotArea()
         self.convFactor, self.maxRate = 1, 0
         self.currentZ, self.zvars = None, []
+        self.changeScale = False
         self.units = r'$10^{-8}$'+'g/s cm'+r'$^2$'
 
     """ convert rate data and change label on colorbar when converting units """

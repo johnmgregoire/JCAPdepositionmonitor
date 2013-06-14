@@ -39,7 +39,7 @@ class Graph(FigureCanvas):
         # used to access date/time data for formatting
         # and displaying on the x-axis
         self.colNums = [getCol("Date"),getCol(self.xvar)]
-        self.figure = Figure(figsize=(width, height), dpi=dpi)
+        self.figure = Figure(figsize=(width, height), dpi=dpi, tight_layout=True)
 
         FigureCanvas.__init__(self, self.figure)
         # Graph will have a parent widget if contained in a layout

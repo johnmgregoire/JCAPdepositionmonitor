@@ -23,7 +23,7 @@ class ProfileWindow(QtGui.QMainWindow):
     """ creates graphics in window """
     def initUI(self):
         # window width is based on number of graphs in profile
-        self.setGeometry(100, 50, 200*(len(self.varsList)+1)+50, 1000)
+        self.setGeometry(0, 50, 200*(len(self.varsList)+1)+50, 800)
         self.setWindowTitle(self.name)
 
         # displays graphs in a grid format

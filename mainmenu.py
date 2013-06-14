@@ -127,17 +127,24 @@ class MainMenu(QtGui.QWidget):
     def initSupplyVars(self):
         self.errors =[]
         self.supply = int(filename_handler.FILE_INFO.get("Supply"))
-        
-        if self.supply % 2 == 0:
-            self.rfl = getCol("Power Supply" + str(self.supply) + " Rfl Power")
-            self.fwd = getCol("Power Supply" + str(self.supply) + " Fwd Power")
-            self.dcbias = getCol("Power Supply" + str(self.supply) + " DC Bias")
 
-        if self.supply % 2 == 1:
-            self.output_power = getCol("Power Supply" + str(self.supply) + \
-                                       " Output Power")
-            self.output_voltage = getCol("Power Supply" + str(self.supply) + \
-                                         " Output Voltage")
+        try:
+            if self.supply % 2 == 0:
+                self.rfl = getCol("Power Supply" + str(self.supply) + " Rfl Power")
+                self.fwd = getCol("Power Supply" + str(self.supply) + " Fwd Power")
+                self.dcbias = getCol("Power Supply" + str(self.supply) + " DC Bias")
+
+            if self.supply % 2 == 1:
+                self.output_power = getCol("Power Supply" + str(self.supply) + \
+                                           " Output Power")
+                self.output_voltage = getCol("Power Supply" + str(self.supply) + \
+                                             " Output Voltage")
+        except IndexError:
+            self.processor.end()
+            message = "This file is invalid.  Please load a new file."
+            invalidFileError = QtGui.QMessageBox.warning(None, "Invalid File",
+                                                         message)
+            self.loadDataFile(1)
 
     """ if filename is not in correct format, ask user to enter
         experiment parameters manually
