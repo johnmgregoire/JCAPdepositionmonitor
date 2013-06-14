@@ -1,21 +1,21 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 5/23/2013
-# Last Updated: 6/13/2013
+# Last Updated: 6/14/2013
 # For JCAP
 
 from PyQt4 import QtGui, QtCore
-from datareader import DATA_HEADINGS
+import datareader
 import cPickle as pickle
 
-"""widget to make profiles"""
+""" widget to make profiles """
 class ProfileCreator(QtGui.QWidget):
 
-    """sets up the Widget"""
+    """ sets up the Widget """
     def __init__(self):
         super(ProfileCreator, self).__init__()
         self.initUI()
 
-    """creates all graphics in the Widget"""
+    """ creates all graphics in the Widget """
     def initUI(self):
         self.setGeometry(400, 200, 400, 300)
         self.setWindowTitle('Create a New Profile')
@@ -46,12 +46,12 @@ class ProfileCreator(QtGui.QWidget):
         buttons.rejected.connect(self.close)
         vBox.addWidget(buttons)
 
-    """makes checkboxes for each variable in data set"""
+    """ makes checkboxes for each variable in data set """
     def getVars(self):
         global DATA_HEADINGS
         self.checkboxes = []
         # this ignores first date and time columns in spreadsheet
-        varNames = DATA_HEADINGS.values()
+        varNames = datareader.DATA_HEADINGS.values()
         varNames.remove('Time')
         varNames.remove('Date')
         for index in range(len(varNames)):
@@ -63,7 +63,7 @@ class ProfileCreator(QtGui.QWidget):
             else:
                 self.col2.addWidget(self.checkboxes[index])
 
-    """uses cPickle to save profile for future use"""
+    """ uses cPickle to save profile for future use """
     def saveProfile(self):
         varsList = []
         # get varsList from checked boxes
@@ -94,17 +94,16 @@ class ProfileCreator(QtGui.QWidget):
             savedProfiles.append((str(name), varsList))
             savefile = open('saved_profiles.txt', 'wb')
             pickle.dump(savedProfiles, savefile)
-            print 'Saved!'
             savefile.close()
         self.close()
 
-    """sends error message if more than 8 variables selected"""
+    """ sends error message if more than 8 variables selected """
     def tooManyVars(self):
         error = QtGui.QMessageBox.question(None, 'Error',
                                            'You can only put 8 graphs in a profile.',
                                            QtGui.QMessageBox.Ok)
 
-    """sends error message if no variables selected"""
+    """ sends error message if no variables selected """
     def tooFewVars(self):
         error = QtGui.QMessageBox.question(None, 'Error',
                                            'Please select at least one graph for this profile.',
