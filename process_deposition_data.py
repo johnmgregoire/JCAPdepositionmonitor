@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 6/05/2013
-# Last Updated: 6/12/2013
+# Last Updated: 6/14/2013
 # For JCAP
 
 import numpy as np
@@ -10,8 +10,7 @@ import date_helpers
 import filename_handler
 import datareader
 
-# global dictionary holds all processed (z, x, y, rate)
-#   data for this experiment
+# global dictionary holds all processed (z, x, y, rate) data for the experiment
 DEP_DATA = []
 
 zndec = 1
@@ -19,9 +18,7 @@ tndec = 0
 radius1 = 28.
 radius2 = 45.
 
-""" does all of the data processing necessary for
-    deposition plots """
-
+""" does all of the data processing necessary for deposition plots """
 class ProcessorThread(QtCore.QThread):
 
     # transfers new line from reader to MainMenu
@@ -67,7 +64,7 @@ class ProcessorThread(QtCore.QThread):
                 self.processData(prevz, prevangle, radius1)
                 self.processData(prevz, prevangle, radius2)
                 # indicates that center point will need to be
-                #   computed in next round of processing
+                # computed in next round of processing
                 self.changeZ = True
                 # reset row buffer
                 self.rowBuffer = [row]
@@ -77,12 +74,12 @@ class ProcessorThread(QtCore.QThread):
                 self.rowBuffer = [row]
 
     """ processes all rates at the same angle and z-value
-        to produce a single (x, y, rate) data point """
+        to produce a single (z, x, y, rate) data point """
     def processData(self, z, angle, radius):
         global DEP_DATA
         rowRange = self.getRowRange()
-        # only one or two data points indicates a transitional
-        #   angle that can be ignored
+        # only one or two data points indicates a transitional angle
+        # that can be ignored - Savitzky Golay can be used in the future
         if rowRange[1] - rowRange[0] <= 2:
             pass
         else:
@@ -99,7 +96,7 @@ class ProcessorThread(QtCore.QThread):
             if radius == radius1:
                 if angle == 0 or self.changeZ:
                     # plot center point along with first set
-                    #   of data for this z-value
+                    # of data for this z-value
                     DEP_DATA.append((z, 0.0, 0.0, rate))
                     self.newData.emit((z, 0.0, 0.0, rate))
                     self.changeZ = False
@@ -116,11 +113,10 @@ class ProcessorThread(QtCore.QThread):
             # store data points for initializing new graph
             DEP_DATA.append((z, x, y, rate))
             # indicate to exisiting graphs that there is
-            #   new data to display
+            # new data to display
             self.newData.emit((z, x, y, rate))
 
-    """ helper function to correct for instrument noise
-        in measuring z-value """
+    """ helper function to correct for instrument noise in measuring z-value """
     def roundZ(self, zcol):
         zrnd=np.round(zcol, decimals=zndec)
         for i, zval in enumerate(zrnd):
@@ -128,9 +124,8 @@ class ProcessorThread(QtCore.QThread):
                 zrnd[i] = -1
         return zrnd
 
-    """ helper function to correct for instrument noise
-        in measuring tilt """
-    def roundt(self, tcol):
+    """ helper function to correct for instrument noise in measuring tilt """
+    def roundT(self, tcol):
         trnd=np.round(tcol, decimals=tndec)
         for i, tval in enumerate(trnd):
             if tval not in filename_handler.FILE_INFO['TiltDeg']:
@@ -146,16 +141,14 @@ class ProcessorThread(QtCore.QThread):
         datacols = data.T
         zcol = map(float, datacols[zcolnum])
         tcol = map(float, datacols[tcolnum])
-        inds_useful=np.where((self.roundZ(zcol)>=0)&
-                                (self.roundt(tcol)>=0))[0]
+        inds_useful=np.where((self.roundZ(zcol)>=0)&(self.roundT(tcol)>=0))[0]
         # if rowRange is nonzero, send it
         if inds_useful.size:
             return (inds_useful[0], inds_useful[-1])
         # otherwise, send dummy rowRange to processData
         return (0, 0)
 
-    """ gets time span of valid data set for given angle
-        and z-value """
+    """ gets time span of valid data set for given angle and z-value """
     def getTimeSpan(self, dataArrayT):
         datecol = getCol('Date')
         timecol = getCol('Time')
@@ -165,8 +158,7 @@ class ProcessorThread(QtCore.QThread):
         durationObj = date_helpers.dateObjFloat(endStr) - date_helpers.dateObjFloat(startStr)
         return durationObj.total_seconds()
 
-    """ helper function to return column of Xtal rates
-        from valid data set """
+    """ helper function to return column of Xtal rates from valid data set """
     def getXtalRate(self, ratenum, dataArrayT):
         rcolnum = getCol('Xtal%d Rate' % ratenum)
         return np.array(map(float, dataArrayT[rcolnum]))
@@ -193,8 +185,7 @@ class ProcessorThread(QtCore.QThread):
         self.reader.lineRead.connect(self.newLineRead)
         self.reader.start()
 
-    """ empties row buffer and kills reader when experiment
-        has ended """
+    """ empties row buffer and kills reader when experiment has ended """
     def onEndExperiment(self):
         if self.rowBuffer:
             anglecolnum = getCol('Platen Motor Position')
