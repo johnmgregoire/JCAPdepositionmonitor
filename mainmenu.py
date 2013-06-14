@@ -318,7 +318,8 @@ class MainMenu(QtGui.QWidget):
         # show error warnings if necessary
         if newErrors:
             message = "You have the following errors: " + " ".join(newErrors)
-            validityError = QtGui.QMessageBox.warning(None,"Unreliable Data Error", message)
+            validityError = QtGui.QMessageBox.warning(None,
+                                                      "Unreliable Data Error", message)
 
     """ kills data processor and prompts user to load new file if
         invalid source number was provided """
@@ -402,6 +403,17 @@ class FileInfoDialog(QtGui.QWidget):
         # notify MainMenu that FILE_INFO is complete and close window
         self.fileInfoComplete.emit(self.mode)
         self.hide()
+
+    """ NOTE: We don't check the validity of any of the actual entries
+        here because we trust the user to know the parameters of his/her
+        own experiment.  Our program doesn't use the element name anywhere,
+        but you could easily check if the element name given is an actual
+        element by checking if it's a key in the ELEMENTS dictionary.  An
+        invalid power supply will raise an error in initSupplyVars in this
+        file; an invalid source number will raise an error in process_
+        deposition_data, which will be handled by MainMenu (see SourceError).
+        If the input t and z values are incorrect, the deposition graph
+        will simply be blank. """
 
     """ brings up an error message if not all fields are filled in """
     def completionError(self):
