@@ -1,6 +1,6 @@
 # Allison Schubauer and Daisy Hernandez
 # Created: 6/06/2013
-# Last Updated: 6/13/2013
+# Last Updated: 6/14/2013
 # For JCAP
 
 from PyQt4 import QtGui
@@ -8,7 +8,6 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.colors as colors
 import matplotlib.cm as cm
-#from process_deposition_data import DEP_DATA
 import process_deposition_data as pdd
 import numpy as np
 
@@ -25,15 +24,14 @@ class DepositionGraph(FigureCanvas):
                                    QtGui.QSizePolicy.Expanding,
                                    QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
+        # set up a preliminary plot and the constants need
         self.initPlotArea()
-        
-        self.figure.canvas.mpl_connect('button_press_event', self.onclick)
-
+    
         # conversion factor is scalar used for changing units
         # maxRate is used for resetting the color scale
         self.convFactor, self.maxRate = 1, 0
-        # currentZ is z-position for which this graph is
-        #   currently displaying deposition rate data
+        # currentZ is the z-position that the graph
+        # is displaying for the deposition rate data
         # zvars holds all z-values for this experiment
         self.currentZ, self.zvars = None, []
         # used for resetting the color scale
@@ -70,24 +68,22 @@ class DepositionGraph(FigureCanvas):
             self.ydata.append(y)
             modified_rate = rate*self.convFactor
             self.ratedata.append(modified_rate)
+            # keep maxRate updated if we need to reset the scale
             if modified_rate > self.maxRate:
                 self.maxRate = modified_rate
         # holds information about the scale of the colorbar
         self.scalarMap = cm.ScalarMappable(norm=colors.Normalize(vmin=0, vmax=self.maxRate))
         self.scalarMap.set_array(np.array(self.ratedata))
-        # plot all available data and save scatter object for
-        #   later deletion
+        # plot all available data and save scatter object for later deletion
         self.datavis = [self.plot.scatter(self.xdata, self.ydata,
                                          c = self.ratedata, cmap=self.scalarMap.get_cmap(),
                                          marker='o', edgecolor='none', s=60)]
-        # initialize colorbar
+        # initialize colorbar and set any preferences
         self.colorbar = self.figure.colorbar(self.scalarMap, ax = self.plot)
         self.colorbar.set_array(np.array(self.ratedata))
         self.colorbar.autoscale()
         self.colorbar.set_label(self.units)
         self.scalarMap.set_clim(0, self.maxRate)
-        self.scalarMap.changed()
-        
         self.scalarMap.changed()
         self.draw()
 
@@ -112,7 +108,6 @@ class DepositionGraph(FigureCanvas):
                                                  marker='o', edgecolor='none', s=60)]
             else:
                 self.rescale()
-        
         self.draw()
 
     """ redraws the graph according to the new color scale
@@ -123,7 +118,6 @@ class DepositionGraph(FigureCanvas):
             plot.remove()
         # reset limits of color scale
         self.scalarMap.set_clim(0, self.maxRate)
-        
         # plot entire set of data according to new scale
         self.datavis = [self.plot.scatter(self.xdata, self.ydata,
                                          c = self.ratedata,
@@ -151,6 +145,7 @@ class DepositionGraph(FigureCanvas):
         for rateLoc, (z, x, y, rate) in enumerate(pdd.DEP_DATA):
             if currLocation < lenOfRateData and z == self.currentZ:
                 self.ratedata[currLocation] = rate*self.convFactor
+                currLocation +=1 
             elif currLocation >= lenOfRateData:
                 break
         # again, in case of errors due to float precision
