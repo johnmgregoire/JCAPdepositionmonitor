@@ -141,7 +141,7 @@ class MainMenu(QtGui.QWidget):
                                              " Output Voltage")
         except IndexError:
             self.processor.end()
-            message = "This file is invalid.  Please load a new file."
+            message = "This is not a valid data file.  Please load a new file."
             invalidFileError = QtGui.QMessageBox.warning(None, "Invalid File",
                                                          message)
             self.loadDataFile(1)
@@ -317,7 +317,7 @@ class MainMenu(QtGui.QWidget):
         # show error warnings if necessary
         if newErrors:
             message = "You have the following errors: " + " ".join(newErrors)
-            validityError = QtGui.QMessageBox.information(None,"Unreliable Data Error", message)
+            validityError = QtGui.QMessageBox.warning(None,"Unreliable Data Error", message)
 
 """ custom dialog box to request necessary file info from user """
 class FileInfoDialog(QtGui.QWidget):
@@ -344,14 +344,20 @@ class FileInfoDialog(QtGui.QWidget):
         self.setLayout(self.layout)
         self.labels = []
         self.lineEdits = []
+        # get necessary parameters from FILE_INFO and sort in alphabetical order
         self.tagsList = [tag for tag in filename_handler.FILE_INFO.iteritems()]
         self.tagsList.sort(key = lambda x: x[0])
         self.layout.addWidget(QtGui.QLabel('Please enter values for the following parameters:'))
+        # make sub-layout to hold labels and text fields
         self.layout.addLayout(self.gridlayout)
         for i, (tag, val) in enumerate(self.tagsList):
+            # allow comma-separated lists for z and t values
             if type(val) == list:
                 val = ','.join([str(x) for x in val])
+            # add label for this parameter
             self.labels.append(QtGui.QLabel(tag+':'))
+            # if a value was obtained from the filename, fill it in the
+            #   text input field
             self.lineEdits.append(QtGui.QLineEdit(str(val)))
             self.gridlayout.addWidget(self.labels[i], i, 0)
             self.gridlayout.addWidget(self.lineEdits[i], i, 1)
@@ -365,20 +371,26 @@ class FileInfoDialog(QtGui.QWidget):
     def sendInfo(self):
         global FILE_INFO
         for i, (tag, val) in enumerate(self.tagsList):
+            # convert Qstring to string
             newValStr = str(self.lineEdits[i].text())
+            # if text input field is blank, bring up an error message
             if not newValStr:
                 self.completionError()
                 return
+            # convert comma-separated entries into list
             if type(filename_handler.FILE_INFO.get(tag)) == list:
                 newValStrList = newValStr.split(',')
                 try:
                     newValList = [float(x) for x in newValStrList]
                     filename_handler.FILE_INFO[tag] = newValList
+                # raise error if z and t aren't decimal values
                 except ValueError:
                     self.formatError()
                     return
+            # add user input values to FILE_INFO
             else:
                 filename_handler.FILE_INFO[tag] = newValStr
+        # notify MainMenu that FILE_INFO is complete and close window
         self.fileInfoComplete.emit(self.mode)
         self.hide()
 
@@ -393,6 +405,7 @@ class FileInfoDialog(QtGui.QWidget):
         message = "Please enter comma-separated decimal values for Z and tilt."
         error = QtGui.QMessageBox.warning(self, "Error", message,
                                           QtGui.QMessageBox.Ok)
+        # clear text input fields for z and t
         if error == QtGui.QMessageBox.Ok:
             for i, (tag, val) in enumerate(self.tagsList):
                 if type(filename_handler.FILE_INFO.get(tag)) == list:
