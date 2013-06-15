@@ -119,7 +119,6 @@ class ProcessorThread(QtCore.QThread):
             DEP_DATA.append((z, x, y, rate))
             # indicate to exisiting graphs that there is
             # new data to display
-            #print (angle, radius, z, x, y, rate)
             self.newData.emit((z, x, y, rate))
 
     """ helper function to correct for instrument noise in measuring z-value """

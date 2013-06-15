@@ -1,0 +1,22 @@
+ACCESSING DATA FILES
+The program accesses a file in its own folder called "DefaultDirectory.txt" that contains a single line of plain text, the address of your working folder.  If this folder contains .csv files, the application will automatically load the most recently modified one upon startup.  Otherwise, the application will show a "load file" menu upon startup for you to select the spreadsheet file to work with.  You can change the contents of "DefaultDirectory.txt" at any time.
+
+MAIN MENU OPTIONS:
+
+1. CHOOSE DATA FILE
+The deposition monitor program automatically loads the most recently modified file in your working folder upon startup.  Click on "choose data file" to load a different file.  If you have any graph windows currently open, loading a new file will close them.
+
+2. SHOW GRAPH
+This option displays a real-time updating plot of a single variable versus time.  In this window, you can select the variable to display, plot multiple variables on the left-hand and right-hand axes, change the scale of the y-axes, change the time frame to display, pause the live data feed (with the "Hold" button), and take a screen shot of the graph in its current state.  The "Auto X" and "Auto Y" buttons readjust the axes limits to display the entire set of data in the graph window.  If there is only one y-axis, clicking on a point on the graph will display the (x, y) coordinates of that point, and clicking on the dark gray area outside the graph will hide the text.
+
+3. CREATE A NEW PROFILE
+Here, you can select multiple variables to monitor simultaneously in a grid of single y-variable plots versus time.  Choose a name for your profile, and you will be able to load this profile any time you run the application.
+
+4. LOAD A PROFILE
+Choose a saved profile to display in a new window.  You can also delete saved profiles from this menu.
+
+5. CREATE DEPOSITION GRAPH
+This graph processes and displays incoming data in real time, plotting the deposition rate for each angle and radius.  The deposition rate (time-averaged Xtal rate) is displayed on a color scale, the units of which can be selected from a list of options.  Enter the chemical formula of the compound to display the deposition rate in nmol/(s*cm^2), or enter the density of the compound to display the deposition rate in nm/s.  The chemical formula must be in terms of a single metal atom; for example, Fe2O3 would be entered as FeO1.5.  The color scale updates automatically when a new maximum rate is obtained.  If, for any reason, the color scale appears to be inaccurate, you can click on "Reset Colors" to manually reset it.  When the instrument moves to the next z-position, the graph will reset automatically, but you can select which z-position to show on the graph at any time.
+
+6. END EXPERIMENT
+This tells the program to stop checking the spreadsheet file for new data, which will allow the last set of points on the deposition graph to be processed and plotted.  This action can be undone by re-loading the data file.

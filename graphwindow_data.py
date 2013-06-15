@@ -222,11 +222,9 @@ class GraphWindow(QtGui.QWidget):
             self.YmaxR.clear()
         elif self.plotOptionMenu.currentText() == 'Add to left axis':
             self.graph.addVarToAxis(varString)
-            print 'Adding to left axis'
             return
         else:
             self.graph.addVarToAxis(varString, "right")
-            print 'Adding to right axis'
             return
 
     """ called when request to add plot to right-hand axis is made """

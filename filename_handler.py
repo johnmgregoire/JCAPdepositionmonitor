@@ -45,9 +45,7 @@ def parseFilename(filename):
     invalidTags = []
     for tag in FILE_INFO:
         if not FILE_INFO.get(tag):
-            print 'No info entered for', tag
             invalidTags.append(tag)
     
-    print FILE_INFO
     # existence of invalidTags will be checked by MainMenu
     return invalidTags

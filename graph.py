@@ -202,7 +202,6 @@ class Graph(FigureCanvas):
             try:
                 datetime_date = matplotlib.dates.num2date(event.xdata)
                 formatted_xdate = datetime_date.strftime("%m/%d/%Y %H:%M:%S")
-                print 'xdata=%s, ydata=%f'%(formatted_xdate, event.ydata)
                 if self.xyLabel:
                     self.xyLabel.set_visible(False)
                 # textcoords is the coordinate system used to place the

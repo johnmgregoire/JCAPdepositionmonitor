@@ -16,8 +16,7 @@ import process_deposition_data as pdd
 import sys
 import cPickle as pickle
 
-#DATA_FILE_DIR = 'C:/Users/JCAP-HTE/Documents/GitHub/JCAPdepositionmonitor'
-DATA_FILE_DIR = 'Z:/CMS/PM/Data/log/signal/2013_1_16'
+DATA_FILE_DIR = ''
 
 """ window that pops up when application launches """
 class MainMenu(QtGui.QWidget):
@@ -48,7 +47,6 @@ class MainMenu(QtGui.QWidget):
             self.initData()
         self.initUI()
         
-
     """ automatically loads last modified data file
         when application launches """
     def initReader(self):
@@ -286,8 +284,8 @@ class MainMenu(QtGui.QWidget):
     """ terminates reader (if still active) when main window is closed """
     def closeEvent(self, event):
         if self.processor:
-            self.processor.end()
-        event.accept()
+            self.processor.end()   
+        event.accept()        
 
     """ handles signal from reader when new line has been read """
     def newLineRead(self, newRow):
@@ -317,12 +315,10 @@ class MainMenu(QtGui.QWidget):
 
         # show error warnings if necessary
         if newErrors:
-            self.powerError(newErrors)
-
-    def powerError(self, newErrors):
-        message = "You have the following errors: " + " ".join(newErrors)
-        self.validityError = QtGui.QErrorMessage()
-        self.validityError.showMessage(message)
+            message = "You have the following errors: " + " ".join(newErrors)
+            self.validityError = QtGui.QErrorMessage()
+            self.validityError.setWindowTitle("Power Supply Warning")
+            self.validityError.showMessage(message)
 
     """ kills data processor and prompts user to load new file if
         invalid source number was provided """
@@ -454,7 +450,11 @@ class FileInfoDialog(QtGui.QWidget):
         
 """ main event loop """
 def main():
-    app = QtGui.QApplication(profilewindow.sys.argv)
+    global DATA_FILE_DIR
+    dirfile = open('DefaultDirectory.txt', 'rb')
+    DATA_FILE_DIR = dirfile.readline()
+    dirfile.close()
+    app = QtGui.QApplication(sys.argv)
     menu = MainMenu()
     sys.exit(app.exec_())
 
