@@ -61,9 +61,9 @@ class ProcessorThread(QtCore.QThread):
             self.rowBuffer += [row]
         else:
             angle = round(float(row[self.anglecolnum]))
-            zval = round(float(row[self.zcolnum]), 1)
+            zval = round(float(row[self.zcolnum]), 2)
             prevangle = round(float(self.rowBuffer[-1][self.anglecolnum]), 0)
-            prevz = round(float(self.rowBuffer[-1][self.zcolnum]), 1)
+            prevz = round(float(self.rowBuffer[-1][self.zcolnum]), 2)
             if (angle == prevangle and zval == prevz):
                 self.rowBuffer += [row]
             elif (angle == prevangle):
