@@ -1,3 +1,9 @@
+LIBRARIES REQUIRED TO RUN THIS PROGRAM
+This program uses Python version 2.7.  Additional libraries required to run this program are:
+Matplotlib 1.2.1
+Numpy 1.6.1
+PyQt 4.10.2 (uses Qt version 4.8.4 as the backend)
+
 ACCESSING DATA FILES
 The program accesses a file in its own folder called "DefaultDirectory.txt" that contains a single line of plain text, the address of your working folder.  If this folder contains .csv files, the application will automatically load the most recently modified one upon startup.  Otherwise, the application will show a "load file" menu upon startup for you to select the spreadsheet file to work with.  You can change the contents of "DefaultDirectory.txt" at any time.
 

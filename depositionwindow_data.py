@@ -40,7 +40,7 @@ class DepositionWindow(QtGui.QWidget):
 
         # dealing with layouts and design
         self.mainlayout = QtGui.QGridLayout(self)
-        self.sidelayout = QtGui.QGridLayout(self)
+        self.sidelayout = QtGui.QGridLayout()
 
         # adding layouts to one another
         self.mainlayout.addWidget(self.depgraph,0,0)

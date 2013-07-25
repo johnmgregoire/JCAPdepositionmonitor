@@ -34,6 +34,7 @@ class GraphWindow(QtGui.QWidget):
         # initialize default graph
         self.graph = graph.Graph(self, xvarname="Time",
                            yvarname=self.vars[0])
+        self.toolbar = graph.NavigationToolbar(self.graph, self)
         self.updating = True
         self.setWindowTitle(self.vars[0])
 
@@ -49,13 +50,13 @@ class GraphWindow(QtGui.QWidget):
 
         # set up layout and sub-layouts
         self.layout = QtGui.QVBoxLayout(self)
-        self.optionslayout = QtGui.QGridLayout(self)
-        self.gridlayout = QtGui.QGridLayout(self)
-        self.axeslayout = QtGui.QGridLayout(self)
-        self.timelayout = QtGui.QGridLayout(self)
+        self.optionslayout = QtGui.QGridLayout()
+        self.gridlayout = QtGui.QGridLayout()
+        self.axeslayout = QtGui.QGridLayout()
+        self.timelayout = QtGui.QGridLayout()
         # this exists so auto axis buttons can move if necessary
         self.autowidget = QtGui.QWidget(self)
-        self.autolayout = QtGui.QGridLayout(self)
+        self.autolayout = QtGui.QGridLayout()
 
         # first column holds graph, second column holds graph options
         # set the column stretches - 0 is the default
@@ -65,10 +66,11 @@ class GraphWindow(QtGui.QWidget):
         self.gridlayout.setColumnMinimumWidth(0,300)
         self.gridlayout.setRowMinimumHeight(0,375)
 
-        # add drop-down menus to top of window
+        # add drop-down menus and MPL toolbar to top of window
         self.layout.addLayout(self.optionslayout)
         self.optionslayout.addWidget(self.plotOptionMenu, 0, 0)
         self.optionslayout.addWidget(self.selectVar, 0, 1, 1, 3)
+        self.optionslayout.addWidget(self.toolbar, 1, 0, 1, 4)
 
         # initialize checkbox that acts as pause button
         self.hold_cb = QtGui.QCheckBox('Hold', self)

@@ -35,12 +35,16 @@ class ProfileWindow(QtGui.QMainWindow):
         num_graphs = len(self.varsList)
         midpoint = (num_graphs+1)/2
         for index in range(num_graphs):
+            graphLayout = QtGui.QVBoxLayout()
             newGraph = graph.Graph(parent=None, xvarname="Time",
                                    yvarname=self.varsList[index])
+            toolbar = graph.NavigationToolbar(newGraph, self)
             self.graphs += [newGraph]
             
             column = 0 if index < midpoint else 1
-            grid.addWidget(newGraph,column,index%midpoint)         
+            grid.addLayout(graphLayout, column, index%midpoint)
+            graphLayout.addWidget(toolbar)
+            graphLayout.addWidget(newGraph)         
 
     """ called whenever new data is ready to be plotted """
     def updateWindow(self, newRow):

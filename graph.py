@@ -5,6 +5,7 @@
 
 from PyQt4 import QtGui
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt4 import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
 from pylab import matplotlib
 import sys
@@ -50,9 +51,10 @@ class Graph(FigureCanvas):
         FigureCanvas.updateGeometry(self)
         self.initPlot()
         
+        # ---- this is deprecated as of adding the toolbar ----
         # clicking on graph gives x and y coordinates
         # (not enabled when right y axis is present)
-        self.figure.canvas.mpl_connect('button_press_event', self.onclick)
+        #self.figure.canvas.mpl_connect('button_press_event', self.onclick)
         
         
     """ draws and labels axes """
@@ -196,23 +198,24 @@ class Graph(FigureCanvas):
     def clearPlot(self):
         self.figure.clf()
 
-    """ called when user clicks on graph to display (x, y) data """
-    def onclick(self,event):
-        if not self.hasRightAxis:
-            try:
-                datetime_date = matplotlib.dates.num2date(event.xdata)
-                formatted_xdate = datetime_date.strftime("%m/%d/%Y %H:%M:%S")
-                if self.xyLabel:
-                    self.xyLabel.set_visible(False)
-                # textcoords is the coordinate system used to place the
-                #   text on the axes; 0.55 is horizontal placement,
-                #   1.05 is vertical placement (where 1,1 is upper right corner)
-                self.xyLabel = self.axes.annotate('x = %s, y = %f'
-                                                  %(formatted_xdate, event.ydata),
-                                                  xy=(event.xdata, event.ydata),
-                                                  textcoords='axes fraction',
-                                                  xytext=(0.55,1.05))
-                self.draw()
-            except TypeError:
-                if self.xyLabel:
-                    self.xyLabel.set_visible(False)
+## ---- the function below is deprecated as of adding the toolbar ----
+##    """ called when user clicks on graph to display (x, y) data """
+##    def onclick(self,event):
+##        if not self.hasRightAxis:
+##            try:
+##                datetime_date = matplotlib.dates.num2date(event.xdata)
+##                formatted_xdate = datetime_date.strftime("%m/%d/%Y %H:%M:%S")
+##                if self.xyLabel:
+##                    self.xyLabel.set_visible(False)
+##                # textcoords is the coordinate system used to place the
+##                #   text on the axes; 0.55 is horizontal placement,
+##                #   1.05 is vertical placement (where 1,1 is upper right corner)
+##                self.xyLabel = self.axes.annotate('x = %s, y = %f'
+##                                                  %(formatted_xdate, event.ydata),
+##                                                  xy=(event.xdata, event.ydata),
+##                                                  textcoords='axes fraction',
+##                                                  xytext=(0.55,1.05))
+##                self.draw()
+##            except TypeError:
+##                if self.xyLabel:
+##                    self.xyLabel.set_visible(False)
