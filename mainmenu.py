@@ -125,6 +125,8 @@ class MainMenu(QtGui.QWidget):
     """Initializes any variables that are useful for error checking"""
     def initSupplyVars(self):
         self.errors =[]
+        # number of rows read by checkValidity
+        self.rowsReadCV = 0
         self.supply = int(filename_handler.FILE_INFO.get("Supply"))
 
         try:
@@ -292,9 +294,15 @@ class MainMenu(QtGui.QWidget):
         self.updateGraphs(newRow)
         self.checkValidity(newRow)
 
+
+    # This can be changed to check for errors. Currently it checks one
+    # row at a time but it could be changed to use averages
     """ shows an error message if data indicates experiment failure """
     def checkValidity(self, row):
         errors_list = []
+        # change the number so that it ignores the errors for the first
+        # calibratingNumber of lines we read in case we're callibrating
+        calibratingNumber = 30
 
         if self.supply % 2 == 0:
             fwdValue = float(row[self.fwd])
@@ -311,6 +319,14 @@ class MainMenu(QtGui.QWidget):
             if opValue < 5: errors_list.append("Output power is below 5.") 
 
         newErrors = [error for error in errors_list if error not in self.errors]
+
+        # rows read by the checkValidity increased
+        self.rowsReadCV +=1
+        
+        # do not consider these errors if it's for the first bufferNumber lines
+        # as it could be callibrating
+        if self.rowsReadCV < calibratingNumber:
+            newErrors = []
         self.errors += newErrors
 
         # show error warnings if necessary

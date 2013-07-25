@@ -7,13 +7,17 @@ PyQt 4.10.2 (uses Qt version 4.8.4 as the backend)
 ACCESSING DATA FILES
 The program accesses a file in its own folder called "DefaultDirectory.txt" that contains a single line of plain text, the address of your working folder.  If this folder contains .csv files, the application will automatically load the most recently modified one upon startup.  Otherwise, the application will show a "load file" menu upon startup for you to select the spreadsheet file to work with.  You can change the contents of "DefaultDirectory.txt" at any time.
 
+ERRORS
+For even power supplies we check if RFL is greater than 10% of FWD, FWD is less than 5, and DC bias is less than 50. For odd power supplies we check if the Output Power is less than 5. Note: This is done on a row to row basis after a set number (calibratingNumber) of initial rows are read in order to avoid errors being thrown by callibration. The initial variables are set in the initSupplyVars function, however, the actual error testing occurs in checkValidity. calibratingNumber is located in the checkValidity function and can be changed.
+
+
 MAIN MENU OPTIONS:
 
 1. CHOOSE DATA FILE
 The deposition monitor program automatically loads the most recently modified file in your working folder upon startup.  Click on "choose data file" to load a different file.  If you have any graph windows currently open, loading a new file will close them.
 
 2. SHOW GRAPH
-This option displays a real-time updating plot of a single variable versus time.  In this window, you can select the variable to display, plot multiple variables on the left-hand and right-hand axes, change the scale of the y-axes, change the time frame to display, pause the live data feed (with the "Hold" button), and take a screen shot of the graph in its current state.  The "Auto X" and "Auto Y" buttons readjust the axes limits to display the entire set of data in the graph window.  If there is only one y-axis, clicking on a point on the graph will display the (x, y) coordinates of that point, and clicking on the dark gray area outside the graph will hide the text.
+This option displays a real-time updating plot of a single variable versus time.  In this window, you can select the variable to display, plot multiple variables on the left-hand and right-hand axes, change the scale of the y-axes, change the time frame to display, pause the live data feed (with the "Hold" button), and take a screen shot of the graph in its current state.  The "Auto X" and "Auto Y" buttons readjust the axes limits to display the entire set of data in the graph window. The navigation toolbar is fully functional, however, zooming in and panning do not work with live updating. 
 
 3. CREATE A NEW PROFILE
 Here, you can select multiple variables to monitor simultaneously in a grid of single y-variable plots versus time.  Choose a name for your profile, and you will be able to load this profile any time you run the application.
