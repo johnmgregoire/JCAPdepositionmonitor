@@ -103,12 +103,10 @@ class GraphWindow(QtGui.QWidget):
         self.auto_xaxes = QtGui.QPushButton('Auto X')
         self.auto_yaxes = QtGui.QPushButton('Auto Y (left)')
         self.auto_yraxes = QtGui.QPushButton('Auto Y (right)')
-        self.screen_shot = QtGui.QPushButton('Screen Shot')
         self.set_axes.clicked.connect(self.setAxes)
         self.auto_xaxes.clicked.connect(self.autoXAxes)
         self.auto_yaxes.clicked.connect(self.autoYAxes)
         self.auto_yraxes.clicked.connect(self.autoYRAxes)
-        self.screen_shot.clicked.connect(self.takeScreenShot)
 
         # set the possible streches of input boxes
         self.Ymin.setSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Preferred)
@@ -144,14 +142,13 @@ class GraphWindow(QtGui.QWidget):
         self.axeslayout.addItem(self.spacer1, 0, 0)
         self.axeslayout.addWidget(self.hold_cb, 1, 0)
         self.axeslayout.addItem(self.spacer2, 2, 0)
-        self.axeslayout.addWidget(self.screen_shot, 3, 0)
-        self.axeslayout.addItem(self.spacer3, 4, 0)
-        self.axeslayout.addWidget(self.label_raxis, 5, 0)
-        self.axeslayout.addWidget(self.choose_var, 6, 0)
-        self.axeslayout.addWidget(self.set_raxis, 7, 0)
-        self.axeslayout.addItem(self.spacer4, 8, 0)
-        self.axeslayout.addWidget(self.label_time, 9, 0)
-        self.axeslayout.addLayout(self.timelayout, 10, 0)
+        self.axeslayout.addItem(self.spacer3, 3, 0)
+        self.axeslayout.addWidget(self.label_raxis, 4, 0)
+        self.axeslayout.addWidget(self.choose_var, 5, 0)
+        self.axeslayout.addWidget(self.set_raxis, 6, 0)
+        self.axeslayout.addItem(self.spacer4, 7, 0)
+        self.axeslayout.addWidget(self.label_time, 8, 0)
+        self.axeslayout.addLayout(self.timelayout, 9, 0)
 
         # add options for time axis to a sub-grid
         self.timelayout.addWidget(self.minutes, 0, 0)
@@ -368,7 +365,3 @@ class GraphWindow(QtGui.QWidget):
         self.graph.rightAxes.autoscale(axis ='y')
         self.YminR.clear()
         self.YmaxR.clear()
-
-    """ called when 'Screen Shot' button is clicked """
-    def takeScreenShot(self):
-        self.graph.figure.savefig(date_helpers.dateStringFile() + ".png")

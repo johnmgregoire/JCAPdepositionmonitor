@@ -5,7 +5,7 @@
 
 from PyQt4 import QtGui
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt4 import NavigationToolbar2QT as NavigationToolbar
+from navigation_toolbar import NavigationToolbar
 from matplotlib.figure import Figure
 from pylab import matplotlib
 import sys
