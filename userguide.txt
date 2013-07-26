@@ -7,6 +7,9 @@ PyQt 4.10.2 (uses Qt version 4.8.4 as the backend)
 ACCESSING DATA FILES
 The program accesses a file in its own folder called "DefaultDirectory.txt" that contains a single line of plain text, the address of your working folder.  If this folder contains .csv files, the application will automatically load the most recently modified one upon startup.  Otherwise, the application will show a "load file" menu upon startup for you to select the spreadsheet file to work with.  You can change the contents of "DefaultDirectory.txt" at any time.
 
+FILE FORMAT AND REQUIRMENTS
+The file format required is two columns followed by a blank column, after which are the rest of the data columns. There must be no blank columns until after all the data columns we want and need (with the exception of the third column as this case is already handled). In order for a file to be valid, there must be a "date", "time", "Platen Motor Position", "Platen Zshift Motor 1 Position" along with all the Xtal Rate columns, Motor Tilt Position for the SRC number, and Power columns for the given supply. Valid SRC and Supplys will be required by the Filename Handler.
+
 ERRORS
 For even power supplies we check if RFL is greater than 10% of FWD, FWD is less than 5, and DC bias is less than 50. For odd power supplies we check if the Output Power is less than 5. Note: This is done on a row to row basis after a set number (calibratingNumber) of initial rows are read in order to avoid errors being thrown by callibration. The initial variables are set in the initSupplyVars function, however, the actual error testing occurs in checkValidity. calibratingNumber is located in the checkValidity function and can be changed.
 
